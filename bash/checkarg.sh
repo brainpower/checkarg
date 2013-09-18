@@ -148,14 +148,14 @@ function checkarg_add_autohelp(){
 ##
 
 function _checkarg_arg(){
-	if [ "${1:0:1}" = "-" ]; then # check if it is an argument or just weirdness
+	if [ -n "$_checkarg_has_val" ]; then
+		_checkarg_eval_has_val "$1"
+	elif [ "${1:0:1}" = "-" ]; then # check if it is an argument or just weirdness
 		if [ "${1:1:1}" = "-" ]; then # it's a long arg
 			_checkarg_long_arg "$1"
 		else # it's a short one
 			_checkarg_short_arg "$1"
 		fi
-	elif [ -n "$_checkarg_has_val" ]; then
-		_checkarg_eval_has_val "$1"
 	else
 		checkarg_pos_args+=("$1")
 		return 0 # ignore everything unknown
