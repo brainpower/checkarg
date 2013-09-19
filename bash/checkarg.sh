@@ -206,7 +206,7 @@ function _checkarg_long_arg(){
 }
 
 function _checkarg_show_help(){
-	echo "Usage: $1 <Mode> [Options]"
+	echo "Usage: $1 [Options]"
 	echo ""
 	echo "$_checkarg_autohelp_descr"
 	echo ""
