@@ -59,7 +59,7 @@ _checkarg_autohelp_appendix=''
 # of valid arguments before calling this.
 ##
 function checkarg(){
-	for arg in "$@"; do
+for arg in $(eval echo $@); do # HACK: zsh works only when using this 'eval'-hack
 		_checkarg_arg "$arg" || return 1
 	done
 }
@@ -84,11 +84,11 @@ function checkarg(){
 #    checkarg_add '-input' '_checkarg_has_val=input_file' 'The file to read from.'
 ##
 function checkarg_add(){
-	if [ -n "$2" ]; then eval "_checkarg_valid_args['$1']='$2'"
-	else                 eval "_checkarg_valid_args['$1']=''"
+	if [ -n "$2" ]; then eval "_checkarg_valid_args[$1]='$2'"
+	else                 eval "_checkarg_valid_args[$1]=''"
 	fi
-	if [ -n "$3" ]; then eval "_checkarg_autohelp['$1']='$3'"
-	else                 eval "_checkarg_autohelp['$1']=''"
+	if [ -n "$3" ]; then eval "_checkarg_autohelp[$1]='$3'"
+	else                 eval "_checkarg_autohelp[$1]=''"
 	fi
 }
 
@@ -172,7 +172,7 @@ function _checkarg_short_arg(){
 	for i in $(eval echo "{1..$len}") ; do
 		local arg="${1:$i:1}"
 		local ev="${_checkarg_valid_args[$arg]}"
-		if [ -z "${ev}" ]; then ev="${_checkarg_valid_args['$arg']}"; fi
+#		if [ -z "${ev}" ]; then ev="${_checkarg_valid_args['$arg']}"; fi # HACK: zsh needed this
 		if [ -n "${ev}" ]; then
 			eval "${ev}"
 
