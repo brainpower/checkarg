@@ -59,7 +59,7 @@ _checkarg_autohelp_appendix=''
 # of valid arguments before calling this.
 ##
 function checkarg(){
-for arg in $(eval echo $@); do # HACK: zsh works only when using this 'eval'-hack
+for arg in $(echo $@); do # HACK: zsh works only when using this 'eval'-hack
 		_checkarg_arg "$arg" || return 1
 	done
 }
