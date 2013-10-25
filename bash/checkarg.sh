@@ -1,5 +1,3 @@
-#!/bin/bash
-
 ##
 # This is a getopt-like function, it uses the contents
 # of the associative array 'checkarg_valid_args', the keys are the options,
@@ -172,8 +170,11 @@ function _checkarg_short_arg(){
 	local len=${#str} # length of the string, minus the dash
 
 	for i in $(eval echo "{1..$len}") ; do
-		if [ -n "${_checkarg_valid_args[${1:$i:1}]}" ]; then
-			eval "${_checkarg_valid_args[${1:$i:1}]}"
+		local arg="${1:$i:1}"
+		local ev="${_checkarg_valid_args[$arg]}"
+		if [ -z "${ev}" ]; then ev="${_checkarg_valid_args['$arg']}"; fi
+		if [ -n "${ev}" ]; then
+			eval "${ev}"
 
 			if [ -n "$_checkarg_has_val" ] && [ ! $i = $len ]; then
 			#  if arg is of value-type and val-type arg is not last one in arg-group -> remainder is value
@@ -206,7 +207,7 @@ function _checkarg_long_arg(){
 }
 
 function _checkarg_show_help(){
-	echo "Usage: $1 <Mode> [Options]"
+	echo "Usage: $1 [options] [positional args]"
 	echo ""
 	echo "$_checkarg_autohelp_descr"
 	echo ""
