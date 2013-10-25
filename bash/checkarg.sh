@@ -18,7 +18,7 @@
 # Those are arguments passed which are not preceeded by a dash
 # and are not a value of an value-type argument.
 #
-# Requires bash >= 4
+# Requires bash >= 4 or other compatible shell, like zsh
 #
 #
 #  Copyright (C) 2013  brainpower <brainpower at gulli dot com>
