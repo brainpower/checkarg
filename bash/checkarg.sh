@@ -59,7 +59,7 @@ _checkarg_autohelp_appendix=''
 # of valid arguments before calling this.
 ##
 function checkarg(){
-for arg in $(echo $@); do # HACK: zsh works only when using this 'eval'-hack
+for arg in "$@"; do 
 		_checkarg_arg "$arg" || return 1
 	done
 }
@@ -172,7 +172,6 @@ function _checkarg_short_arg(){
 	for i in $(eval echo "{1..$len}") ; do
 		local arg="${1:$i:1}"
 		local ev="${_checkarg_valid_args[$arg]}"
-#		if [ -z "${ev}" ]; then ev="${_checkarg_valid_args['$arg']}"; fi # HACK: zsh needed this
 		if [ -n "${ev}" ]; then
 			eval "${ev}"
 
