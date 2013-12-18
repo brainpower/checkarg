@@ -35,6 +35,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+if [ -z "$CHECKARG_SH" ]; then # include guard
+  CHECKARG_SH=1
+
 ##
 # initialize global vars used by checkarg
 ##
@@ -44,6 +47,7 @@ declare -A _checkarg_autohelp;
 _checkarg_has_val=''
 _checkarg_autohelp_descr=''
 _checkarg_autohelp_appendix=''
+_checkarg_autohelp_posargname=''
 
 ##
 # "public" checkarg functions
@@ -59,7 +63,7 @@ _checkarg_autohelp_appendix=''
 # of valid arguments before calling this.
 ##
 function checkarg(){
-for arg in "$@"; do 
+	for arg in "$@"; do
 		_checkarg_arg "$arg" || return 1
 	done
 }
@@ -126,9 +130,9 @@ function checkarg_add_long_val(){
 }
 
 ##
-#	this adds the arguments '-h' and '--help' with
+# this adds the arguments '-h' and '--help' with
 # an automatically generated help-message.
-#	It takes the name of the programm.
+# It takes the name of the programm.
 #
 # Example:
 #    checkarg_add_autohelp "mySuperScript.sh"
@@ -139,6 +143,7 @@ function checkarg_add_autohelp(){
 	checkarg_add      'h'    "_checkarg_show_help '$1'" "show this help message and exit"
 	_checkarg_autohelp_descr="$2"
 	_checkarg_autohelp_appendix="$3"
+	_checkarg_autohelp_posargname="$4"
 }
 
 ##
@@ -196,7 +201,7 @@ function _checkarg_long_arg(){
 	if [ -n "${_checkarg_valid_args[$arg]}" ]; then
 		eval "${_checkarg_valid_args[$arg]}"
 		if [ -n "$_checkarg_has_val" ] && [ ! "$arg" = "$raw" ]; then
-			#  if arg is of value-type and has an '=' in it -> remainder is value
+			# if arg is of value-type and has an '=' in it -> remainder is value
 			_checkarg_eval_has_val "${raw#*=}" # set the var specified in has_val to this string
 		fi
 	else
@@ -206,7 +211,7 @@ function _checkarg_long_arg(){
 }
 
 function _checkarg_show_help(){
-	echo "Usage: $1 [options] [positional args]"
+	echo "Usage: $1 [Options] $_checkarg_autohelp_posargname"
 	echo ""
 	echo "$_checkarg_autohelp_descr"
 	echo ""
@@ -218,3 +223,5 @@ function _checkarg_show_help(){
 
 	exit 0
 }
+
+fi # CHECKARG_SH
