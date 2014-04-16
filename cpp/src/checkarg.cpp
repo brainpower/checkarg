@@ -2,6 +2,8 @@
 #include "checkarg.hpp"
 #include "bpstd.hpp"
 #include <sstream>
+//#include <algorithm> // for each
+#include <iostream> // debug output
 using namespace std;
 
 map <int,string>
@@ -16,15 +18,15 @@ CheckArg::_errors = {
 
 CheckArg::CheckArg(const int argc, char** argv, const string &appname)
 	: _argc(argc), _argv(argv), _appname(appname), _autohelp_on(false),
-	  _usage_line(_appname + " [options] [positional args]") {}
+	  _usage_line(_appname + " [options]") {}
 
 CheckArg::CheckArg(const int argc, char** argv, const string &appname, const string &desc)
 	: _argc(argc), _argv(argv), _appname(appname), _descr(desc),_autohelp_on(false),
-	  _usage_line(_appname + " [options] [positional args]") {}
+	  _usage_line(_appname + " [options]") {}
 
 CheckArg::CheckArg(const int argc, char** argv, const string &appname, const string &desc, const string &appendix)
 	: _argc(argc), _argv(argv), _appname(appname), _descr(desc), _appendix(appendix),_autohelp_on(false),
-	  _usage_line(_appname + " [options] [positional args]") {}
+	  _usage_line(_appname + " [options]") {}
 
 
 //~ int CheckArg::add(const char sopt, const string &help, bool has_val){
@@ -46,7 +48,7 @@ int CheckArg::add(const char sopt, const string &lopt, const string &help, bool 
 	return CA_ALLOK;
 }
 
-int CheckArg::add(const char sopt, const string &lopt, function<int(const string &, const string &)> cb, const string &help, bool has_val){
+int CheckArg::add(const char sopt, const string &lopt, function<int(CheckArgPtr,const string &, const string &)> cb, const string &help, bool has_val){
 	//~ _valid_args[sopt] = has_val;
 	_valid_args[lopt] = has_val;
 	//~ _valid_args_cb[sopt] = cb;
@@ -62,7 +64,7 @@ int CheckArg::add(const string &lopt, const string &help, bool has_val){
 	return CA_ALLOK;
 }
 
-int CheckArg::add(const string &lopt, function<int(const string &, const string &)> cb, const string &help, bool has_val){
+int CheckArg::add(const string &lopt, function<int(CheckArgPtr,const string &, const string &)> cb, const string &help, bool has_val){
 	_valid_args[lopt] = has_val;
 	_valid_args_cb[lopt] = cb;
 	_autohelp[lopt] = help;
@@ -70,10 +72,10 @@ int CheckArg::add(const string &lopt, function<int(const string &, const string 
 }
 
 int CheckArg::add_autohelp(){
-	_valid_args["help"] = false;
-	_short2long['h'] = "help";
-	_valid_args_cb["help"] = checkarg::show_autohelp;
-	_autohelp_on = true;
+	_valid_args["help"] = false; // add --help with no value
+	_short2long['h'] = "help";   // add -h mapped to --help
+	_valid_args_cb["help"] = checkarg::show_autohelp; // set the autohelp callback
+	_autohelp_on = true; // switch autohelp to on
 	return CA_ALLOK;
 }
 
@@ -144,25 +146,7 @@ int CheckArg::arg_long(const string &arg){
 
 	auto pos = _valid_args.find(real_arg);
 	if( pos != _valid_args.end() ){
-		if( pos->first == "help"  && _autohelp_on ) {
-			stringstream ss;
-			ss << "Usage: " << _usage_line << _posarg_help_usage << endl;
-			if(!_descr.empty()) ss << endl << _descr << endl;
-			ss << endl << "Options:" << endl;
-			for(auto it=_valid_args.begin(); it != _valid_args.end(); ++it){
-				auto sarg = long2short(it->first);
-				if(!sarg.empty()) ss << "   -" << sarg << ",";
-				else ss << "      ";
-				ss << " --" << it->first << (it->first.size() > 7?"\n      \t":"\t")
-				   << _autohelp[it->first] << endl;
-			}
-			if(!_posarg_help_descr.empty())
-				ss << endl
-					 << "Positional Arguments:" << endl 
-					 << _posarg_help_descr << endl;
-			if(!_appendix.empty()) ss << endl << _appendix << endl;
-			val = ss.str();
-		} else if( pos->second && !val.empty() ) {
+		if( pos->second && !val.empty() ) {
 			// arg has value defined, and value is given by '='
 			_valid_args_vals[real_arg] = val;
 		} else if( pos->second ){
@@ -181,7 +165,7 @@ int CheckArg::arg_long(const string &arg){
 			// if arg has no val, or val is found already, call callback now, if there's one
 			auto cbpos = _valid_args_cb.find(real_arg);
 			if( cbpos != _valid_args_cb.end() ){
-				int cbret = cbpos->second(real_arg, val);
+				int cbret = cbpos->second(CheckArgPtr(this), real_arg, val);
 				if(cbret != CA_ALLOK) {
 					// if callback returns anything other than CA_ALLOK, there's been an error
 					ca_error(CA_CALLBACK, bpstd::stringf(": %d!", cbret));
@@ -219,9 +203,34 @@ int CheckArg::arg_short(const string &arg){
 	return CA_ALLOK;
 }
 
-int checkarg::show_autohelp(const string&, const string &val){
-	cout << val << flush;
+int checkarg::show_autohelp(CheckArgPtr ca, const string&, const string &val){
+	stringstream ss;
+	size_t space = 0;
+	for( auto &kv : ca->_valid_args )
+		space = max(space, kv.first.size() );
 
+	space += 2; // add 2 more spaces
+
+	ss << "Usage: " << ca->_usage_line << " " << ca->_posarg_help_usage << endl;
+	
+	if(!ca->_descr.empty()) ss << endl << ca->_descr << endl;
+	
+	ss << endl << "Options:" << endl;
+	for(auto it=ca->_valid_args.begin(); it != ca->_valid_args.end(); ++it){
+		auto sarg = ca->long2short(it->first);
+		if(!sarg.empty()) ss << "   -" << sarg << ",";
+		else ss << "      ";
+		ss << " --" << it->first << string(space-it->first.size(), ' ')
+		   << ca->_autohelp[it->first] << endl;
+	}
+	if(!ca->_posarg_help_descr.empty())
+		ss << endl
+			 << "Positional Arguments:" << endl 
+			 << ca->_posarg_help_descr << endl;
+	if(!ca->_appendix.empty()) ss << endl << ca->_appendix << endl;
+
+	cout << ss.str() << flush;
+	
 	exit(0); // always exit after showing help
 }
 

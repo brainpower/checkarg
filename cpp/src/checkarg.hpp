@@ -10,14 +10,18 @@ enum {
 	CA_CALLBACK,
 };
 
+#include <memory> // shared_ptr
 #include <string>
 #include <map>
 #include <vector>
 #include <functional>
 #include <iostream>
 
+class CheckArg;
+typedef std::shared_ptr<CheckArg> CheckArgPtr;
+
 namespace checkarg{
-	int show_autohelp(const std::string &, const std::string &);
+	int show_autohelp(CheckArgPtr, const std::string &, const std::string &);
 };
 
 class CheckArg {
@@ -30,9 +34,9 @@ public:
 	//~ int add(const char sopt, const std::string &help, bool has_val=false);
 	//~ int add(const char sopt, function<void(const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
 	int add(const char sopt, const std::string &lopt, const std::string &help, bool has_val=false);
-	int add(const char sopt, const std::string &lopt, std::function<int(const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
+	int add(const char sopt, const std::string &lopt, std::function<int(CheckArgPtr, const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
 	int add(const std::string &lopt, const std::string &help, bool has_val=false);
-	int add(const std::string &lopt, std::function<int(const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
+	int add(const std::string &lopt, std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
 
 	void add_posarg_help(const std::string &usage, const std::string &descr ) { _posarg_help_usage = usage; _posarg_help_descr = descr; }
 	int add_autohelp();
@@ -56,7 +60,7 @@ private:
 
 	//~ int register_val_callback();
 
-	friend int checkarg::show_autohelp(const std::string &, const std::string &);
+	friend int checkarg::show_autohelp(CheckArgPtr, const std::string &, const std::string &);
 
 	void ca_error(int eno, const std::string &info="!") const {
 #ifdef CA_PRINTERR
@@ -68,7 +72,7 @@ private:
 
 	static std::map<int,std::string> _errors;
 
-	std::map<std::string,std::function<int(const std::string &,const std::string &)>> _valid_args_cb;
+	std::map<std::string,std::function<int(CheckArgPtr, const std::string &,const std::string &)>> _valid_args_cb;
 	std::map<std::string, bool> _valid_args;
 	std::map<std::string,std::string> _valid_args_vals;
 	std::map<std::string,std::string> _autohelp;

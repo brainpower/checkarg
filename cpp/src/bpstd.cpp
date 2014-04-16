@@ -121,7 +121,7 @@ std::string string_join(const std::deque<std::string> &v, uint s, uint e){
   return res;
 }
 
-// strip line-comments out of an string.
+// strip line-comments out of a string.
 // Here, only a single char can be used as delimiter
 void strip_line_comments(std::string &s, const char c, const std::string &raw){
   std::deque<std::string> lines;
