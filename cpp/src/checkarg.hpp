@@ -1,21 +1,15 @@
 #ifndef CHECKARG_HPP
 #define CHECKARG_HPP
 
-enum {
-	CA_ALLOK=0,
-	CA_ERROR,
-	CA_INVARG,
-	CA_INVVAL,
-	CA_MISSVAL,
-	CA_CALLBACK,
-};
-
 #include <memory> // shared_ptr
 #include <string>
 #include <map>
 #include <vector>
 #include <functional>
+
+#ifdef CA_PRINTERR
 #include <iostream>
+#endif
 
 class CheckArg;
 typedef std::shared_ptr<CheckArg> CheckArgPtr;
@@ -38,11 +32,11 @@ public:
 	int add(const std::string &lopt, const std::string &help, bool has_val=false);
 	int add(const std::string &lopt, std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
 
-	void add_posarg_help(const std::string &usage, const std::string &descr ) { _posarg_help_usage = usage; _posarg_help_descr = descr; }
 	int add_autohelp();
 
 	int parse();
 
+	void set_posarg_help(const std::string &usage, const std::string &descr ) { _posarg_help_usage = usage; _posarg_help_descr = descr; }
 	void set_usage_line(const std::string &str) { _usage_line = str; }
 
 	std::string argv0() { return _argv[0]; }
@@ -95,5 +89,15 @@ private:
 	std::string _next_is_val_of;
 
 };
+
+enum {
+	CA_ALLOK=0,
+	CA_ERROR,
+	CA_INVARG,
+	CA_INVVAL,
+	CA_MISSVAL,
+	CA_CALLBACK,
+};
+
 
 #endif //CHECKARG_HPP
