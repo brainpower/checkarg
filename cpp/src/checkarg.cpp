@@ -29,19 +29,7 @@ CheckArg::CheckArg(const int argc, char** argv, const string &appname, const str
 	  _usage_line(_appname + " [options]") {}
 
 
-//~ int CheckArg::add(const char sopt, const string &help, bool has_val){
-	//~ _valid_args[sopt] = has_val;
-	//~ _autohelp[sopt] = help;
-//~ }
-//~
-//~ int CheckArg::add(const char sopt, function<void(const string &, const string &)> cb, const string &help, bool has_val){
-	//~ _valid_args[sopt] = has_val;
-	//~ _valid_args_cb[sopt] = cb;
-	//~ _autohelp[sopt] = help;
-//~ }
-
 int CheckArg::add(const char sopt, const string &lopt, const string &help, bool has_val){
-	//~ _valid_args[sopt] = has_val;
 	_valid_args[lopt] = has_val;
 	_autohelp[lopt] = help;
 	_short2long[sopt] = lopt;
@@ -49,9 +37,7 @@ int CheckArg::add(const char sopt, const string &lopt, const string &help, bool 
 }
 
 int CheckArg::add(const char sopt, const string &lopt, function<int(CheckArgPtr,const string &, const string &)> cb, const string &help, bool has_val){
-	//~ _valid_args[sopt] = has_val;
 	_valid_args[lopt] = has_val;
-	//~ _valid_args_cb[sopt] = cb;
 	_valid_args_cb[lopt] = cb;
 	_autohelp[lopt] = help;
 	_short2long[sopt] = lopt;
@@ -74,6 +60,7 @@ int CheckArg::add(const string &lopt, function<int(CheckArgPtr,const string &, c
 int CheckArg::add_autohelp(){
 	_valid_args["help"] = false; // add --help with no value
 	_short2long['h'] = "help";   // add -h mapped to --help
+	_autohelp["help"] = "show this help message and exit";
 	_valid_args_cb["help"] = checkarg::show_autohelp; // set the autohelp callback
 	_autohelp_on = true; // switch autohelp to on
 	return CA_ALLOK;
@@ -81,7 +68,6 @@ int CheckArg::add_autohelp(){
 
 int CheckArg::parse(){
 	int ret = CA_ALLOK;
-//	_argv0 = argv[0];
 	for(int i=1; i<_argc; ++i){ // start with 1 here, because argv[0] is special
 		ret = arg(_argv[i]);
 		if( ret != CA_ALLOK ) break;
@@ -99,12 +85,6 @@ string CheckArg::value(const string &arg) const{
 	if( pos != _valid_args_vals.end() ){
 		return pos->second;
 	}
-	//~ if( tmp.length() == 1 ){
-		//~ pos = _valid_args_vals.find(_short2long[arg]);
-		//~ if( pos != _valid_args_vals.end() ){
-			//~ return *pos;
-		//~ }
-	//~ }
 	return "";
 }
 
@@ -187,13 +167,13 @@ int CheckArg::arg_short(const string &arg){
 		if( pos != _short2long.end() ){ // there is such a short arg registered
 			if( _valid_args[pos->second] ) { // if has val,
 				if( i < len-1 ){ //remainder is interpreted as val,
-					_valid_args_vals[_short2long[arg[i]]] = arg.substr(i+1);
+					_valid_args_vals[pos->second] = arg.substr(i+1);
 				} else { // or next_arg is treated as val
-					_next_is_val_of = _short2long[arg[i]];
+					_next_is_val_of = pos->second;
 				}
 				return CA_ALLOK; // no further looping, we're done.
 			} else {
-				_valid_args_vals[_short2long[arg[i]]] = "x"; // mark arg as seen
+				_valid_args_vals[pos->second] = "x"; // mark arg as seen
 			}
 		} else {
 			ca_error(CA_INVARG, string(": -") + arg[i] + "!");
@@ -212,9 +192,9 @@ int checkarg::show_autohelp(CheckArgPtr ca, const string&, const string &val){
 	space += 2; // add 2 more spaces
 
 	ss << "Usage: " << ca->_usage_line << " " << ca->_posarg_help_usage << endl;
-	
+
 	if(!ca->_descr.empty()) ss << endl << ca->_descr << endl;
-	
+
 	ss << endl << "Options:" << endl;
 	for(auto it=ca->_valid_args.begin(); it != ca->_valid_args.end(); ++it){
 		auto sarg = ca->long2short(it->first);
@@ -225,12 +205,12 @@ int checkarg::show_autohelp(CheckArgPtr ca, const string&, const string &val){
 	}
 	if(!ca->_posarg_help_descr.empty())
 		ss << endl
-			 << "Positional Arguments:" << endl 
+			 << "Positional Arguments:" << endl
 			 << ca->_posarg_help_descr << endl;
 	if(!ca->_appendix.empty()) ss << endl << ca->_appendix << endl;
 
 	cout << ss.str() << flush;
-	
+
 	exit(0); // always exit after showing help
 }
 
