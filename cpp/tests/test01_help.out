@@ -1,0 +1,5 @@
+Usage: test_args [options] 
+
+Options:
+   -h, --help   show this help message and exit
+   -i, --input  file to read from
