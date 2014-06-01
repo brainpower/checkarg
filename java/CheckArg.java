@@ -111,7 +111,7 @@ public class CheckArg {
 	}
 
 	public boolean isset(final String arg){
-		return _valid_args.get(arg) != null;
+		return _valid_args_vals.get(arg) != null;
 	}
 
 	public static String str_err(final Error errno){
@@ -169,8 +169,9 @@ public class CheckArg {
 	private int arg(final String arg){
 		if(! _next_is_val_of.isEmpty() ){
 			_valid_args_vals.put(_next_is_val_of, arg);
+			int ret = _call_cb(_next_is_val_of);
 			_next_is_val_of = "";
-			return Error.CA_ALLOK.ordinal();
+			return ret;
 		}
 
 		if( arg.charAt(0) == '-' ) { // yay, some arg
@@ -215,16 +216,7 @@ public class CheckArg {
 
 			if( ! hasval.booleanValue() || ! val.isEmpty()){
 				// if arg has no val, or val is found already, call callback now, if there's one
-				Callable<Void> cb = _valid_args_cb.get(real_arg);
-				if( cb != null ){
-					try{
-						cb.call();
-					}catch(Exception e){
-						ca_error(Error.CA_CALLBACK, ": "+e+"!");
-						e.printStackTrace();
-						return Error.CA_CALLBACK.ordinal();
-					}
-				}
+        return _call_cb(real_arg);
 			}
 
 			return Error.CA_ALLOK.ordinal();
@@ -248,6 +240,9 @@ public class CheckArg {
 					return Error.CA_ALLOK.ordinal();
 				} else {
 					_valid_args_vals.put(larg, "x");
+					int ret = _call_cb(larg);
+					if( ret != Error.CA_ALLOK.ordinal() )
+					  return ret;
 				}
 			} else {
 				ca_error(Error.CA_INVARG, ": -"+arg.charAt(i)+"!");
@@ -257,6 +252,20 @@ public class CheckArg {
 		return Error.CA_ALLOK.ordinal();
 	}
 	
+  private int _call_cb(final String larg){
+		Callable<Void> cb = _valid_args_cb.get(larg);
+		if( cb != null ){
+			try{
+				cb.call();
+			}catch(Exception e){
+				ca_error(Error.CA_CALLBACK, ": "+e+"!");
+				e.printStackTrace();
+				return Error.CA_CALLBACK.ordinal();
+			}
+		}
+		return Error.CA_ALLOK.ordinal();
+  }
+
 	private String long2short(final String larg){
 		for (Map.Entry<Character,String> e : _short2long.entrySet() ) {
 			if( e.getValue().equals(larg) )
@@ -265,17 +274,17 @@ public class CheckArg {
 		return null;
 	}
 
-	String _appname, _descr, _appendix, _usage_line, _posarg_help_descr, _posarg_help_usage;
-	boolean _autohelp_on;
-	String _next_is_val_of;
+	private String _appname, _descr, _appendix, _usage_line, _posarg_help_descr, _posarg_help_usage;
+	private boolean _autohelp_on;
+	private String _next_is_val_of;
 
-	Map<String,Boolean>        _valid_args;
-	Map<String,String>         _valid_args_vals;
-	Map<String,Callable<Void>> _valid_args_cb;
-	Map<String,String>         _autohelp;
-	Map<Character,String>      _short2long;
-	List<String>               _pos_args;
-	String                     _args[];
+	private Map<String,Boolean>        _valid_args;
+	private Map<String,String>         _valid_args_vals;
+	private Map<String,Callable<Void>> _valid_args_cb;
+	private Map<String,String>         _autohelp;
+	private Map<Character,String>      _short2long;
+	private List<String>               _pos_args;
+	private String                     _args[];
 
 	private static final Map<Error, String> _errors;
 	static {
