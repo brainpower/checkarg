@@ -65,17 +65,17 @@ $(EXEC): $(EXEC).o $(OBJS) $(STLIB) $(HDRS)
 
 install: all
 	@echo -e "  \e[1mINSTALL \e[0m$(SHLIB)"
-	$(INSTALL) -Dm755  $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIB)
+	@$(INSTALL) -Dm755  $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIB)
 	@echo -e "  \e[1mLN      \e[0m$(SHLIBM)"
-	$(LNS) $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIBM)
+	@$(LNS) $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIBM)
 	@echo -e "  \e[1mLN      \e[0m$(SHLIBN)"
-	$(LNS) $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIBN)
+	@$(LNS) $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIBN)
 
 	@echo -e "  \e[1mINSTALL \e[0m$(CAHDR)"
-	$(INSTALL) -Dm755  src/$(CAHDR) $(DESTDIR)$(PREFIX)/include/checkarg/$(CAHDR)
+	@$(INSTALL) -Dm755  src/$(CAHDR) $(DESTDIR)$(PREFIX)/include/checkarg/$(CAHDR)
 	
 	@echo -e "  \e[1mINSTALL \e[0m$(PCFILE)"
-	$(INSTALL) -Dm755  data/$(PCFILE) $(DESTDIR)$(PREFIX)/lib/pkgconfig/$(PCFILE)
+	@$(INSTALL) -Dm755  data/$(PCFILE) $(DESTDIR)$(PREFIX)/lib/pkgconfig/$(PCFILE)
 
 clean:
 	@for e in $(OBJS) $(CAOBJS); do \
