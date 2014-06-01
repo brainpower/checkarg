@@ -10,7 +10,7 @@ depends=()
 makedepends=()
 
 source=("checkarg-${pkgver}.tar.gz::https://github.com/brainpower/checkarg/archive/${pkgver}.tar.gz")
-sha256sums=('58715117e6299dcbb98a43bbbe5e5a0f93f4570bb8bd10f0ba568d69bbb97b4a')
+sha256sums=('fe21489b5d8b7d1497345cc760fe82b6e9ff4c604cc553bce1e1095ef55149b7')
 
 #options=(!ccache)
 
