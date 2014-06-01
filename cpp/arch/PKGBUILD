@@ -1,0 +1,30 @@
+# Maintainer: oi_wtf aka. brainpower <brainpower at gulli dot com>
+pkgname=checkarg-cpp
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="The CheckArg commandline parser"
+arch=('i686' 'x86_64')
+url="https://github.com/brainpower/checkarg"
+license=('GPL')
+depends=()
+makedepends=()
+
+source=("checkarg-${pkgver}.tar.gz::https://github.com/brainpower/checkarg/archive/${pkgver}.tar.gz")
+sha256sums=('58715117e6299dcbb98a43bbbe5e5a0f93f4570bb8bd10f0ba568d69bbb97b4a')
+
+#options=(!ccache)
+
+build() {
+  cd "$srcdir/checkarg-${pkgver}/cpp"
+
+  make
+}
+
+package() {
+  cd "$srcdir/checkarg-${pkgver}/cpp"
+
+  make DESTDIR="$pkgdir/" install
+
+}
+
+# vim:set ts=2 sw=2 et:
