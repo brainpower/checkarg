@@ -25,10 +25,6 @@ SHLIBN=libcheckarg.so
 STLIB=libcheckarg.a
 PCFILE=checkarg.pc
 
-HDRS=$(CAHDRS)
-OBJS=tests/test_args.o
-EXEC=tests/test_args
-
 .PHONY: clean check
 .SUFFIXES: .cpp .c
 
@@ -59,9 +55,6 @@ $(SHLIB): $(CAOBJS)
 	@echo -e "  \e[1mCXXLD   \e[0m$@"
 	@$(CXXLD) -shared -Wl,-soname,$(SHLIBM) -o $@ $(CAOBJS)
 
-$(EXEC): $(EXEC).o $(OBJS) $(STLIB) $(HDRS)
-	@echo -e "  \e[1mCXXLD   \e[0m$@"
-	@$(CXX) $(LDFLAGS) $(OBJS) $(STLIB) -o $@ $(LIBS)
 
 install: all
 	@echo -e "  \e[1mINSTALL \e[0m$(SHLIB)"
@@ -83,17 +76,11 @@ clean:
 		$(RM) $$e ;\
 	done;
 
-	@echo -e "  \e[1mRM      \e[0m$(EXEC).o"
-	@$(RM) $(EXEC).o
-	
-	@echo -e "  \e[1mRM      \e[0m$(EXEC)"
-	@$(RM) $(EXEC)
-
 	@echo -e "  \e[1mRM      \e[0m$(STLIB)"
 	@$(RM) $(STLIB)
 
 	@echo -e "  \e[1mRM      \e[0m$(SHLIB)"
 	@$(RM) $(SHLIB)
 
-check: $(EXEC) tests/run_tests.sh
+check: static tests/run_tests.sh
 	tests/run_tests.sh
