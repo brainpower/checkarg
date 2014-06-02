@@ -25,7 +25,7 @@ SHLIBN=libcheckarg.so
 STLIB=libcheckarg.a
 PCFILE=checkarg.pc
 
-.PHONY: clean check
+.PHONY: clean check doc
 .SUFFIXES: .cpp .c
 
 .cpp.o:
@@ -55,6 +55,9 @@ $(SHLIB): $(CAOBJS)
 	@echo -e "  \e[1mCXXLD   \e[0m$@"
 	@$(CXXLD) -shared -Wl,-soname,$(SHLIBM) -o $@ $(CAOBJS)
 
+doc:
+	@echo -e "  \e[1mDOXYGEN \e[0m"
+	@cd doc && doxygen
 
 install: all
 	@echo -e "  \e[1mINSTALL \e[0m$(SHLIB)"
