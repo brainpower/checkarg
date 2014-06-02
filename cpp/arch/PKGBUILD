@@ -1,6 +1,6 @@
 # Maintainer: oi_wtf aka. brainpower <brainpower at gulli dot com>
 pkgname=checkarg-cpp
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="The CheckArg commandline parser"
 arch=('i686' 'x86_64')
@@ -10,9 +10,7 @@ depends=()
 makedepends=()
 
 source=("checkarg-${pkgver}.tar.gz::https://github.com/brainpower/checkarg/archive/${pkgver}.tar.gz")
-sha256sums=('fe21489b5d8b7d1497345cc760fe82b6e9ff4c604cc553bce1e1095ef55149b7')
-
-#options=(!ccache)
+sha256sums=('04a590a5cb487669b271a86a2eae1fd415c55404da04dd0228caeaeddaec55e0')
 
 build() {
   cd "$srcdir/checkarg-${pkgver}/cpp"
