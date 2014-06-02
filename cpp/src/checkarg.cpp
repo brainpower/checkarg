@@ -39,32 +39,32 @@ CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, cons
 	  usage_line(appname + " [options]") {}
 
 
-// small inline functions
-inline void 
+void 
 CheckArg::set_posarg_help(const std::string &usage, const std::string &descr ) {
   p->posarg_help_usage = usage; 
   p->posarg_help_descr = descr; 
 }
 
-inline void
+void
 CheckArg::set_usage_line(const std::string &str) { 
   p->usage_line = str; 
 }
-inline std::string 
+
+std::string 
 CheckArg::argv0() { 
   return p->argv[0]; 
 }
 
-inline std::vector<std::string> 
+std::vector<std::string> 
 CheckArg::pos_args() const { 
   return p->pos_args; 
 }
 
 	
-inline std::string 
+std::string 
 CheckArg::str_err(const int errno){ return CheckArgPrivate::errors[errno]; }
 	
-inline void 
+void 
 CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
 #ifdef CA_PRINTERR
   va_list al;
