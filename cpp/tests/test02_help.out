@@ -1,0 +1,9 @@
+Usage: test_args [options]  [files...]
+
+Options:
+   -h, --help   show this help message and exit
+   -i, --input  file to read from
+   -t, --test   run pos_arg test
+
+Positional Arguments:
+one or more output files
