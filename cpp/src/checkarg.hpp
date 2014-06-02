@@ -62,11 +62,16 @@ private:
 
   CheckArgPrivatePtr p;
 
+  /**
+   * \brief function which will be the callback for '-\-help'
+   * if add_autohelp() was called
+   * \see add_autohelp()
+   */
 	friend int checkarg::show_autohelp(CheckArgPtr, const std::string &, const std::string &);
 };
 
 // return codes
-enum {
+enum CAError{
 	CA_ALLOK=0,
 	CA_ERROR,
 	CA_INVARG,

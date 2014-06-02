@@ -4,6 +4,23 @@
 #include <sstream>
 using namespace std;
 
+/**
+ * \class CheckArg
+ * \brief a lightweight and easy to use command line parser
+ *
+ * It's inspired by ArgumentParser from python,
+ * therefore, if you've used that one before, you'll find this one quite similar.
+ * It is, intentionally, in no way a complete reimplementation or port of the former.
+ *
+ * The main goal is for it to be easy to understand and use.
+ * Secondly, its intended to be non-intrusive and lightweight.
+ * Therefore it pulls no 'external' dependencies and relies completely on the STL.
+ * 
+ * That way it's pretty easy to integrate into an existing project,
+ * because it's non-intrusive, you dont need to 'build your project arount it'.
+ */
+
+
 map <int,string>
 CheckArgPrivate::errors = {
 	{CA_ALLOK,  "Everything is fine"},
@@ -15,12 +32,34 @@ CheckArgPrivate::errors = {
 };
 
 // c'tors
+
+/**
+ * \brief constructs a CheckArg object
+ * \param argc the number of arguments, you'll want to pass argc gotten from main()
+ * \param argv the list of arguments, you'll want to pass argv from main()
+ * \param appname the name of your application, will be used in the usage-line
+ */
 CheckArg::CheckArg(const int argc, char ** argv, const std::string &appname)
   : p(new CheckArgPrivate(this, argc,argv,appname)){
 }
+/**
+ * \brief constructs a CheckArg object
+ * \param argc the number of arguments, you'll want to pass argc gotten from main()
+ * \param argv the list of arguments, you'll want to pass argv from main()
+ * \param appname the name of your application, will be used in the usage-line
+ * \param desc description of your programm, used in help
+ */
 CheckArg::CheckArg(const int argc, char ** argv, const std::string &appname, const std::string &desc)
   : p(new CheckArgPrivate(this, argc, argv, appname, desc)){
 }
+/**
+ * \brief constructs a CheckArg object
+ * \param argc the number of arguments, you'll want to pass argc gotten from main()
+ * \param argv the list of arguments, you'll want to pass argv from main()
+ * \param appname the name of your application, will be used in the usage-line
+ * \param desc description of your programm, used in help
+ * \param appendix text which will be added at the end of help
+ */
 CheckArg::CheckArg(const int argc, char ** argv, const std::string &appname, const std::string &desc, const std::string &appendix)
   : p(new CheckArgPrivate(this, argc,argv,appname,desc,appendix)){
 }
@@ -39,28 +78,61 @@ CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, cons
 	  usage_line(appname + " [options]") {}
 
 
+/**
+ * \brief set help's text for positional arguments
+ * \param usage text to be appended to the usage line, like " [files...]"
+ * \param descr text describing the positional arguments, will be used in help
+ */
 void 
 CheckArg::set_posarg_help(const std::string &usage, const std::string &descr ) {
   p->posarg_help_usage = usage; 
   p->posarg_help_descr = descr; 
 }
 
+
+/**
+ * \brief set a completely own usage line
+ * \param str the usage line to use
+ */
 void
 CheckArg::set_usage_line(const std::string &str) { 
   p->usage_line = str; 
 }
 
+
+/**
+ * \brief get argv[0], the programms "name"
+ * \return argv[0]
+ */
 std::string 
 CheckArg::argv0() { 
   return p->argv[0]; 
 }
 
+/**
+ * \brief get all positional arguments
+ *
+ * all arguments not being options like '-h' or '-\-help'
+ * or values of the former are considered positional arguments
+ * 
+ * For Example:<br>
+ *  <code>./ca_user pos0 -h -i input.txt pos1 -t pos2 pos3</code><br>
+ *  all arguments starting with pos are positional arguments,
+ *  given, that '-i' has a value and '-t' and '-h' have not
+ * \return vector of positional arguments
+ */
 std::vector<std::string> 
 CheckArg::pos_args() const { 
   return p->pos_args; 
 }
 
 	
+/**
+ * \brief get error message for given errno
+ * \param errno error number
+ * \return error message string 
+ * \see CAError
+ */
 std::string 
 CheckArg::str_err(const int errno){ return CheckArgPrivate::errors[errno]; }
 	
@@ -79,12 +151,34 @@ CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
 }
 
 // bigger functions
+//
+
+
+/**
+ * \brief add a command line option the parser shall accept
+ * \param sopt the short option, like 'h' for '-h'
+ * \param lopt the long option, like 'help' for '-\-help'
+ * \param help a short description for the option, used in generated help
+ * \param has_val does the option have a value
+ * \return a return code from CAError
+ * \see CAError
+ */
 int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, bool has_val){
 	p->valid_args[lopt] = { has_val, sopt, help };
 	p->short2long[sopt] = lopt;
 	return CA_ALLOK;
 }
 
+/**
+ * \brief add a command line option the parser shall accept
+ * \param sopt the short option, like 'h' for '-h'
+ * \param lopt the long option, like 'help' for '-\-help'
+ * \param cb a callback to be called whenever the option is encountered
+ * \param help a short description for the option, used in generated help
+ * \param has_val does the option have a value
+ * \return a return code from CAError
+ * \see CAError
+ */
 int CheckArg::add(const char sopt, const std::string &lopt, 
                   std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb, 
                   const std::string &help, bool has_val){
@@ -96,12 +190,29 @@ int CheckArg::add(const char sopt, const std::string &lopt,
 	return CA_ALLOK;
 }
 
+/**
+ * \brief add a command line option the parser shall accept
+ * \param lopt the long option, like 'help' for '-\-help'
+ * \param help a short description for the option, used in generated help
+ * \param has_val does the option have a value
+ * \return a return code from CAError
+ * \see CAError
+ */
 int CheckArg::add(const std::string &lopt, const std::string &help, bool has_val){
 	p->valid_args[lopt].has_val = has_val;
 	p->valid_args[lopt].help    = help;
 	return CA_ALLOK;
 }
 
+/**
+ * \brief add a command line option the parser shall accept
+ * \param lopt the long option, like 'help' for '-\-help'
+ * \param cb a callback to be called whenever the option is encountered
+ * \param help a short description for the option, used in generated help
+ * \param has_val does the option have a value
+ * \return a return code from CAError
+ * \see CAError
+ */
 int CheckArg::add(const std::string &lopt, 
                   std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb,
                   const std::string &help, bool has_val){
@@ -111,6 +222,11 @@ int CheckArg::add(const std::string &lopt,
 	return CA_ALLOK;
 }
 
+
+/**
+ * \brief add auto generated '-\-help' message
+ * \return CA_ALLOK
+ */
 int CheckArg::add_autohelp(){
 	p->valid_args["help"].has_val = false; // add --help with no value
 	p->valid_args["help"].sopt    = 'h';
@@ -121,6 +237,11 @@ int CheckArg::add_autohelp(){
 	return CA_ALLOK;
 }
 
+/**
+ * \brief parse the commnd line, this should come after any add() or add_autohelp()
+ * \return CA_ALLOK on success, some other code from CAError otherwise
+ * \see CAError
+ */
 int CheckArg::parse(){
 	int ret = CA_ALLOK;
 	for(int i=1; i<p->argc; ++i){ // start with 1 here, because argv[0] is special
@@ -146,6 +267,13 @@ int CheckArg::parse(){
 	return ret;
 }
 
+
+/**
+ * \brief get the value of a given option
+ * \warning you shouldn't call this before parse()!
+ * \param arg the long name of the option to get the value of
+ * \return the value
+ */
 string CheckArg::value(const std::string &arg) const{
 
 	auto pos = p->valid_args.find(arg);
@@ -155,6 +283,11 @@ string CheckArg::value(const std::string &arg) const{
 	return "";
 }
 
+/**
+ * \brief check if an option was given on the command line
+ * \param arg the option specified by it's long name
+ * \return true if give, false otherwise
+ */
 bool CheckArg::isset(const std::string &arg) const {
 	auto pos = p->valid_args.find(arg);
 	return pos != p->valid_args.end() && !(pos->second.value.empty());
@@ -262,6 +395,7 @@ int CheckArgPrivate::call_cb(const std::string &arg){
 	}
 	return CA_ALLOK;
 }
+
 
 int checkarg::show_autohelp(CheckArgPtr ca, const std::string&, const std::string &val){
 	stringstream ss;
