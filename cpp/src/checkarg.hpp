@@ -33,10 +33,10 @@ public:
 	CheckArg(const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix);
 
   // pre-parse add functions
-	int add(const char sopt, const std::string &lopt, const std::string &help, bool has_val=false);
-	int add(const char sopt, const std::string &lopt, std::function<int(CheckArgPtr, const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
-	int add(const std::string &lopt, const std::string &help, bool has_val=false);
-	int add(const std::string &lopt, std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
+	int add(const char sopt, const std::string &lopt, const std::string &help, const bool has_val=false);
+	int add(const char sopt, const std::string &lopt, std::function<int(CheckArgPtr, const std::string &, const std::string &)> cb, const std::string &help, const bool has_val=false);
+	int add(const std::string &lopt, const std::string &help, const bool has_val=false);
+	int add(const std::string &lopt, std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb, const std::string &help, const bool has_val=false);
 
 	int add_autohelp();
 

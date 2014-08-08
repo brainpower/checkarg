@@ -2,6 +2,7 @@
 #include "checkarg.hpp"
 #include "checkarg_private.hpp"
 #include <sstream>
+#include <iostream>
 using namespace std;
 
 /**
@@ -15,10 +16,10 @@ using namespace std;
  * The main goal is for it to be easy to understand and use.
  * Secondly, its intended to be non-intrusive and lightweight.
  * Therefore it pulls no 'external' dependencies and relies completely on the STL.
- * 
+ *
  * That way it's pretty easy to integrate into an existing project,
  * because it's non-intrusive, you dont need to 'build your project arount it'.
- * 
+ *
  * Commandline options use the common so-called GNU style,
  * e.g. use double dashes and look something like these: <br>
  *  -\-option[=value] <br>
@@ -27,6 +28,20 @@ using namespace std;
  * They look like this: <br>
  *  -o [value]
  * I'll call them long and short options, respectively.
+ *
+ * Using CheckArg as a developer can be divided in two phases, pre-parse() and post-parse().
+ * In the pre-parse phase, you'll define your commandline options using the add() members.
+ * In the post-parse phase, you can check, which options where given
+ * and get their values, if they've got one.
+ *
+ * Callbacks will, for now, be called while parsing,
+ * if an option has no value, immediately after it was parsed,
+ * otherwise, immediately after the value was parsed.
+ *
+ * Maybe they'll be split in immediate and deferred ones later,
+ * but defferred ones would currently have no advantage over doing<br>
+ * <code>  if( ca.isset("option") ) doOption();</code><br> after parse(),
+ * so in favor of being lightweight, they're not implementet for now.
  */
 
 
@@ -92,10 +107,10 @@ CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, cons
  * \param usage text to be appended to the usage line, like " [files...]"
  * \param descr text describing the positional arguments, will be used in help
  */
-void 
+void
 CheckArg::set_posarg_help(const std::string &usage, const std::string &descr ) {
-  p->posarg_help_usage = usage; 
-  p->posarg_help_descr = descr; 
+  p->posarg_help_usage = usage;
+  p->posarg_help_descr = descr;
 }
 
 
@@ -104,8 +119,8 @@ CheckArg::set_posarg_help(const std::string &usage, const std::string &descr ) {
  * \param str the usage line to use
  */
 void
-CheckArg::set_usage_line(const std::string &str) { 
-  p->usage_line = str; 
+CheckArg::set_usage_line(const std::string &str) {
+  p->usage_line = str;
 }
 
 
@@ -113,9 +128,9 @@ CheckArg::set_usage_line(const std::string &str) {
  * \brief get argv[0], the programms "name"
  * \return argv[0]
  */
-std::string 
-CheckArg::argv0() { 
-  return p->argv[0]; 
+std::string
+CheckArg::argv0() {
+  return p->argv[0];
 }
 
 /**
@@ -123,29 +138,29 @@ CheckArg::argv0() {
  *
  * all arguments not being options like '-h' or '-\-help'
  * or values of the former are considered positional arguments
- * 
+ *
  * For Example:<br>
- *  <code>./ca_user pos0 -h -i input.txt pos1 -t pos2 pos3</code><br>
+ *  <code>  ./ca_user pos0 -h -i input.txt pos1 -t pos2 pos3</code><br>
  *  all arguments starting with pos are positional arguments,
  *  given, that '-i' has a value and '-t' and '-h' have not
  * \return vector of positional arguments
  */
-std::vector<std::string> 
-CheckArg::pos_args() const { 
-  return p->pos_args; 
+std::vector<std::string>
+CheckArg::pos_args() const {
+  return p->pos_args;
 }
 
-	
+
 /**
  * \brief get error message for given errno
  * \param errno error number
- * \return error message string 
+ * \return error message string
  * \see CAError
  */
-std::string 
+std::string
 CheckArg::str_err(const int errno){ return CheckArgPrivate::errors[errno]; }
-	
-void 
+
+void
 CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
 #ifdef CA_PRINTERR
   va_list al;
@@ -172,7 +187,7 @@ CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, bool has_val){
+int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, const bool has_val){
 	p->valid_args[lopt] = { has_val, sopt, help };
 	p->short2long[sopt] = lopt;
 	return CA_ALLOK;
@@ -188,9 +203,9 @@ int CheckArg::add(const char sopt, const std::string &lopt, const std::string &h
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(const char sopt, const std::string &lopt, 
-                  std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb, 
-                  const std::string &help, bool has_val){
+int CheckArg::add(const char sopt, const std::string &lopt,
+                  std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb,
+                  const std::string &help, const bool has_val){
 	p->valid_args[lopt].has_val = has_val;
 	p->valid_args[lopt].sopt    = sopt;
 	p->valid_args[lopt].help    = help;
@@ -207,7 +222,7 @@ int CheckArg::add(const char sopt, const std::string &lopt,
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(const std::string &lopt, const std::string &help, bool has_val){
+int CheckArg::add(const std::string &lopt, const std::string &help, const bool has_val){
 	p->valid_args[lopt].has_val = has_val;
 	p->valid_args[lopt].help    = help;
 	return CA_ALLOK;
@@ -222,9 +237,9 @@ int CheckArg::add(const std::string &lopt, const std::string &help, bool has_val
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(const std::string &lopt, 
+int CheckArg::add(const std::string &lopt,
                   std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb,
-                  const std::string &help, bool has_val){
+                  const std::string &help, const bool has_val){
 	p->valid_args[lopt].has_val = has_val;
 	p->valid_args[lopt].cb      = cb;
 	p->valid_args[lopt].help    = help;
