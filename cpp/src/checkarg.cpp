@@ -18,6 +18,15 @@ using namespace std;
  * 
  * That way it's pretty easy to integrate into an existing project,
  * because it's non-intrusive, you dont need to 'build your project arount it'.
+ * 
+ * Commandline options use the common so-called GNU style,
+ * e.g. use double dashes and look something like these: <br>
+ *  -\-option[=value] <br>
+ *  -\-option [value] <br>
+ * Additionally, abreviations of those in so-called POSIX style can be added.
+ * They look like this: <br>
+ *  -o [value]
+ * I'll call them long and short options, respectively.
  */
 
 
