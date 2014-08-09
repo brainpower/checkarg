@@ -22,8 +22,8 @@ private:
 	static std::map<int,std::string> errors;
 
 	struct Opt{
-		bool has_val;
-		char sopt;
+		bool has_val = false;
+		char sopt    = 0;
 		std::string help;
 		std::function<int(CheckArgPtr, const std::string &,const std::string &)> cb;
 		std::string value;
