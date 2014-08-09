@@ -160,7 +160,7 @@ CheckArg::pos_args() const {
 std::string
 CheckArg::str_err(const int errno){ return CheckArgPrivate::errors[errno]; }
 
-void
+int
 CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
 #ifdef CA_PRINTERR
   va_list al;
@@ -172,6 +172,7 @@ CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
     free(buff);
   }
 #endif
+  return eno;
 }
 
 // bigger functions
@@ -273,8 +274,7 @@ int CheckArg::parse(){
 		if( ret != CA_ALLOK ) break;
 	}
 	if( ! p->next_is_val_of.empty() ){
-		p->ca_error(CA_MISSVAL, ": "+ string(p->argv[p->argc-1]) + "!");
-		return CA_MISSVAL;
+		return p->ca_error(CA_MISSVAL, ": %s!", p->argv[p->argc-1]);
 	}
 
 	// free strings not necessary anymore, e.g. those for '--help'
@@ -363,8 +363,7 @@ int CheckArgPrivate::arg_long(const std::string &arg){
 		} else { // there's no value defined by add()
 			if( !val.empty() ){
 				// error?
-				ca_error(CA_INVVAL, ": --" + real_arg + "!");
-				return CA_INVVAL;
+				return ca_error(CA_INVVAL, ": --%s!", real_arg.c_str());
 			}
 			valid_args[real_arg].value = "x"; // mark arg as seen
 		}
@@ -375,8 +374,7 @@ int CheckArgPrivate::arg_long(const std::string &arg){
 		}
 		return CA_ALLOK;
 	} else {
-		ca_error(CA_INVARG, ": --" + real_arg + "!");
-		return CA_INVARG;
+		return ca_error(CA_INVARG, ": --%s!", real_arg.c_str());
 	}
 }
 
@@ -400,8 +398,7 @@ int CheckArgPrivate::arg_short(const std::string &arg){
 				  return ret;
 			}
 		} else {
-			ca_error(CA_INVARG, string(": -") + arg[i] + "!");
-			return CA_INVARG;
+			return ca_error(CA_INVARG, ": -%c!", arg[i]);
 		}
 	}
 	return CA_ALLOK;
@@ -413,8 +410,7 @@ int CheckArgPrivate::call_cb(const std::string &arg){
 		int cbret = cbpos->second.cb(CheckArgPtr(parent), arg, cbpos->second.value);
 		if(cbret != CA_ALLOK) {
 			// if callback returns anything other than CA_ALLOK, there's been an error
-			ca_error(CA_CALLBACK, ": %d!", cbret);
-			return CA_CALLBACK;
+			return ca_error(CA_CALLBACK, ": %d!", cbret);
 		}
 	}
 	return CA_ALLOK;

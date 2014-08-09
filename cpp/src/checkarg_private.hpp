@@ -17,7 +17,7 @@ private:
 	int call_cb(const std::string &arg);
 
 
-	void ca_error(int eno, const std::string &info="!", ...) const;
+	int ca_error(int eno, const std::string &info="!", ...) const;
 
 	static std::map<int,std::string> errors;
 
