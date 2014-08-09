@@ -189,7 +189,9 @@ CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
  * \see CAError
  */
 int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, const bool has_val){
-	p->valid_args[lopt] = { has_val, sopt, help };
+	p->valid_args[lopt].has_val = has_val;
+	p->valid_args[lopt].sopt    = sopt;
+	p->valid_args[lopt].help    = help;
 	p->short2long[sopt] = lopt;
 	return CA_ALLOK;
 }
@@ -431,11 +433,10 @@ int checkarg::show_autohelp(CheckArgPtr ca, const std::string&, const std::strin
 
 	ss << endl << "Options:" << endl;
 	for(auto it=ca->p->valid_args.begin(); it != ca->p->valid_args.end(); ++it){
-		auto sarg = ca->p->valid_args.find(it->first);
-		if(sarg != ca->p->valid_args.end()) ss << "   -" << sarg->second.sopt << ",";
+		if(it->second.sopt) ss << "   -" << it->second.sopt << ",";
 		else ss << "      ";
 		ss << " --" << it->first << string(space-it->first.size(), ' ')
-		   << ca->p->valid_args[it->first].help << endl;
+		   << it->second.help << endl;
 	}
 	if(!ca->p->posarg_help_descr.empty())
 		ss << endl
