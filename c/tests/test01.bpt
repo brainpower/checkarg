@@ -1,0 +1,21 @@
+
+name="checkarg"
+type="c"
+sources=("test_args.c" "../libcheckarg.a")
+
+prepare(){
+  compile_sources
+}
+
+run(){
+
+  test_rc "--help return code" 0 --help
+  test_rc "-h return code" 0 -h
+
+  test_stdout "help output" test01_help.out --help
+
+  test_rc "missing value" 4 -i
+  test_rc "invalid option" 2 -x
+  test_rc "correct value" 0 -i input.in
+
+}
