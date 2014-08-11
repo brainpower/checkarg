@@ -358,7 +358,7 @@ int CheckArgPrivate::arg_long(const std::string &arg){
 	if( pos != valid_args.end() ){
 		if( pos->second.has_val && !val.empty() ) {
 			// arg has value defined, and value is given by '='
-			valid_args[real_arg].value = val;
+			pos->second.value = val;
 		} else if( pos->second.has_val ){
 			// value of arg is the next arg, remember that for the next call of arg
 			next_is_val_of = real_arg;
@@ -367,7 +367,7 @@ int CheckArgPrivate::arg_long(const std::string &arg){
 				// error?
 				return ca_error(CA_INVVAL, ": --%s!", real_arg.c_str());
 			}
-			valid_args[real_arg].value = "x"; // mark arg as seen
+			pos->second.value = "x"; // mark arg as seen
 		}
 
 		if( !pos->second.has_val || !val.empty()) {
