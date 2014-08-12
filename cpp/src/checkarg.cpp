@@ -265,7 +265,8 @@ int CheckArg::add_autohelp(){
 }
 
 /**
- * \brief parse the commnd line, this should come after any add() or add_autohelp()
+ * \brief parse the commnd line
+ * this should be called after all add()s and add_autohelp()
  * \return CA_ALLOK on success, some other code from CAError otherwise
  * \see CAError
  */
