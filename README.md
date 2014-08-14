@@ -7,7 +7,8 @@ It is, intentionally, in no way a complete reimplementation or port of the forme
 
 The main goal is for it to be easy to understand and use.<br>
 Secondly, its intended to be non-intrusive and lightweight.<br>
-Therefore it pulls no 'external' dependencies and relies completely on the STL.
+Therefore it pulls no 'external' dependencies and relies completely on the STL (C++),
+Java API or C Standard Library, respectively.
 
 That way it's pretty easy to integrate into an existing project,<br>
 because it's non-intrusive, you dont need to 'build your project arount it'.
