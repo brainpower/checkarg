@@ -63,6 +63,7 @@ _checkarg_autohelp_posargname=''
 #
 # Note: Please make sure to add arguments to checkarg's list
 # of valid arguments before calling this.
+# Preferably using the checkarg_add* functions.
 ##
 function checkarg(){
 	for arg in "$@"; do
