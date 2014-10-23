@@ -34,7 +34,7 @@ const char* errors[] = {
 };
 
 
-// c'tors
+/* c'tors */
 
 CheckArg*
 checkarg_new(const int argc, char **argv, const char *appname, const char *desc, const char *appendix){
@@ -42,20 +42,20 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
   CheckArgPrivate *priv = NULL;
 
   ret = (CheckArg*) malloc(sizeof(CheckArg));
-  if(!ret) return NULL; // malloc failed
+  if(!ret) return NULL; /* malloc failed */
 
   priv = (CheckArgPrivate*)malloc(sizeof(CheckArgPrivate));
-  if(!priv) // malloc failed
+  if(!priv) /* malloc failed */
     goto clean;
 
   ret->p = priv;
 
   priv->appname = strdup(appname);
-  if(!priv->appname)// malloc failed
+  if(!priv->appname)/* malloc failed */
     goto clean;
 
   priv->usage_line = (char*)malloc(strlen(appname)+11);
-  if(!priv->usage_line){ // malloc failed
+  if(!priv->usage_line){ /* malloc failed */
     goto clean_app;
   }
 
@@ -65,7 +65,7 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
 
   if(desc){
     priv->descr = strdup(desc);
-    if(!priv->descr){ // malloc failed
+    if(!priv->descr){ /* malloc failed */
       goto clean_usage;
     }
   } else
@@ -73,7 +73,7 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
 
   if(appendix){
     priv->appendix = strdup(appendix);
-    if(!priv->appendix){ // malloc failed
+    if(!priv->appendix){ /* malloc failed */
       goto clean_descr;
     }
   } else
@@ -96,7 +96,7 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
 
   return ret;
 
-// clean up and return in case of error
+/* clean up and return in case of error */
 clean_descr:
   free(priv->descr);
 clean_usage:
@@ -119,7 +119,7 @@ checkarg_free(CheckArg *ca){
   free(ca->p->posarg_help_descr);
   free(ca->p->posarg_help_usage);
 
-  // arrays
+  /* arrays */
   pos_args_free(ca->p->pos_args );
   valid_args_free(ca->p->valid_args);
 
@@ -127,7 +127,7 @@ checkarg_free(CheckArg *ca){
   free(ca);
 }
 
-inline int
+int
 checkarg_add(CheckArg *ca, const char sopt, const char *lopt, const char *help){
   return checkarg_add_value(ca, sopt, lopt, help, 0);
 }
@@ -136,7 +136,7 @@ int
 checkarg_add_value(CheckArg *ca, const char sopt, const char *lopt, const char *help, const uint8_t has_val){
   Opt *opt = opt_new(sopt, lopt, NULL, help, has_val);
   if(!opt)
-    return CA_ALLOC_ERR; // malloc failed
+    return CA_ALLOC_ERR; /* malloc failed */
 
   return valid_args_insert(ca, opt);
 }
@@ -217,16 +217,17 @@ checkarg_parse(CheckArg *ca) {
 
 int
 checkarg_set_posarg_help(CheckArg *ca, const char *usage, const char *descr){
+  /* free possible previous values */
   free(ca->p->posarg_help_descr);
   free(ca->p->posarg_help_usage);
 
   ca->p->posarg_help_usage = strdup(usage);
-  if(!ca->p->posarg_help_usage) return CA_ALLOC_ERR; // malloc failed
+  if(!ca->p->posarg_help_usage) return CA_ALLOC_ERR; /* malloc failed */
   ca->p->posarg_help_descr = strdup(descr);
   if(!ca->p->posarg_help_descr){
     free(ca->p->posarg_help_usage);
     ca->p->posarg_help_usage = NULL;
-    return CA_ALLOC_ERR; // malloc failed
+    return CA_ALLOC_ERR; /* malloc failed */
   }
   return CA_ALLOK;
 }
@@ -248,6 +249,7 @@ checkarg_argv0(CheckArg *ca) {
 
 const char**
 checkarg_pos_args(CheckArg *ca){
+  /* turn the cahr** into a const char** */
   return (const char**)ca->p->pos_args;
 }
 
@@ -289,7 +291,8 @@ checkarg_show_autohelp(CheckArg *ca, const char* larg, const char* val){
     space = space > tmp ? space : tmp;
   } while( (it=it->next) );
 
-  space += 2; // two more than opt length
+  /* two more than opt length, so theres some space between the columns */
+  space += 2;
 
   if(ca->p->posarg_help_usage)
     printf("Usage: %s %s\n", ca->p->usage_line, ca->p->posarg_help_usage);
@@ -328,13 +331,13 @@ opt_new(const char sopt, const char *lopt, CheckArgFP cb, const char *help, cons
   if(!opt) return NULL;
 
   opt->lopt = strdup(lopt);
-  if(!opt->lopt){ // malloc failed
+  if(!opt->lopt){ /* malloc failed */
     free(opt);
     return NULL;
   }
 
   opt->help = strdup(help);
-  if(!opt->help){ // malloc failed
+  if(!opt->help){ /* malloc failed */
     free(opt->lopt);
     free(opt);
     return NULL;
@@ -384,7 +387,7 @@ int  valid_args_insert(CheckArg *ca, Opt *opt){
     return CA_ALLOK;
   }
 
-  // the first insert
+  /* the first insert */
   ca->p->valid_args      = opt;
   ca->p->valid_args_last = opt;
   return CA_ALLOK;
@@ -411,13 +414,13 @@ Opt* valid_args_find_sopt(CheckArg *ca, char sopt){
 
 int checkarg_arg(CheckArg *ca, const char *arg) {
   if( ca->p->next_is_val_of ){
-    //_next_val_of should be an lopt width value
+    /* _next_val_of should be an lopt with value */
     int ret = 0;
 
     Opt *opt = valid_args_find(ca, ca->p->next_is_val_of);
     if(opt->value) free(opt->value); /* in case someone specifies an option with value twice */
     opt->value = strdup(arg);
-    if( ! opt->value ) // malloc failed
+    if( ! opt->value ) /* malloc failed */
       return ca_error(CA_ALLOC_ERR, "!");
 
     ret = call_cb(ca, opt);
