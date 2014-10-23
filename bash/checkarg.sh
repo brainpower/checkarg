@@ -12,6 +12,7 @@
 # Long options are also supportet, just use '-help' for '--help'
 # as key with checkarg_args, like this gets you a '--version' option:
 #  checkarg_add '-version' 'print_version=1' "Print programm's version and exit."
+# Or simply use the convenience function checkarg_add_long.
 #
 # Positional arguments are appended to 'checkarg_pos_args'
 # which is declared as indexed array on sourcing this file..
