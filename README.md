@@ -16,12 +16,32 @@ because it's non-intrusive, you dont need to 'build your project arount it'.
 Commandline options use the common so-called GNU style,<br>
 e.g. use double dashes and look something like these: 
 
-    --option[=value]
-    --option [value]
+    program --option=value --quiet --option2 <value>
     
-Additionally, abreviations of those in so-called POSIX style can be added.<br>
+Additionally, abreviations of those in so-called POSIX style (or UNIX style) can be added.<br>
 They look like this: 
 
-    -o [value]
+    program -o [value] -q -f <value>
     
-In the docs I'll call them long and short options, respectively.
+They can be combined:
+
+    program -o <value> -qf <value>
+    program -o <value> -qf<value>
+    
+Note that both commands are equivalent, this means after a value type option is found in a grouped option
+the remainder is always considered the value, even if you meant it to be an option.
+So these commands are not the same:
+
+    program -o <value> -qfi other_file
+    program -o <value> -q -i input_file -f other_file
+
+In the first command, 'i' is the value for -f,
+other_file is a positional argument, not the value of either -f or -i.
+    
+In the docs I'll call the GNU style and POSIX style options "long" and "short" options, respectively.
+
+Old style or traditional style options are not supported and I don't plan to.
+You may convince me otherwise, though.
+Old style options (like tar supports) look like this:
+
+    tar xfL <value_for_f> <value_for_L>
