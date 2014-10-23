@@ -1,9 +1,6 @@
 CheckArg<br>
 is a lightweight and easy to use command line parser.
 
-The License of all files, if not stated otherwise inside, is GPLv3.
-Havn't had the time to add it everywhere yet.
-
 It's inspired by ArgumentParser from python,<br>
 therefore, if you've used that one before, you'll find this one quite similar.<br>
 It is, intentionally, in no way a complete reimplementation or port of the former.
@@ -17,20 +14,20 @@ That way it's pretty easy to integrate into an existing project,<br>
 because it's non-intrusive, you dont need to 'build your project arount it'.
 
 Commandline options use the common so-called GNU style,<br>
-e.g. use double dashes and look something like these: 
+e.g. use double dashes and look something like these:
 
     program --option=value --quiet --option2 <value>
-    
+
 Additionally, abreviations of those in so-called POSIX style (or UNIX style) can be added.<br>
-They look like this: 
+They look like this:
 
     program -o [value] -q -f <value>
-    
+
 And they can be combined:
 
     program -o <value> -qf <value>
     program -o <value> -qf<value>
-    
+
 Note that above commands are equivalent.
 This means after a value type option is found in a grouped option
 the remainder is always considered to be the value,
