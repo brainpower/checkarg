@@ -23,25 +23,28 @@ They look like this:
 
     program -o [value] -q -f <value>
     
-They can be combined:
+And they can be combined:
 
     program -o <value> -qf <value>
     program -o <value> -qf<value>
     
-Note that both commands are equivalent, this means after a value type option is found in a grouped option
-the remainder is always considered the value, even if you meant it to be an option.
+Note that above commands are equivalent.
+This means after a value type option is found in a grouped option
+the remainder is always considered to be the value,
+even if you meant it to be an option.<br>
 So these commands are not the same:
 
     program -o <value> -qfi other_file
-    program -o <value> -q -i input_file -f other_file
+    program -o <value> -q -f other_file -i
 
 In the first command, 'i' is the value for -f,
 other_file is a positional argument, not the value of either -f or -i.
-    
+
+
 In the docs I'll call the GNU style and POSIX style options "long" and "short" options, respectively.
 
-Old style or traditional style options are not supported and I don't plan to.
-You may convince me otherwise, though.
+Old style or traditional style options are *not* supported and I don't plan to do so.<br>
+You may convince me otherwise, though.<br>
 Old style options (like tar supports) look like this:
 
     tar xfL <value_for_f> <value_for_L>
