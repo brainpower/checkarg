@@ -4,12 +4,14 @@
 # the values are passed to eval. You can set global vars that way
 # or execute functions... well, everything eval accepts.
 #
-# It supports value-type arguments, you have to indicate this by setting
+# It supports value-type options, you have to indicate this by setting
 # 'checkarg_has_val' to the var name in which the value shall be stored.
 # (without the preceeding dollar)
+# But there's a convenience function for that: checkarg_add_val
 #
-# Long args are also supportet, just use '-help' for '--help'
-# as key in checkarg_valid_args. E.g. 'checkarg_valid_args[-help]='print_help'
+# Long options are also supportet, just use '-help' for '--help'
+# as key with checkarg_args, like this gets you a '--version' option:
+#  checkarg_add '-version' 'print_version=1' "Print programm's version and exit."
 #
 # Positional arguments are appended to 'checkarg_pos_args'
 # which is declared as indexed array on sourcing this file..
