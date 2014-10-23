@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2013-2014 brainpower <brainpower at gulli dot com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -76,7 +93,7 @@ public class CheckArg {
 
 	public int parse(){
 		int ret;
-		
+
 		for (String a : _args){
 			ret = arg(a);
 			if( ret != Error.CA_ALLOK.ordinal() )
@@ -159,7 +176,7 @@ public class CheckArg {
 		}
 
 	}
-	
+
 	private String str_repeat(char c, int times){
 		char[] chars = new char[times];
 		Arrays.fill(chars, c);
@@ -206,7 +223,7 @@ public class CheckArg {
 			} else if( hasval.booleanValue()) {
 				// value of arg is the next arg, remember that for the next call of arg
 				_next_is_val_of = real_arg;
-			} else { // arg has no value 
+			} else { // arg has no value
 				if( ! val.isEmpty() ){
 					ca_error(Error.CA_INVVAL, ": --"+real_arg+"!");
 					return Error.CA_INVVAL.ordinal();
@@ -251,7 +268,7 @@ public class CheckArg {
 		}
 		return Error.CA_ALLOK.ordinal();
 	}
-	
+
   private int _call_cb(final String larg){
 		Callable<Void> cb = _valid_args_cb.get(larg);
 		if( cb != null ){

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2013-2014 brainpower <brainpower at gulli dot com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "checkarg_private.h"
 
 #include <string.h>
@@ -118,7 +135,8 @@ checkarg_add(CheckArg *ca, const char sopt, const char *lopt, const char *help){
 int
 checkarg_add_value(CheckArg *ca, const char sopt, const char *lopt, const char *help, const uint8_t has_val){
   Opt *opt = opt_new(sopt, lopt, NULL, help, has_val);
-  if(!opt) return CA_ALLOC_ERR; // malloc failed
+  if(!opt)
+    return CA_ALLOC_ERR; // malloc failed
 
   return valid_args_insert(ca, opt);
 }
@@ -544,4 +562,3 @@ void pos_args_append(CheckArg *ca, const char *arg){
   *tmp = arg;
   ++(ca->p->pos_args_count);
 }
-
