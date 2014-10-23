@@ -37,8 +37,8 @@ So these commands are not the same:
     program -o <value> -qfi other_file
     program -o <value> -q -f other_file -i
 
-In the first command, 'i' is the value for -f,
-other_file is a positional argument, not the value of either -f or -i.
+In the first command, 'i' is considered the value of -f,
+other_file a positional argument, not the value of either -f or -i.
 
 
 In the docs I'll call the GNU style and POSIX style options "long" and "short" options, respectively.
