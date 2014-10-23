@@ -1,6 +1,9 @@
 CheckArg<br>
 is a lightweight and easy to use command line parser.
 
+The License of all files, if not stated otherwise inside, is GPLv3.
+Havn't had the time to add it everywhere yet.
+
 It's inspired by ArgumentParser from python,<br>
 therefore, if you've used that one before, you'll find this one quite similar.<br>
 It is, intentionally, in no way a complete reimplementation or port of the former.
