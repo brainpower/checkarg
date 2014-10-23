@@ -13,7 +13,7 @@ General
   Like ```int verbose_cb() { verbose_level++; }``` to support ```-vvv```.<br>
   Havn't come up with any easy implementation of this yet.<br>
   I'll probably have to add another map for value options,
-  like map<string,vector<string>>... <br>
+  like map&lt;string,vector&lt;string&gt;&gt;... <br>
   and some kind of counter for non-value options.
 
 
