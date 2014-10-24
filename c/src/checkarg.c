@@ -93,6 +93,7 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
   priv->argv = argv;
   priv->argc = argc;
   priv->autohelp_on = 0;
+  priv->pos_arg_sep = 0;
 
   return ret;
 
@@ -413,29 +414,34 @@ Opt* valid_args_find_sopt(CheckArg *ca, char sopt){
 }
 
 int checkarg_arg(CheckArg *ca, const char *arg) {
-  if( ca->p->next_is_val_of ){
-    /* _next_val_of should be an lopt with value */
-    int ret = 0;
+  if( ! ca->p->pos_arg_sep ){
+    /* if the separator '--' was given, all following args are positional */
 
-    Opt *opt = valid_args_find(ca, ca->p->next_is_val_of);
-    if(opt->value) free(opt->value); /* in case someone specifies an option with value twice */
-    opt->value = strdup(arg);
-    if( ! opt->value ) /* malloc failed */
-      return ca_error(CA_ALLOC_ERR, "!");
+    if( ca->p->next_is_val_of ){
+      /* _next_val_of should be an lopt with value */
+      int ret = 0;
 
-    ret = call_cb(ca, opt);
-    free(ca->p->next_is_val_of);
-    ca->p->next_is_val_of = NULL;
-    return ret;
-  }
+      Opt *opt = valid_args_find(ca, ca->p->next_is_val_of);
+      if(opt->value) free(opt->value); /* in case someone specifies an option with value twice */
+      opt->value = strdup(arg);
+      if( ! opt->value ) /* malloc failed */
+        return ca_error(CA_ALLOC_ERR, "!");
 
-  if( arg[0] == '-' ) { /* it's an option */
-    if( arg[1] == '-') { /* it's a long option */
-      return checkarg_arg_long(ca, (arg + 2) ); /* omit first two chars */
+      ret = call_cb(ca, opt);
+      free(ca->p->next_is_val_of);
+      ca->p->next_is_val_of = NULL;
+      return ret;
     }
 
-    /* it's a short or a group of short options */
-    return checkarg_arg_short(ca, (arg + 1) ); /* omit first char */
+    if( arg[0] == '-' ) { /* it's an option */
+      if( arg[1] == '-') { /* it's a long option */
+        return checkarg_arg_long(ca, (arg + 2) ); /* omit first two chars */
+      }
+
+      /* it's a short or a group of short options */
+      return checkarg_arg_short(ca, (arg + 1) ); /* omit first char */
+    }
+
   }
 
   /* it's a positional arg */
@@ -449,6 +455,12 @@ int checkarg_arg_long(CheckArg *ca, const char *lopt){
   Opt *opt;
   int ret = 0;
 
+  if( ! *lopt ) {
+    /* if '--' was given, lopt is an empty string */
+    ca->p->pos_arg_sep = 1;
+    return CA_ALLOK;
+  }
+
   value = NULL;
   real_opt = strdup(lopt);
   if( ! real_opt )
@@ -456,8 +468,9 @@ int checkarg_arg_long(CheckArg *ca, const char *lopt){
 
   it = real_opt;
   while( *it && *it != '=' ) ++it;
+  /* iterated to either the position of the first '=' or the end of the string */
 
-  if( *it == '=' ) {
+  if( *it == '=' ) { /* if we're at an '=', split the value off */
     value = it +1; /* points to the part after the equal */
     *it = 0;
     /* mark the end of the option with '\0' instead of '=' so it'll become a separate c-str,
@@ -481,7 +494,7 @@ int checkarg_arg_long(CheckArg *ca, const char *lopt){
       goto invval_error;
     }
     else {
-      opt->value = "x"; /* mark option as seen */
+      opt->value = "x"; /* mark option as seen, any value except NULL is ok here */
     }
 
     if( !opt->has_val || value ){
@@ -532,7 +545,7 @@ int checkarg_arg_short(CheckArg *ca, const char *args){
         return CA_ALLOK; /* we're done here */
       }
       else {
-        opt->value = "x";
+        opt->value = "x"; /* any value except NULL is ok here */
         ret = call_cb(ca, opt);
         if( ret != CA_ALLOK )
           return ret;

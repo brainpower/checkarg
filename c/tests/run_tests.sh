@@ -23,12 +23,13 @@ test_rc(){
   shift 2;
 
   printf "   - Running test: ${tname}... "
-  ./$name "$@" >/dev/null
+  ./$name "$@" >/dev/null ; ret=$?
 
-  if [[ $expect == $? ]]; then
+  if [[ $expect == $ret ]]; then
     printf "[ ok ]\n"
   else
     printf "[ failed ]\n"
+    printf "Expected: $expect - Got: $ret\n"
   fi
 
 }

@@ -20,6 +20,8 @@
 
 #include "checkarg.h"
 
+typedef uint8_t bool;
+
 typedef struct _Opt Opt;
 struct _Opt {
   uint8_t     has_val;
@@ -41,7 +43,8 @@ struct _CheckArgPrivate {
   int    argc;
   char **argv;
 
-  uint8_t autohelp_on;
+  bool autohelp_on;
+  bool pos_arg_sep;
 
   char *appname,
        *descr,
