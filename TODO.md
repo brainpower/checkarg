@@ -1,9 +1,5 @@
 General
 =======
-- Rename either cpp or c port a little to allow parallel installation
-  of those on a system. Currently they've got the same library-filename.
-  Maybe something among libcheckargxx.so, libcheckargpp.so or libcheckarg++.so.
-
 - support option and (positinal-)argument separator: --
     like in git checkout --option -- file1 file2
 
