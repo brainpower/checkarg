@@ -1,5 +1,5 @@
 # Maintainer: oi_wtf aka. brainpower <brainpower at gulli dot com>
-pkgname=checkarg-cpp
+pkgname=checkarg++
 pkgver=0.1.1
 pkgrel=1
 pkgdesc="The CheckArg commandline parser"

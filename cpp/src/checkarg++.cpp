@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "checkarg.hpp"
+#include "checkarg++.hpp"
 #include "checkarg_private.hpp"
 #include <sstream>
 #include <iostream>

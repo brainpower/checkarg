@@ -9,21 +9,21 @@ AR=ar
 INSTALL=install
 LNS=ln -s
 
-CFLAGS=-std=c11 -Og -g -fPIC
+CFLAGS=-std=gnu11 -Og -g -fPIC
 CXXFLAGS=-std=c++11 -Og -g -fPIC
 LIBS=
 PREFIX=/usr
 
-CAHDR=checkarg.hpp
-CAHDRS=src/checkarg.hpp src/checkarg_private.hpp
-CAOBJS=src/checkarg.o
+LIBNAME=checkarg++
+CAHDR=$(LIBNAME).hpp
+CAHDRS=src/$(LIBNAME).hpp src/checkarg_private.hpp
+CAOBJS=src/$(LIBNAME).o
 
-LIBNAME=checkarg
-SHLIB=libcheckarg.so.0.0.0
-SHLIBM=libcheckarg.so.0
-SHLIBN=libcheckarg.so
-STLIB=libcheckarg.a
-PCFILE=checkarg.pc
+SHLIB=lib$(LIBNAME).so.0.0.0
+SHLIBM=lib$(LIBNAME).so.0
+SHLIBN=lib$(LIBNAME).so
+STLIB=lib$(LIBNAME).a
+PCFILE=$(LIBNAME).pc
 
 .PHONY: clean check doc
 .SUFFIXES: .cpp .c
@@ -31,15 +31,11 @@ PCFILE=checkarg.pc
 .cpp.o:
 	@echo -e "  \e[1mCXX     \e[0m$<"
 	@$(CXX) $(CXXFLAGS) $< -c -o $@
-	
-#.cxx.o:
-#	@echo "  CXX     $<"
-#	@$(CXX) $(CXXFLAGS) $< -c -o $@
-	
+
 .c.o:
 	@echo -e "  \e[1mCC      \e[0m$<"
 	@$(CC) $(CFLAGS) $< -c -o $@
-              
+
 
 all: shared
 
@@ -68,8 +64,8 @@ install: all
 	@$(LNS) $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIBN)
 
 	@echo -e "  \e[1mINSTALL \e[0m$(CAHDR)"
-	@$(INSTALL) -Dm755  src/$(CAHDR) $(DESTDIR)$(PREFIX)/include/checkarg/$(CAHDR)
-	
+	@$(INSTALL) -Dm755  src/$(CAHDR) $(DESTDIR)$(PREFIX)/include/$(LIBNAME)/$(CAHDR)
+
 	@echo -e "  \e[1mINSTALL \e[0m$(PCFILE)"
 	@$(INSTALL) -Dm755  data/$(PCFILE) $(DESTDIR)$(PREFIX)/lib/pkgconfig/$(PCFILE)
 

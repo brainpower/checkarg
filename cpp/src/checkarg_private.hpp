@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "checkarg.hpp"
+#include "checkarg++.hpp"
 
 #ifdef CA_PRINTERR
 #include <cstdarg>
