@@ -1,26 +1,28 @@
 #!/usr/bin/make -f
 
 CC=gcc
-CLD=$(CC)
+LD=$(CC)
 RMF=rm -f
 AR=ar
+INSTALL=install
+LNS=ln -s
 
 CFLAGS=-std=gnu11 -Og -g -fPIC -Wall
 LIBS=
-
-CAHDRS=src/checkarg.h
-CAOBJS=src/checkarg.o
+PREFIX=/usr
 
 LIBNAME=checkarg
-SHLIB=libcheckarg.so.0.0.0
-SHLIBM=libcheckarg.so.0
-STLIB=libcheckarg.a
+CAHDR=$(LIBNAME).h
+CAHDRS=src/$(LIBNAME).h src/checkarg_private.h
+CAOBJS=src/$(LIBNAME).o
 
-HDRS=$(CAHDRS)
-OBJS=tests/test_args.o
-EXEC=tests/test_args
+SHLIB=lib$(LIBNAME).so.0.0.0
+SHLIBM=lib$(LIBNAME).so.0
+SHLIBN=lib$(LIBNAME).so
+STLIB=lib$(LIBNAME).a
+PCFILE=$(LIBNAME).pc
 
-.PHONY: clean check
+.PHONY: clean check doc
 .SUFFIXES: .c
 
 .c.o:
@@ -39,13 +41,26 @@ $(STLIB): $(CAOBJS)
 	@$(AR) rcs $@ $(CAOBJS)
 
 $(SHLIB): $(CAOBJS)
-	@echo -e "  \e[1mCXXLD   \e[0m$@"
-	@$(CLD) -shared -Wl,-soname,$(SHLIBM) -o $@ $(CAOBJS)
+	@echo -e "  \e[1mLD      \e[0m$@"
+	@$(LD) -shared -Wl,-soname,$(SHLIBM) -o $@ $(CAOBJS)
 
-$(EXEC): $(EXEC).o $(OBJS) $(STLIB) $(HDRS)
-	@echo -e "  \e[1mCXXLD   \e[0m$@"
-	@$(CC) $(LDFLAGS) $(OBJS) $(STLIB) -o $@ $(LIBS)
+doc:
+	@echo -e "  \e[1mDOXYGEN \e[0m"
+	@cd doc && doxygen
 
+install: all
+	@echo -e "  \e[1mINSTALL \e[0m$(SHLIB)"
+	@$(INSTALL) -Dm755  $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIB)
+	@echo -e "  \e[1mLN      \e[0m$(SHLIBM)"
+	@$(LNS) $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIBM)
+	@echo -e "  \e[1mLN      \e[0m$(SHLIBN)"
+	@$(LNS) $(SHLIB) $(DESTDIR)$(PREFIX)/lib/$(SHLIBN)
+
+	@echo -e "  \e[1mINSTALL \e[0m$(CAHDR)"
+	@$(INSTALL) -Dm755  src/$(CAHDR) $(DESTDIR)$(PREFIX)/include/$(LIBNAME)/$(CAHDR)
+
+	@echo -e "  \e[1mINSTALL \e[0m$(PCFILE)"
+	@$(INSTALL) -Dm755  data/$(PCFILE) $(DESTDIR)$(PREFIX)/lib/pkgconfig/$(PCFILE)
 
 clean:
 	@for e in $(OBJS) $(CAOBJS); do \
@@ -53,17 +68,11 @@ clean:
 		$(RM) $$e ;\
 	done;
 
-	@echo -e "  \e[1mRM      \e[0m$(EXEC).o"
-	@$(RM) $(EXEC).o
-
-	@echo -e "  \e[1mRM      \e[0m$(EXEC)"
-	@$(RM) $(EXEC)
-
 	@echo -e "  \e[1mRM      \e[0m$(STLIB)"
 	@$(RM) $(STLIB)
 
 	@echo -e "  \e[1mRM      \e[0m$(SHLIB)"
 	@$(RM) $(SHLIB)
 
-check: $(EXEC) tests/run_tests.sh
+check: static tests/run_tests.sh
 	tests/run_tests.sh
