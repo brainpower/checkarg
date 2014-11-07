@@ -6,7 +6,10 @@ compile_sources(){
 }
 
 compile_cpp(){
-  g++ -std=c++11 "${sources[@]}" -o $name
+  g++ -std=gnu++11 "${sources[@]}" -o $name
+}
+compile_c(){
+  gcc -std=gnu11 "${sources[@]}" -o $name
 }
 
 clean(){
@@ -20,12 +23,13 @@ test_rc(){
   shift 2;
 
   printf "   - Running test: ${tname}... "
-  ./$name "$@" >/dev/null
-  
-  if [[ $expect == $? ]]; then
+  ./$name "$@" >/dev/null ; ret=$?
+
+  if [[ $expect == $ret ]]; then
     printf "[ ok ]\n"
   else
     printf "[ failed ]\n"
+    printf "Expected: $expect - Got: $ret\n"
   fi
 
 }
@@ -37,7 +41,7 @@ test_stdout(){
   local tmpout="${name}.${tname// /_}.out"
 
   printf "   - Running test: ${tname}... "
-  ./$name "$@" > "$tmpout" 
+  ./$name "$@" > "$tmpout"
 
   if diff -Nru $expect "$tmpout"; then
     printf "[ ok ]\n"
@@ -53,7 +57,7 @@ for test in *.bpt; do
     (
     . ./"$test"
     printf "\n * Running test set ${name}...\n"
-    prepare
+    prepare || exit 1
     run
     clean
     )

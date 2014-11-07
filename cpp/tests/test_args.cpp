@@ -1,7 +1,7 @@
 
 #define CA_PRINTERR
 
-#include "../src/checkarg.hpp"
+#include "../src/checkarg++.hpp"
 
 using namespace std;
 

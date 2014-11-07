@@ -1,7 +1,7 @@
 
 #define CA_PRINTERR
 
-#include "../src/checkarg.hpp"
+#include "../src/checkarg++.hpp"
 
 using namespace std;
 
@@ -21,6 +21,6 @@ int main(int argc, char **argv){
   	if( ca.pos_args()[0] == ca.value("test") )
   	  return CA_ALLOK;
   }
-  
+
   return ret;
 }
