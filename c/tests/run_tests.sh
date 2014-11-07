@@ -43,7 +43,9 @@ test_stdout(){
   printf "   - Running test: ${tname}... "
   ./$name "$@" > "$tmpout"
 
-  if diff -Nru $expect "$tmpout"; then
+  # --strip-trailing-cr fixes test run on windows,
+  # while only skipping \r not all whitespace like -w would
+  if diff -Nru --strip-trailing-cr $expect "$tmpout"; then
     printf "[ ok ]\n"
   else
     printf "[ failed ]\n"
@@ -53,7 +55,6 @@ test_stdout(){
 
 cd "${script_dir}"
 for test in *.bpt; do
-  if [ -x "$test" ]; then
     (
     . ./"$test"
     printf "\n * Running test set ${name}...\n"
@@ -61,7 +62,6 @@ for test in *.bpt; do
     run
     clean
     )
-  fi
 done
 
 #printf " * Testing --help ... "
