@@ -63,12 +63,12 @@ using namespace std;
 
 map <int,string>
 CheckArgPrivate::errors = {
-	{CA_ALLOK,  "Everything is fine"},
-	{CA_ERROR,  "An Error occurred"},
-	{CA_INVARG, "Unknown command line argument"},
-	{CA_INVVAL, "Value given to non-value argument"},
-	{CA_MISSVAL, "Missing value of argument"},
-	{CA_CALLBACK, "Callback returned with error code"},
+  {CA_ALLOK,  "Everything is fine"},
+  {CA_ERROR,  "An Error occurred"},
+  {CA_INVARG, "Unknown command line argument"},
+  {CA_INVVAL, "Value given to non-value argument"},
+  {CA_MISSVAL, "Missing value of argument"},
+  {CA_CALLBACK, "Callback returned with error code"},
 };
 
 // c'tors
@@ -106,16 +106,16 @@ CheckArg::CheckArg(const int argc, char ** argv, const std::string &appname, con
 
 // private c'tors
 CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname)
-	: argc(argc), argv(argv), parent(ca), appname(appname), autohelp_on(false),
-	  usage_line(appname + " [options]") {}
+  : argc(argc), argv(argv), parent(ca), appname(appname), autohelp_on(false), pos_arg_sep(false),
+    usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc)
-	: argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), autohelp_on(false),
-	  usage_line(appname + " [options]") {}
+  : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), autohelp_on(false), pos_arg_sep(false),
+    usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix)
-	: argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix), autohelp_on(false),
-	  usage_line(appname + " [options]") {}
+  : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix), autohelp_on(false), pos_arg_sep(false),
+    usage_line(appname + " [options]") {}
 
 
 /**
@@ -205,11 +205,11 @@ CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
  * \see CAError
  */
 int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, const bool has_val){
-	p->valid_args[lopt].has_val = has_val;
-	p->valid_args[lopt].sopt    = sopt;
-	p->valid_args[lopt].help    = help;
-	p->short2long[sopt] = lopt;
-	return CA_ALLOK;
+  p->valid_args[lopt].has_val = has_val;
+  p->valid_args[lopt].sopt    = sopt;
+  p->valid_args[lopt].help    = help;
+  p->short2long[sopt] = lopt;
+  return CA_ALLOK;
 }
 
 /**
@@ -225,12 +225,12 @@ int CheckArg::add(const char sopt, const std::string &lopt, const std::string &h
 int CheckArg::add(const char sopt, const std::string &lopt,
                   std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb,
                   const std::string &help, const bool has_val){
-	p->valid_args[lopt].has_val = has_val;
-	p->valid_args[lopt].sopt    = sopt;
-	p->valid_args[lopt].help    = help;
-	p->valid_args[lopt].cb      = cb;
-	p->short2long[sopt]         = lopt;
-	return CA_ALLOK;
+  p->valid_args[lopt].has_val = has_val;
+  p->valid_args[lopt].sopt    = sopt;
+  p->valid_args[lopt].help    = help;
+  p->valid_args[lopt].cb      = cb;
+  p->short2long[sopt]         = lopt;
+  return CA_ALLOK;
 }
 
 /**
@@ -242,9 +242,9 @@ int CheckArg::add(const char sopt, const std::string &lopt,
  * \see CAError
  */
 int CheckArg::add(const std::string &lopt, const std::string &help, const bool has_val){
-	p->valid_args[lopt].has_val = has_val;
-	p->valid_args[lopt].help    = help;
-	return CA_ALLOK;
+  p->valid_args[lopt].has_val = has_val;
+  p->valid_args[lopt].help    = help;
+  return CA_ALLOK;
 }
 
 /**
@@ -259,10 +259,10 @@ int CheckArg::add(const std::string &lopt, const std::string &help, const bool h
 int CheckArg::add(const std::string &lopt,
                   std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb,
                   const std::string &help, const bool has_val){
-	p->valid_args[lopt].has_val = has_val;
-	p->valid_args[lopt].cb      = cb;
-	p->valid_args[lopt].help    = help;
-	return CA_ALLOK;
+  p->valid_args[lopt].has_val = has_val;
+  p->valid_args[lopt].cb      = cb;
+  p->valid_args[lopt].help    = help;
+  return CA_ALLOK;
 }
 
 
@@ -271,13 +271,13 @@ int CheckArg::add(const std::string &lopt,
  * \return CA_ALLOK
  */
 int CheckArg::add_autohelp(){
-	p->valid_args["help"].has_val = false; // add --help with no value
-	p->valid_args["help"].sopt    = 'h';
-	p->valid_args["help"].help    = "show this help message and exit";
-	p->valid_args["help"].cb      = checkarg::show_autohelp; // set the autohelp callback
-	p->short2long['h'] = "help";   // add -h mapped to --help
-	p->autohelp_on = true;         // switch autohelp to on
-	return CA_ALLOK;
+  p->valid_args["help"].has_val = false; // add --help with no value
+  p->valid_args["help"].sopt    = 'h';
+  p->valid_args["help"].help    = "show this help message and exit";
+  p->valid_args["help"].cb      = checkarg::show_autohelp; // set the autohelp callback
+  p->short2long['h'] = "help";   // add -h mapped to --help
+  p->autohelp_on = true;         // switch autohelp to on
+  return CA_ALLOK;
 }
 
 /**
@@ -287,27 +287,27 @@ int CheckArg::add_autohelp(){
  * \see CAError
  */
 int CheckArg::parse(){
-	int ret = CA_ALLOK;
-	for(int i=1; i<p->argc; ++i){ // start with 1 here, because argv[0] is special
-		ret = p->arg(p->argv[i]);
-		if( ret != CA_ALLOK ) break;
-	}
-	if( ! p->next_is_val_of.empty() ){
-		return p->ca_error(CA_MISSVAL, ": %s!", p->argv[p->argc-1]);
-	}
+  int ret = CA_ALLOK;
+  for(int i=1; i<p->argc; ++i){ // start with 1 here, because argv[0] is special
+    ret = p->arg(p->argv[i]);
+    if( ret != CA_ALLOK ) break;
+  }
+  if( ! p->next_is_val_of.empty() ){
+    return p->ca_error(CA_MISSVAL, ": %s!", p->argv[p->argc-1]);
+  }
 
-	// free strings not necessary anymore, e.g. those for '--help'
-	p->appname.clear();
-	p->appendix.clear();
-	p->usage_line.clear();
-	p->descr.clear();
-	p->posarg_help_descr.clear();
-	p->posarg_help_usage.clear();
-	p->next_is_val_of.clear();
-	for( auto arg : p->valid_args)
-		arg.second.help.clear();
+  // free strings not necessary anymore, e.g. those for '--help'
+  p->appname.clear();
+  p->appendix.clear();
+  p->usage_line.clear();
+  p->descr.clear();
+  p->posarg_help_descr.clear();
+  p->posarg_help_usage.clear();
+  p->next_is_val_of.clear();
+  for( auto arg : p->valid_args)
+    arg.second.help.clear();
 
-	return ret;
+  return ret;
 }
 
 
@@ -319,11 +319,11 @@ int CheckArg::parse(){
  */
 string CheckArg::value(const std::string &arg) const{
 
-	auto pos = p->valid_args.find(arg);
-	if( pos != p->valid_args.end() ){
-		return pos->second.value;
-	}
-	return "";
+  auto pos = p->valid_args.find(arg);
+  if( pos != p->valid_args.end() ){
+    return pos->second.value;
+  }
+  return "";
 }
 
 /**
@@ -332,136 +332,146 @@ string CheckArg::value(const std::string &arg) const{
  * \return true if give, false otherwise
  */
 bool CheckArg::isset(const std::string &arg) const {
-	auto pos = p->valid_args.find(arg);
-	return pos != p->valid_args.end() && !(pos->second.value.empty());
+  auto pos = p->valid_args.find(arg);
+  return pos != p->valid_args.end() && !(pos->second.value.empty());
 }
 
 int CheckArgPrivate::arg(const std::string &arg){
-	if( ! next_is_val_of.empty() ){
-		// _next val of should be an opt with value
-		//static_assert( _valid_args[_next_is_val_of].has_val );
+  if( ! pos_arg_sep ){
+    // if the separator '--' was given, all following args are positional
 
-		valid_args[next_is_val_of].value = arg;
-		auto ret = call_cb(next_is_val_of);
-		next_is_val_of.clear();
-		return ret;
-	}
+    if( ! next_is_val_of.empty() ){
+      // _next val of should be an opt with value
+      //static_assert( _valid_args[_next_is_val_of].has_val );
 
-	if( arg[0] == '-' ){ // it's an arg
-		if( arg[1] == '-' ) { // it's a long one
-			return arg_long(arg.substr(2));
-		}
+      valid_args[next_is_val_of].value = arg;
+      auto ret = call_cb(next_is_val_of);
+      next_is_val_of.clear();
+      return ret;
+    }
 
-		// it's a short one or a group of short ones
-		return arg_short(arg.substr(1));
-	}
+    if( arg[0] == '-' ){ // it's an arg
+      if( arg[1] == '-' ) { // it's a long one
+        return arg_long(arg.substr(2));
+      }
 
-	// it's some positional arg
-	pos_args.push_back(arg);
-	return CA_ALLOK;
+      // it's a short one or a group of short ones
+      return arg_short(arg.substr(1));
+    }
+  }
+
+  // it's some positional arg
+  pos_args.push_back(arg);
+  return CA_ALLOK;
 }
 
 int CheckArgPrivate::arg_long(const std::string &arg){
-	auto eqpos = arg.find('=');
-	string real_arg, val;
-	if( eqpos != string::npos ){
-		real_arg = arg.substr(0, eqpos);
-		val = arg.substr(eqpos+1);
-	} else {
-		real_arg = arg;
-	}
+  if( arg.empty() ){
+    // if the given arg was '--', arg is an empty string
+    pos_arg_sep = true;
+    return CA_ALLOK;
+  }
 
-	auto pos = valid_args.find(real_arg);
-	if( pos != valid_args.end() ){
-		if( pos->second.has_val && !val.empty() ) {
-			// arg has value defined, and value is given by '='
-			pos->second.value = val;
-		} else if( pos->second.has_val ){
-			// value of arg is the next arg, remember that for the next call of arg
-			next_is_val_of = real_arg;
-		} else { // there's no value defined by add()
-			if( !val.empty() ){
-				// error?
-				return ca_error(CA_INVVAL, ": --%s!", real_arg.c_str());
-			}
-			pos->second.value = "x"; // mark arg as seen
-		}
+  auto eqpos = arg.find('=');
+  string real_arg, val;
+  if( eqpos != string::npos ){
+    real_arg = arg.substr(0, eqpos);
+    val = arg.substr(eqpos+1);
+  } else {
+    real_arg = arg;
+  }
 
-		if( !pos->second.has_val || !val.empty()) {
-			// if arg has no val, or val is found already, call callback now, if there's one
-			return call_cb(real_arg);
-		}
-		return CA_ALLOK;
-	} else {
-		return ca_error(CA_INVARG, ": --%s!", real_arg.c_str());
-	}
+  auto pos = valid_args.find(real_arg);
+  if( pos != valid_args.end() ){
+    if( pos->second.has_val && !val.empty() ) {
+      // arg has value defined, and value is given by '='
+      pos->second.value = val;
+    } else if( pos->second.has_val ){
+      // value of arg is the next arg, remember that for the next call of arg
+      next_is_val_of = real_arg;
+    } else { // there's no value defined by add()
+      if( !val.empty() ){
+        // error?
+        return ca_error(CA_INVVAL, ": --%s!", real_arg.c_str());
+      }
+      pos->second.value = "x"; // mark arg as seen
+    }
+
+    if( !pos->second.has_val || !val.empty()) {
+      // if arg has no val, or val is found already, call callback now, if there's one
+      return call_cb(real_arg);
+    }
+    return CA_ALLOK;
+  } else {
+    return ca_error(CA_INVARG, ": --%s!", real_arg.c_str());
+  }
 }
 
 int CheckArgPrivate::arg_short(const std::string &arg){
-	size_t len = arg.size();
-	for(int i=0; i < len; ++i){
-		auto pos = short2long.find(arg[i]);
-		if( pos != short2long.end() ){ // there is such a short arg registered
-			if( valid_args[pos->second].has_val ) { // if has val,
-				if( i < len-1 ){ //remainder is interpreted as val,
-					valid_args[pos->second].value = arg.substr(i+1);
-					return call_cb(pos->second);
-				} else { // or next_arg is treated as val
-					next_is_val_of = pos->second;
-				}
-				return CA_ALLOK; // no further looping, we're done.
-			} else {
-				valid_args[pos->second].value = "x"; // mark arg as seen
-				auto ret = call_cb(pos->second);
-				if(ret != CA_ALLOK )
-				  return ret;
-			}
-		} else {
-			return ca_error(CA_INVARG, ": -%c!", arg[i]);
-		}
-	}
-	return CA_ALLOK;
+  size_t len = arg.size();
+  for(int i=0; i < len; ++i){
+    auto pos = short2long.find(arg[i]);
+    if( pos != short2long.end() ){ // there is such a short arg registered
+      if( valid_args[pos->second].has_val ) { // if has val,
+        if( i < len-1 ){ //remainder is interpreted as val,
+          valid_args[pos->second].value = arg.substr(i+1);
+          return call_cb(pos->second);
+        } else { // or next_arg is treated as val
+          next_is_val_of = pos->second;
+        }
+        return CA_ALLOK; // no further looping, we're done.
+      } else {
+        valid_args[pos->second].value = "x"; // mark arg as seen
+        auto ret = call_cb(pos->second);
+        if(ret != CA_ALLOK )
+          return ret;
+      }
+    } else {
+      return ca_error(CA_INVARG, ": -%c!", arg[i]);
+    }
+  }
+  return CA_ALLOK;
 }
 
 int CheckArgPrivate::call_cb(const std::string &arg){
-	auto cbpos = valid_args.find(arg);
-	if( cbpos != valid_args.end() && cbpos->second.cb ){
-		int cbret = cbpos->second.cb(CheckArgPtr(parent), arg, cbpos->second.value);
-		if(cbret != CA_ALLOK) {
-			// if callback returns anything other than CA_ALLOK, there's been an error
-			return ca_error(CA_CALLBACK, ": %d!", cbret);
-		}
-	}
-	return CA_ALLOK;
+  auto cbpos = valid_args.find(arg);
+  if( cbpos != valid_args.end() && cbpos->second.cb ){
+    int cbret = cbpos->second.cb(CheckArgPtr(parent), arg, cbpos->second.value);
+    if(cbret != CA_ALLOK) {
+      // if callback returns anything other than CA_ALLOK, there's been an error
+      return ca_error(CA_CALLBACK, ": %d!", cbret);
+    }
+  }
+  return CA_ALLOK;
 }
 
 
 int checkarg::show_autohelp(CheckArgPtr ca, const std::string&, const std::string &val){
-	stringstream ss;
-	size_t space = 0;
-	for( auto &kv : ca->p->valid_args )
-		space = max(space, kv.first.size() );
+  stringstream ss;
+  size_t space = 0;
+  for( auto &kv : ca->p->valid_args )
+    space = max(space, kv.first.size() );
 
-	space += 2; // add 2 more spaces
+  space += 2; // add 2 more spaces
 
-	ss << "Usage: " << ca->p->usage_line << " " << ca->p->posarg_help_usage << endl;
+  ss << "Usage: " << ca->p->usage_line << " " << ca->p->posarg_help_usage << endl;
 
-	if(!ca->p->descr.empty()) ss << endl << ca->p->descr << endl;
+  if(!ca->p->descr.empty()) ss << endl << ca->p->descr << endl;
 
-	ss << endl << "Options:" << endl;
-	for(auto it=ca->p->valid_args.begin(); it != ca->p->valid_args.end(); ++it){
-		if(it->second.sopt) ss << "   -" << it->second.sopt << ",";
-		else ss << "      ";
-		ss << " --" << it->first << string(space-it->first.size(), ' ')
-		   << it->second.help << endl;
-	}
-	if(!ca->p->posarg_help_descr.empty())
-		ss << endl
-			 << "Positional Arguments:" << endl
-			 << ca->p->posarg_help_descr << endl;
-	if(!ca->p->appendix.empty()) ss << endl << ca->p->appendix << endl;
+  ss << endl << "Options:" << endl;
+  for(auto it=ca->p->valid_args.begin(); it != ca->p->valid_args.end(); ++it){
+    if(it->second.sopt) ss << "   -" << it->second.sopt << ",";
+    else ss << "      ";
+    ss << " --" << it->first << string(space-it->first.size(), ' ')
+       << it->second.help << endl;
+  }
+  if(!ca->p->posarg_help_descr.empty())
+    ss << endl
+       << "Positional Arguments:" << endl
+       << ca->p->posarg_help_descr << endl;
+  if(!ca->p->appendix.empty()) ss << endl << ca->p->appendix << endl;
 
-	cout << ss.str() << flush;
+  cout << ss.str() << flush;
 
-	exit(0); // always exit after showing help
+  exit(0); // always exit after showing help
 }
