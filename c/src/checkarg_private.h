@@ -43,7 +43,6 @@ struct _CheckArgPrivate {
   int    argc;
   char **argv;
 
-  bool autohelp_on;
   bool pos_arg_sep;
 
   char *appname,

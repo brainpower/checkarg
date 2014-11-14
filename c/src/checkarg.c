@@ -92,7 +92,6 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
 
   priv->argv = argv;
   priv->argc = argc;
-  priv->autohelp_on = 0;
   priv->pos_arg_sep = 0;
 
   return ret;
@@ -183,7 +182,6 @@ int
 checkarg_add_autohelp(CheckArg *ca) {
   Opt *opt = opt_new('h', "help", checkarg_show_autohelp, "show this help message and exit", 0);
   if(!opt) return CA_ALLOC_ERR;
-  ca->p->autohelp_on = 1;
   return valid_args_insert(ca, opt);
 }
 
