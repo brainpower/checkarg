@@ -1,10 +1,10 @@
 prefix=/usr
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
-includedir=${prefix}/include/checkarg
+includedir=${prefix}/include/checkarg++
 
-Name: libcheckarg
+Name: libcheckarg++
 Description: Parses commandline arguments and provides convenience
-Version: 0.1.0
-Libs: -L${libdir} -lcheckarg
+Version: 1.2.0
+Libs: -L${libdir} -lcheckarg++
 Cflags: -I${includedir}
