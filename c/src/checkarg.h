@@ -18,6 +18,8 @@
 #ifndef CHECKARG_H
 #define CHECKARG_H
 
+#define CA_VER_STRING "1.2.0"
+
 #ifndef NDEBUG
 #define CA_PRINTERR
 #endif

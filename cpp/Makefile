@@ -1,7 +1,5 @@
 #!/usr/bin/make -f
 
-MVER=1
-VER=$(MVER).2.0
 
 CC=gcc
 CXX=g++
@@ -21,6 +19,9 @@ LIBNAME=checkarg++
 CAHDR=$(LIBNAME).hpp
 CAHDRS=src/$(LIBNAME).hpp src/checkarg_private.hpp
 CAOBJS=src/$(LIBNAME).o
+
+VER=$(shell grep '\#define.*CA_VER_STRING.*' src/$(CAHDR) | sed 's/.*CA_VER_STRING.*\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\".*/\1/' )
+MVER=$(firstword $(subst ., ,$(VER)))
 
 SHLIB=lib$(LIBNAME).so.$(VER)
 SHLIBM=lib$(LIBNAME).so.$(MVER)

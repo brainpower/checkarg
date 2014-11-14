@@ -18,6 +18,8 @@
 #ifndef CHECKARG_HPP
 #define CHECKARG_HPP
 
+#define CA_VER_STRING "1.2.0"
+
 #include <memory> // shared_ptr
 #include <string>
 #include <map>
