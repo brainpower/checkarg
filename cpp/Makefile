@@ -1,5 +1,8 @@
 #!/usr/bin/make -f
 
+MVER=1
+VER=$(MVER).2.0
+
 CC=gcc
 CXX=g++
 LD=$(CC)
@@ -19,8 +22,8 @@ CAHDR=$(LIBNAME).hpp
 CAHDRS=src/$(LIBNAME).hpp src/checkarg_private.hpp
 CAOBJS=src/$(LIBNAME).o
 
-SHLIB=lib$(LIBNAME).so.0.0.0
-SHLIBM=lib$(LIBNAME).so.0
+SHLIB=lib$(LIBNAME).so.$(VER)
+SHLIBM=lib$(LIBNAME).so.$(MVER)
 SHLIBN=lib$(LIBNAME).so
 STLIB=lib$(LIBNAME).a
 PCFILE=$(LIBNAME).pc
