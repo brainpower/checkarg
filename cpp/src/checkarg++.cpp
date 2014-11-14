@@ -475,3 +475,28 @@ int checkarg::show_autohelp(CheckArgPtr ca, const std::string&, const std::strin
 
   exit(0); // always exit after showing help
 }
+
+#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER) || defined(__WIN32__)
+#include <cstring>
+int vasprintf(char** strp, const char* format, va_list ap)
+{
+  int count;
+  // Find out how long the resulting string is
+  count = _vscprintf(format, ap);
+  if (count == 0) {
+    *strp = strdup("");
+    return *strp == NULL ? -1:0;
+  } else if (count < 0) {
+    // Something went wrong, so return the error code (probably still requires checking of "errno" though)
+    return count;
+  }
+  //Allocate memory for our string
+  *strp = (char*)malloc(count + 1);
+  if (*strp == NULL) {
+    abort();
+    return -1;
+  }
+  // Do the actual printing into our newly created string
+  return vsprintf(*strp, format, ap);
+}
+#endif

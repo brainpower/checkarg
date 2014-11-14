@@ -48,3 +48,6 @@ You may convince me otherwise, though.<br>
 Old style options (like tar supports) look like this:
 
     tar xfL <value_for_f> <value_for_L>
+
+
+If you'd like to use checkarg under a different licence than GPL, for example, in a proprietary project, please contact me. I'm sure we can find a solution.
