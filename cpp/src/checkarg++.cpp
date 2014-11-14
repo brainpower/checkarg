@@ -106,15 +106,15 @@ CheckArg::CheckArg(const int argc, char ** argv, const std::string &appname, con
 
 // private c'tors
 CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname)
-  : argc(argc), argv(argv), parent(ca), appname(appname), autohelp_on(false), pos_arg_sep(false),
+  : argc(argc), argv(argv), parent(ca), appname(appname), pos_arg_sep(false),
     usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc)
-  : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), autohelp_on(false), pos_arg_sep(false),
+  : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), pos_arg_sep(false),
     usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix)
-  : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix), autohelp_on(false), pos_arg_sep(false),
+  : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix), pos_arg_sep(false),
     usage_line(appname + " [options]") {}
 
 
@@ -276,7 +276,6 @@ int CheckArg::add_autohelp(){
   p->valid_args["help"].help    = "show this help message and exit";
   p->valid_args["help"].cb      = checkarg::show_autohelp; // set the autohelp callback
   p->short2long['h'] = "help";   // add -h mapped to --help
-  p->autohelp_on = true;         // switch autohelp to on
   return CA_ALLOK;
 }
 

@@ -58,7 +58,6 @@ private:
   std::string appname;
   std::string descr;
   std::string appendix;
-  bool autohelp_on;
   bool pos_arg_sep;
   std::string usage_line;
   std::string posarg_help_descr, posarg_help_usage;
