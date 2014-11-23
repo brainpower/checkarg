@@ -11,7 +11,7 @@ Therefore it pulls no 'external' dependencies and relies completely on the STL (
 Java API or C Standard Library, respectively.
 
 That way it's pretty easy to integrate into an existing project,<br>
-because it's non-intrusive, you dont need to 'build your project arount it'.
+because it's non-intrusive, you dont need to 'build your project around it'.
 
 Commandline options use the common so-called GNU style,<br>
 e.g. use double dashes and look something like these:
@@ -21,7 +21,7 @@ e.g. use double dashes and look something like these:
 Additionally, abreviations of those in so-called POSIX style (or UNIX style) can be added.<br>
 They look like this:
 
-    program -o [value] -q -f <value>
+    program -o <value> -q -f <value>
 
 And they can be combined:
 
