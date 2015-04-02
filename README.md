@@ -39,7 +39,8 @@ So these commands are not the same:
 
 In the first command, 'i' is considered the value of -f,
 other_file a positional argument, not the value of either -f or -i.
-
+It is discouraged to append the value of an option without a separator like ```-qifother_file```,
+it creates confusion where none is neccessary. Better be clear and use ```-qi -f other_file```.
 
 In the docs I'll call the GNU style and POSIX style options "long" and "short" options, respectively.
 
