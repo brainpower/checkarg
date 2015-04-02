@@ -18,7 +18,7 @@ General
   and some kind of counter for non-value options.
 
 - maybe support (optionally) subcommands, like: git commit --option
-  Currently, you'd have to check poss_args[0] yourself.
+  Currently, you'd have to check pos_args[0] yourself.
 
 
 C++ Port
