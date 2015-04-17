@@ -20,6 +20,7 @@ General
 - maybe support (optionally) subcommands, like: git commit --option
   Currently, you'd have to check pos_args[0] yourself.
 
+- maybe support default values for value-based options
 
 C++ Port
 ========
