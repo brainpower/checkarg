@@ -10,8 +10,8 @@ AR=ar
 INSTALL=install
 LNS=ln -s
 
-CFLAGS=$(CFLAGS) -std=gnu11 -O2 -g -fPIC
-CXXFLAGS=$(CXXFLAGS) -std=c++11 -O2 -g -fPIC
+XCFLAGS=$(CFLAGS) -std=gnu11 -O2 -g -fPIC
+XCXXFLAGS=$(CXXFLAGS) -std=c++11 -O2 -g -fPIC
 LIBS?=
 PREFIX?=/usr
 
@@ -34,11 +34,11 @@ PCFILE=$(LIBNAME).pc
 
 .cpp.o:
 	@echo -e "  \e[1mCXX     \e[0m$<"
-	$(CXX) $(CXXFLAGS) $< -c -o $@
+	$(CXX) $(XCXXFLAGS) $< -c -o $@
 
 .c.o:
 	@echo -e "  \e[1mCC      \e[0m$<"
-	$(CC) $(CFLAGS) $< -c -o $@
+	$(CC) $(XCFLAGS) $< -c -o $@
 
 
 all: shared

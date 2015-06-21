@@ -8,7 +8,7 @@ AR=ar
 INSTALL=install
 LNS=ln -s
 
-CFLAGS=$(CFLAGS) -std=gnu11 -O2 -g -fPIC -Wall
+XCFLAGS=$(CFLAGS) -std=gnu11 -O2 -g -fPIC -Wall
 LIBS?=
 PREFIX?=/usr
 
@@ -31,7 +31,7 @@ PCFILE=$(LIBNAME).pc
 
 .c.o:
 	@echo -e "  \e[1mCC      \e[0m$<"
-	@$(CC) $(CFLAGS) $< -c -o $@
+	@$(CC) $(XCFLAGS) $< -c -o $@
 
 
 all: shared
