@@ -1,18 +1,23 @@
 /*
- * Copyright (C) 2013-2014 brainpower <brainpower at gulli dot com>
+ * Copyright (c) 2013-2015 brainpower <brainpower at mailbox dot org>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
 */
 
 #include "checkarg++.hpp"
@@ -38,38 +43,38 @@ using namespace std;
  *
  * Commandline options use the common so-called GNU style,
  * e.g. use double dashes and look something like these: <br>
- * 
+ *
  *   program --option=value --quiet --option2 <value><br>
- * 
+ *
  * Additionally, abreviations of those in so-called POSIX style can be added.
  * They look like this: <br>
- * 
+ *
  *   program -o <value> -q -f <value>
- * 
+ *
  * And they can be combined:
- * 
+ *
  *   program -o <value> -qf <value>
  *   program -o <value> -qf<value>
- * 
+ *
  * Note that above commands are equivalent.
  * This means after a value type option is found in a grouped option
  * the remainder is always considered to be the value,
  * even if you meant it to be an option.<br>
  * So these commands are not the same:
- * 
+ *
  *   program -o <value> -qfi other_file
  *   program -o <value> -q -f other_file -i
- * 
+ *
  * In the first command, 'i' is considered the value of -f,
  * other_file a positional argument, not the value of either -f or -i.
- * 
+ *
  * In the docs I'll call the GNU style and POSIX style options "long" and "short" options, respectively.
- * 
+ *
  * Old style or traditional style options are *not* supported and I don't plan to do so.<br>
  * You may convince me otherwise, though.<br>
  * Old style options (like tar supports) look like this:
  *   tar xfL <value_for_f> <value_for_L>
- * 
+ *
  *
  * Using CheckArg as a developer can be divided in two phases, pre-parse() and post-parse().
  * In the pre-parse phase, you'll define your commandline options using the add() members.
@@ -89,12 +94,12 @@ using namespace std;
 
 map <int,string>
 CheckArgPrivate::errors = {
-  {CA_ALLOK,  "Everything is fine"},
-  {CA_ERROR,  "An Error occurred"},
-  {CA_INVARG, "Unknown command line argument"},
-  {CA_INVVAL, "Value given to non-value argument"},
-  {CA_MISSVAL, "Missing value of argument"},
-  {CA_CALLBACK, "Callback returned with error code"},
+	{CA_ALLOK,  "Everything is fine"},
+	{CA_ERROR,  "An Error occurred"},
+	{CA_INVARG, "Unknown command line argument"},
+	{CA_INVVAL, "Value given to non-value argument"},
+	{CA_MISSVAL, "Missing value of argument"},
+	{CA_CALLBACK, "Callback returned with error code"},
 };
 
 // c'tors
