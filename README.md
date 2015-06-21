@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/brainpower/checkarg.svg?branch=master)](https://travis-ci.org/brainpower/checkarg)
+
 CheckArg<br>
 is a lightweight and easy to use command line parser.
 
@@ -51,4 +53,3 @@ Old style options (like tar supports) look like this:
     tar xfL <value_for_f> <value_for_L>
 
 
-If you'd like to use checkarg under a different licence than GPL, for example, in a proprietary project, please contact me. I'm sure we can find a solution.
