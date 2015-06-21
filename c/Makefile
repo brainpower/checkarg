@@ -1,16 +1,16 @@
 #!/usr/bin/make -f
 
 
-CC=gcc
-LD=$(CC)
+CC?=gcc
+LD?=$(CC)
 RMF=rm -f
 AR=ar
 INSTALL=install
 LNS=ln -s
 
-CFLAGS=-std=gnu11 -Og -g -fPIC -Wall
-LIBS=
-PREFIX=/usr
+CFLAGS=$(CFLAGS) -std=gnu11 -O2 -g -fPIC -Wall
+LIBS?=
+PREFIX?=/usr
 
 LIBNAME=checkarg
 CAHDR=$(LIBNAME).h

@@ -1,19 +1,19 @@
 #!/usr/bin/make -f
 
 
-CC=gcc
-CXX=g++
-LD=$(CC)
-CXXLD=$(CXX)
+CC?=gcc
+CXX?=g++
+LD?=$(CC)
+CXXLD?=$(CXX)
 RMF=rm -f
 AR=ar
 INSTALL=install
 LNS=ln -s
 
-CFLAGS=-std=gnu11 -Og -g -fPIC
-CXXFLAGS=-std=c++11 -Og -g -fPIC
-LIBS=
-PREFIX=/usr
+CFLAGS=$(CFLAGS) -std=gnu11 -O2 -g -fPIC
+CXXFLAGS=$(CXXFLAGS) -std=c++11 -O2 -g -fPIC
+LIBS?=
+PREFIX?=/usr
 
 LIBNAME=checkarg++
 CAHDR=$(LIBNAME).hpp
@@ -34,11 +34,11 @@ PCFILE=$(LIBNAME).pc
 
 .cpp.o:
 	@echo -e "  \e[1mCXX     \e[0m$<"
-	@$(CXX) $(CXXFLAGS) $< -c -o $@
+	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 .c.o:
 	@echo -e "  \e[1mCC      \e[0m$<"
-	@$(CC) $(CFLAGS) $< -c -o $@
+	$(CC) $(CFLAGS) $< -c -o $@
 
 
 all: shared
