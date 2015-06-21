@@ -2,13 +2,13 @@
 
 
 CC?=gcc
-LD?=$(CC)
+CLD?=$(CC)
 RMF=rm -f
 AR=ar
 INSTALL=install
 LNS=ln -s
 
-XCFLAGS=$(CFLAGS) -std=gnu11 -O2 -g -fPIC -Wall
+XCFLAGS=$(CFLAGS) -std=c11 -O2 -g -fPIC -Wall -D_GNU_SOURCE
 LIBS?=
 PREFIX?=/usr
 
@@ -46,7 +46,7 @@ $(STLIB): $(CAOBJS)
 
 $(SHLIB): $(CAOBJS)
 	@echo -e "  \e[1mLD      \e[0m$@"
-	@$(LD) -shared -Wl,-soname,$(SHLIBM) -o $@ $(CAOBJS)
+	@$(CLD) -shared -Wl,-soname,$(SHLIBM) -o $@ $(CAOBJS)
 
 doc:
 	@echo -e "  \e[1mDOXYGEN \e[0m"

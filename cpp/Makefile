@@ -34,11 +34,11 @@ PCFILE=$(LIBNAME).pc
 
 .cpp.o:
 	@echo -e "  \e[1mCXX     \e[0m$<"
-	$(CXX) $(XCXXFLAGS) $< -c -o $@
+	@$(CXX) $(XCXXFLAGS) $< -c -o $@
 
 .c.o:
 	@echo -e "  \e[1mCC      \e[0m$<"
-	$(CC) $(XCFLAGS) $< -c -o $@
+	@$(CC) $(XCFLAGS) $< -c -o $@
 
 
 all: shared
