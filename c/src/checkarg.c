@@ -535,6 +535,11 @@ int checkarg_arg_short(CheckArg *ca, const char *args){
           opt->value = strdup( it );
           if( !opt->value )
             goto alloc_error;
+
+          ret = call_cb(ca, opt);
+	        if( ret != CA_ALLOK )
+		        return ret;
+
         } else {
           ca->p->next_is_val_of = strdup( opt->lopt );
           if( ! ca->p->next_is_val_of )
