@@ -11,6 +11,9 @@ install:
   - sudo apt-get -qq install g++-5
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 90
+  - $CC --version
+  - $CXX --version
 script:
   - cd $SRCDIR
   - make
+  - make check
