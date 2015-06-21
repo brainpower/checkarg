@@ -1,0 +1,8 @@
+language: cpp
+env:
+  - SRCDIR=c
+  - SRCDIR=cpp
+compiler:
+  - gcc
+  - clang
+script: cd $SRCDIR && make
