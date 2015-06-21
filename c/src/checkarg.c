@@ -42,7 +42,8 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
   CheckArgPrivate *priv = NULL;
 
   ret = (CheckArg*) malloc(sizeof(CheckArg));
-  if(!ret) return NULL; /* malloc failed */
+  if(!ret)
+  	return NULL; /* malloc failed */
 
   priv = (CheckArgPrivate*)malloc(sizeof(CheckArgPrivate));
   if(!priv) /* malloc failed */
@@ -50,81 +51,62 @@ checkarg_new(const int argc, char **argv, const char *appname, const char *desc,
 
   ret->p = priv;
 
+	/* initialize struct with zeros #C99# */
+	*priv = (CheckArgPrivate){0};
+
+  priv->argv = argv;
+  priv->argc = argc;
+
   priv->appname = strdup(appname);
-  if(!priv->appname)/* malloc failed */
-    goto clean;
+  if(!priv->appname) goto clean;
 
   priv->usage_line = (char*)malloc(strlen(appname)+11);
-  if(!priv->usage_line){ /* malloc failed */
-    goto clean_app;
-  }
+  if(!priv->usage_line) goto clean;
 
-  *priv->usage_line = 0; /* set first char to \0, so strcat will start at the beginning */
+  *priv->usage_line = '\0'; /* set first char to \0, so strcat will start at the beginning */
   strcat(priv->usage_line, priv->appname);
   strcat(priv->usage_line, " [options]");
 
   if(desc){
     priv->descr = strdup(desc);
-    if(!priv->descr){ /* malloc failed */
-      goto clean_usage;
-    }
-  } else
-    priv->descr = NULL;
+    if(!priv->descr) goto clean;
+  }
 
   if(appendix){
     priv->appendix = strdup(appendix);
-    if(!priv->appendix){ /* malloc failed */
-      goto clean_descr;
-    }
-  } else
-    priv->appendix = NULL;
-
-
-  priv->next_is_val_of    = NULL;
-  priv->posarg_help_descr = NULL;
-  priv->posarg_help_usage = NULL;
+    if(!priv->appendix) goto clean;
+  }
 
   /* alloc a bit too much and shrink it to real size in one go later */
-  priv->pos_args          = (const char**)malloc(argc*sizeof(char*));
-  priv->pos_args_count    = 0;
-  priv->valid_args        = NULL;
-  priv->valid_args_last   = NULL;
-
-  priv->argv = argv;
-  priv->argc = argc;
-  priv->pos_arg_sep = 0;
+  priv->pos_args = (const char**)malloc(argc*sizeof(char*));
+  if(!priv->pos_args) goto clean;
 
   return ret;
 
 /* clean up and return in case of error */
-clean_descr:
-  free(priv->descr);
-clean_usage:
-  free(priv->usage_line);
-clean_app:
-  free(priv->appname);
 clean:
-  free(priv);
-  free(ret);
+  checkarg_free(ret);
   return NULL;
 }
 
 void
 checkarg_free(CheckArg *ca){
-  free(ca->p->appname);
-  free(ca->p->descr);
-  free(ca->p->appendix);
-  free(ca->p->usage_line);
-  free(ca->p->next_is_val_of);
-  free(ca->p->posarg_help_descr);
-  free(ca->p->posarg_help_usage);
+	if(ca && ca->p){ /* makes free of partially initialized ca possible */
+		free(ca->p->appname);
+		free(ca->p->descr);
+		free(ca->p->appendix);
+		free(ca->p->usage_line);
+		free(ca->p->next_is_val_of);
+		free(ca->p->posarg_help_descr);
+		free(ca->p->posarg_help_usage);
 
-  /* arrays */
-  pos_args_free(ca->p->pos_args );
-  valid_args_free(ca->p->valid_args);
+		/* "arrays" and lists */
+		pos_args_free(ca->p->pos_args );
+		valid_args_free(ca->p->valid_args);
 
-  free(ca->p);
-  free(ca);
+		free(ca->p);
+	}
+	free(ca);
 }
 
 int
@@ -330,17 +312,10 @@ opt_new(const char sopt, const char *lopt, CheckArgFP cb, const char *help, cons
   if(!opt) return NULL;
 
   opt->lopt = strdup(lopt);
-  if(!opt->lopt){ /* malloc failed */
-    free(opt);
-    return NULL;
-  }
+  if(!opt->lopt) goto clean;
 
   opt->help = strdup(help);
-  if(!opt->help){ /* malloc failed */
-    free(opt->lopt);
-    free(opt);
-    return NULL;
-  }
+  if(!opt->help) goto clean;
 
   opt->sopt    = sopt;
   opt->has_val = has_val;
@@ -348,13 +323,20 @@ opt_new(const char sopt, const char *lopt, CheckArgFP cb, const char *help, cons
   opt->value   = NULL;
   opt->next    = NULL;
   return opt;
+
+clean:
+	opt_free(opt);
+	return NULL;
 }
 
+/* WARNING: you have to free 'next' yourself if used, like in valid_args_free */
 void opt_free(Opt *o){
-  free(o->value);
-  free(o->help);
-  free(o->lopt);
-  free(o);
+	if(o){
+		free(o->value);
+		free(o->help);
+		free(o->lopt);
+		free(o);
+	}
 }
 
 int ca_error(int eno, const char *fmt, ...) {
@@ -369,7 +351,7 @@ int ca_error(int eno, const char *fmt, ...) {
 }
 
 void pos_args_free(const char **posargs){
-  free(posargs);
+	free(posargs);
 }
 
 void valid_args_free(Opt* vaptr){
@@ -581,3 +563,5 @@ void pos_args_append(CheckArg *ca, const char *arg){
   *tmp = arg;
   ++(ca->p->pos_args_count);
 }
+
+/* vim: set ft=c : */
