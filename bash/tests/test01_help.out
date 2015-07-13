@@ -1,0 +1,5 @@
+Usage: test01 [options]
+
+Options:
+   -i, --input  file to read from
+   -h, --help   show this help message and exit
