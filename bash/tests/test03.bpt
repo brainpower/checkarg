@@ -1,0 +1,23 @@
+
+name="test03.sh"
+type="bash"
+sources=("test03.sh" "../checkarg.sh")
+
+prepare(){
+  true
+}
+
+run(){
+
+  test_rc "-- return code" 0 -i input -- file file2
+  test_rc "-- return code" 0 -i input -- file --file2
+  test_rc "-- & missing value return code" 0 -i -- file file2
+
+  test_stdout "correct separating" test03.out -i in -- file --file2 file3
+
+}
+
+clean(){
+  true
+}
+# vim: ft=sh
