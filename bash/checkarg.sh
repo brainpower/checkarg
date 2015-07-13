@@ -193,10 +193,10 @@ function checkarg_parse(){
 	local ret=0
 
 	for arg in "$@"; do
-		if ! _checkarg_arg "$arg"; then
-			ret="$?"
-			break;
-		fi
+		_checkarg_arg "$arg";
+		ret="$?"
+
+		[[ "$ret" != 0 ]] && break;
 	done
 
 	if [[ -n "$_checkarg_next_is_val_of" ]]; then
@@ -204,17 +204,19 @@ function checkarg_parse(){
 	fi
 
 	# TODO: cleanup?
+	#
+	return "$ret"
 }
 
 ##
 # auto-help related setters
 ##
 
-# $1: description of the positional args
-# $2: text to be appended to usage line for positional args
+# $1: text to be appended to usage line for positional args
+# $2: description of the positional args
 function checkarg_set_posarg_help(){
-	_checkarg_posarg_descr="$1"
-	_checkarg_posarg_usage="$2"
+	_checkarg_posarg_descr="$2"
+	_checkarg_posarg_usage="$1"
 }
 
 # $1: set the usage line used in autohelp
@@ -225,14 +227,14 @@ function checkarg_set_usage_line(){
 # $1: long opt name
 # returns 0 if opt was given, 1 if not
 function checkarg_isset(){
-	[[ -n "${_checkarg_valid_args[$1]}" ]]
+	[[ -n "${_checkarg_args_values[$1]}" ]]
 }
 
 # $1: long opt name
 # prints argument value
 function checkarg_value(){
-	if [[ -n "${_checkarg_valid_args[$1]}" ]]; then
-		printf "${_checkarg_valid_args[$1]}"
+	if [[ -n "${_checkarg_args_values[$1]}" ]]; then
+		printf "${_checkarg_args_values[$1]}"
 	else
 		return 1
 	fi
@@ -407,9 +409,11 @@ function _checkarg_show_help(){
 		space="$(( space > ${#key} ? space : ${#key} ))"
 	done
 
-	printf "Usage: %s [Options] %s\n\n" "$_checkarg_appname" "$_checkarg_posarg_usage"
+	printf "Usage: %s [options]%s\n\n" "$_checkarg_appname" "$_checkarg_posarg_usage"
 
-	printf "$_checkarg_descr\n\n"
+	if [[ -n "$_checkarg_descr" ]]; then
+		printf "$_checkarg_descr\n\n"
+	fi
 
 	printf "Options:\n"
 
@@ -426,7 +430,7 @@ function _checkarg_show_help(){
 	done
 
 	if [[ -n "$_checkarg_posarg_descr" ]]; then
-		printf "\nPositional Argumments:\n%s\n" "$_checkarg_posarg_descr"
+		printf "\nPositional Arguments:\n%s\n" "$_checkarg_posarg_descr"
 	fi
 
 	if [[ -n "$_checkarg_appendix" ]]; then
