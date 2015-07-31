@@ -3,6 +3,8 @@ General
 - support option and (positinal-)argument separator: --
     like in git checkout --option -- file1 file2
 
+=> DONE
+
 - add ```ca.show_usage()``` and ```ca.show_help()``` to manually show the help or usage message,
   so for example one can output the usage line if expected positional arguments are missing
 
@@ -19,8 +21,33 @@ General
 
 - maybe support (optionally) subcommands, like: git commit --option
   Currently, you'd have to check pos_args[0] yourself.
+  Separate CheckArg Objects for each subcommand would be sensible.
+  Some technique to tell CA objects which arguments belong to the subcommand
+  and which are global ones is needed. Maybe a simple index.
 
-- maybe support default values for value-based options
+- maybe support default values for value-based options.
+  should be simple to implement: an additional map and adapted function parameters.
+  Values will have to be strings for simplicity.
+  But commandline arguments are strings in the first place, so thats no prob.
+
+- maybe support general checks for positional arguments,
+  like number or type, number could be used for subcommands,
+  if set to 1:
+
+    add_posarg("subcmd", 1, 1, "helpmsg")
+
+	number would get specified by minimum and maximum,
+	max 0 disables maximum check
+	min 0 disables minimum check
+	so both 0 would be like * when globbing,
+	any number of args get caught.
+	Specify this only once and last.
+
+  value("subcmd") could return a list,
+  since that may be useful for "multiple options"
+
+- maybe support checking of the type of the values of options.
+  types could be string, int, float, ... maybe file, path or dir...
 
 C++ Port
 ========
