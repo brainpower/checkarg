@@ -1,24 +1,35 @@
 ##
-# This is a getopt-like function, it uses the contents
-# of the associative array 'checkarg_valid_args', the keys are the options,
-# the values are passed to eval. You can set global vars that way
-# or execute functions... well, everything eval accepts.
+# This provides a getopt-like functionality.
 #
-# It supports value-type options, you have to indicate this by setting
-# 'checkarg_has_val' to the var name in which the value shall be stored.
-# (without the preceeding dollar)
-# But there's a convenience function for that: checkarg_add_val
-#
-# Long options are also supportet, just use '-help' for '--help'
-# as key with checkarg_args, like this gets you a '--version' option:
-#  checkarg_add '-version' 'print_version=1' "Print programm's version and exit."
-# Or simply use the convenience function checkarg_add_long.
+#	For general information sbout how this works,
+#	see README.md at the projects root or
+#	at https://github.com/brainpower/checkarg/blob/master/README.md
 #
 # Positional arguments are appended to 'checkarg_pos_args'
 # which is declared as indexed array on sourcing this file..
 # Those are arguments passed which are not preceeded by a dash
 # and are not a value of an value-type argument.
 #
+# Using CheckArg as a developer can be divided in two phases,
+# pre-parse() and post-parse().
+# In the pre-parse phase, you'll initialize CheckArg using checkarg_init
+# and define your commandline options using the checkarg_add* functions.
+#
+# In the post-parse phase, you can check, which options where given
+# and get their values, if they've got one,
+# using checkarg_isset and checkarg_value.
+#
+# Parsing is done by the checkarg_parse function.
+#
+# Callbacks will, for now, be called while parsing,
+# if an option has no value, immediately after it was parsed,
+# otherwise, immediately after the value was parsed.
+# Callbacks have to be some shell function or command,
+# which will be tried to be executed directly without any eval.
+# The long option name and the value (if any)
+# will be passed to that function or command.
+#
+#	For example usages see tests/test*.sh.
 # Requires bash >= 4 or other compatible shell, like zsh
 #
 ###
@@ -87,6 +98,7 @@ _checkarg_next_is_val_of=''
 
 ##
 # initializes checkarg
+#
 # $1: appname
 # $2: description (opt.)
 # $3: appendix (opt.)
@@ -107,10 +119,13 @@ function checkarg_init(){
 }
 
 ##
-# $1: sopt
-# $2: lopt
-# $3: help
-# $4: has_val (0 no, 1 yes)
+# add an option to the list of valid options
+#
+# $1: sopt: char used for the short option
+# $2: lopt: long name of the option
+# $3: help: description used by "autohelp"
+# $4: has_val: specify if option has a value, (opt.)
+#              0 for no (default), 1 for yes
 ##
 function checkarg_add(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z $3 ]]; then
@@ -123,11 +138,15 @@ function checkarg_add(){
 }
 
 ##
-# $1: sopt
-# $2: lopt
-# $3: command name
-# $4: help
-# $5: has_val (0 no, 1 yes)
+# add an option to the list of valid options
+# and register the given callback
+#
+# $1: sopt: char used for the short option
+# $2: lopt: long name of the option
+# $3: command: command or function to be called
+# $4: help: description used by autohelp
+# $5: has_val: specify if option has a value, (opt.)
+#              0 for no (default), 1 for yes
 ##
 function checkarg_add_cb(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z $4 ]]; then
@@ -141,9 +160,13 @@ function checkarg_add_cb(){
 }
 
 ##
-# $1: lopt
-# $2: help
-# $3: has_val (opt.)
+# add an option to the list of valid options
+# without a short option
+#
+# $1: lopt: long name of the option
+# $2: help: description used by "autohelp
+# $3: has_val: specify if option has a value, (opt.)
+#              0 for no (default), 1 for yes
 ##
 function checkarg_add_long(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]]; then
@@ -155,10 +178,14 @@ function checkarg_add_long(){
 }
 
 ##
-# $1: lopt
-# $2: command name
-# $3: help
-# $4: has_val (opt.)
+# add an option to the list of valid options
+# without a short option but register a callback
+#
+# $1: lopt:    long name of the option
+# $2: command: command or function to be called
+# $3: help:    description used by "autohelp"
+# $4: has_val: specify if option has a value, (opt.)
+#              0 for no (default), 1 for yes
 ##
 function checkarg_add_long_cb(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z $3 ]]; then
@@ -170,7 +197,7 @@ function checkarg_add_long_cb(){
 	eval "_checkarg_args_cb[$1]='$2'"
 }
 ##
-# this adds the arguments '-h' and '--help' with
+# this adds the options '-h' and '--help' with
 # an automatically generated help-message.
 ##
 
@@ -183,7 +210,7 @@ function checkarg_add_autohelp(){
 # Calling this will do the parsing and checking.
 # It takes a list of passed arguments.
 #
-# You'd want to call it like this: checkarg "$@"
+# You'd want to call it like this: checkarg_parse "$@"
 #
 # Note: Please make sure to add arguments to checkarg's list
 # of valid arguments before calling this.
