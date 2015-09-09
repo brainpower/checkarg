@@ -363,7 +363,7 @@ function _checkarg_arg_short(){
 		if [[ -n "$lopt" ]]; then
 			if [[ "${_checkarg_args[$lopt]}" -gt 0 ]]; then
 				if [[ -n "${1:$(( i+1 ))}" ]]; then
-					_checkarg_args_values="${1:$(( i+1 ))}"
+					eval "_checkarg_args_values[$lopt]='${1:$(( i+1  ))}'" # _checkarg_args_values="${1:$(( i+1 ))}"
 					if [[ "${_checkarg_args[$lopt]}" = 0 ]]; then
 						if [[ -n "${_checkarg_args_cb[$lopt]}" ]]; then
 							${_checkarg_args_cb[$lopt]} "$lopt" "$value"
@@ -377,7 +377,7 @@ function _checkarg_arg_short(){
 				fi
 				return 0
 			else
-				_checkarg_args_values="x" # mark non-value opt as seen
+				eval "_checkarg_args_values[$lopt]='x'" # mark non-value option as seen
 
 				if [[ "${_checkarg_args[$lopt]}" = 0 ]]; then
 					if [[ -n "${_checkarg_args_cb[$lopt]}" ]]; then
@@ -414,12 +414,14 @@ function _checkarg_arg_long(){
 			# value given to non-value option
 			return 3
 		else
-			_checkarg_args_values="x" # mark non-value option as seen
+			eval "_checkarg_args_values[$arg]='x'" # mark non-value option as seen
 		fi
 
 		if [[ "${_checkarg_args[$arg]}" = 0 ]] || [[ "$arg" != "$value" ]]; then
-			${_checkarg_args_cb[$1]} "$_checkarg_next_is_val_of" "$1"
-			return $?
+			if [[ -n ${_checkarg_args_cb[$1]} ]]; then
+				${_checkarg_args_cb[$1]} "$_checkarg_next_is_val_of" "$1"
+				return $?
+			fi
 		fi
 		return 0
 
