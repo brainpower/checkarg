@@ -38,7 +38,7 @@
 
 // forward declarations
 class CheckArg;
-typedef std::shared_ptr<CheckArg> CheckArgPtr;
+typedef CheckArg* CheckArgPtr;
 class CheckArgPrivate;
 typedef std::shared_ptr<CheckArgPrivate> CheckArgPrivatePtr;
 
