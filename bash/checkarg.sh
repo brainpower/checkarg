@@ -29,6 +29,10 @@
 # The long option name and the value (if any)
 # will be passed to that function or command.
 #
+# If you want to set global variables in callbacks, it is advised
+# to use ALL UPPERCASE variable names, or you may get in conflict
+# with internal variables declared local in checkarg's functions.
+#
 #	For example usages see tests/test*.sh.
 # Requires bash >= 4 or other compatible shell, like zsh
 #
@@ -323,7 +327,7 @@ function _checkarg_arg(){
 			eval "_checkarg_args_values[$_checkarg_next_is_val_of]='$1'"
 
 			if [[ -n "${_checkarg_args_cb[$_checkarg_next_is_val_of]}" ]]; then
-				${_checkarg_args_cb[$1]} "$_checkarg_next_is_val_of" "$1"
+				${_checkarg_args_cb[$_checkarg_next_is_val_of]} "$_checkarg_next_is_val_of" "$1"
 				ret=$?
 			fi
 
@@ -362,15 +366,15 @@ function _checkarg_arg_short(){
 
 		if [[ -n "$lopt" ]]; then
 			if [[ "${_checkarg_args[$lopt]}" -gt 0 ]]; then
-				if [[ -n "${1:$(( i+1 ))}" ]]; then
-					eval "_checkarg_args_values[$lopt]='${1:$(( i+1  ))}'" # _checkarg_args_values="${1:$(( i+1 ))}"
-					if [[ "${_checkarg_args[$lopt]}" = 0 ]]; then
-						if [[ -n "${_checkarg_args_cb[$lopt]}" ]]; then
-							${_checkarg_args_cb[$lopt]} "$lopt" "$value"
-							return $?
-						else
-							return 0
-						fi
+				local value="${1:$(( i+1  ))}"
+				if [[ -n "${value}" ]]; then
+					eval "_checkarg_args_values[$lopt]='${value}'" # _checkarg_args_values="${1:$(( i+1 ))}"
+
+					if [[ -n "${_checkarg_args_cb[$lopt]}" ]]; then
+						${_checkarg_args_cb[$lopt]} "${lopt}" "${value}"
+						return $?
+					else
+						return 0
 					fi
 				else
 					_checkarg_next_is_val_of="$lopt"
@@ -418,8 +422,8 @@ function _checkarg_arg_long(){
 		fi
 
 		if [[ "${_checkarg_args[$arg]}" = 0 ]] || [[ "$arg" != "$value" ]]; then
-			if [[ -n ${_checkarg_args_cb[$1]} ]]; then
-				${_checkarg_args_cb[$1]} "$_checkarg_next_is_val_of" "$1"
+			if [[ -n ${_checkarg_args_cb[$arg]} ]]; then
+				${_checkarg_args_cb[$arg]} "$arg" "$value"
 				return $?
 			fi
 		fi
