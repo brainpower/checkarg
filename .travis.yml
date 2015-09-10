@@ -2,6 +2,7 @@ language: cpp
 env:
   - SRCDIR=c
   - SRCDIR=cpp
+  - SRCDIR=bash
 compiler:
   - gcc
   - clang
