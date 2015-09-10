@@ -22,12 +22,12 @@ checkarg_init "test04"
 
 checkarg_add_autohelp
 
-checkarg_add      "a" "alpha"                "non-value opt a" 1
-checkarg_add_cb   "b" "beta"    "callback_b" "non-value opt b" 1
-checkarg_add_long     "gamma"                "non-value long opt gamma" 1
-checkarg_add_long_cb  "delta"   "callback_d" "non-value long opt delta" 1
-checkarg_add_cb   "e" "epsilon" "callback_e" "non-value opt e" 1
-checkarg_add_long_cb  "zeta"    "callback_z" "non-value long opt zeta" 1
+checkarg_add      "a" "alpha"                "value opt a" 1
+checkarg_add_cb   "b" "beta"    "callback_b" "value opt b" 1
+checkarg_add_long     "gamma"                "value long opt gamma" 1
+checkarg_add_long_cb  "delta"   "callback_d" "value long opt delta" 1
+checkarg_add_cb   "e" "epsilon" "callback_e" "value opt e" 1
+checkarg_add_long_cb  "zeta"    "callback_z" "value long opt zeta" 1
 
 checkarg_parse "$@"
 caret="$?"
