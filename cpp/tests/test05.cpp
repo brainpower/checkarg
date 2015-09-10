@@ -5,10 +5,10 @@
 
 using namespace std;
 
-int callback_b(CheckArgPtr, const string &, const string & ) { return 0; }
-int callback_d(CheckArgPtr, const string &, const string & ) { return 0; }
-int callback_e(CheckArgPtr, const string &a, const string &v ) { printf("%s %s", a.c_str(), v.c_str()); return 0;}
-int callback_z(CheckArgPtr, const string &a, const string &v ) { printf("%s %s", a.c_str(), v.c_str()); return 0;}
+int callback_b(CheckArgRPtr, const string &, const string & ) { return 0; }
+int callback_d(CheckArgRPtr, const string &, const string & ) { return 0; }
+int callback_e(CheckArgRPtr, const string &a, const string &v ) { printf("%s %s", a.c_str(), v.c_str()); return 0;}
+int callback_z(CheckArgRPtr, const string &a, const string &v ) { printf("%s %s", a.c_str(), v.c_str()); return 0;}
 
 int main(int argc, char **argv){
 

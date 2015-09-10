@@ -7,10 +7,10 @@ using namespace std;
 
 int ret_test04 = 0;
 
-int callback_b(CheckArgPtr, const string &, const string & ) { return 0; }
-int callback_d(CheckArgPtr, const string &, const string & ) { return 0; }
-int callback_e(CheckArgPtr, const string &, const string & ) { ret_test04 = 104; return 0;}
-int callback_z(CheckArgPtr, const string &, const string & ) { ret_test04 = 105; return 0;}
+int callback_b(CheckArgRPtr, const string &, const string & ) { return 0; }
+int callback_d(CheckArgRPtr, const string &, const string & ) { return 0; }
+int callback_e(CheckArgRPtr, const string &, const string & ) { ret_test04 = 104; return 0;}
+int callback_z(CheckArgRPtr, const string &, const string & ) { ret_test04 = 105; return 0;}
 
 
 int main(int argc, char **argv){

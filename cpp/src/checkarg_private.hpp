@@ -29,9 +29,9 @@
 
 class CheckArgPrivate {
 private:
-  CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname);
-  CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc);
-  CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix);
+  CheckArgPrivate(CheckArgRPtr ca, const int argc, char** argv, const std::string &appname);
+  CheckArgPrivate(CheckArgRPtr ca, const int argc, char** argv, const std::string &appname, const std::string &desc);
+  CheckArgPrivate(CheckArgRPtr ca, const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix);
 
   int arg(const std::string &arg);
   int arg_long(const std::string &arg);
@@ -47,7 +47,7 @@ private:
     bool has_val = false;
     char sopt    = 0;
     std::string help;
-    std::function<int(CheckArgPtr, const std::string &,const std::string &)> cb;
+    std::function<int(CheckArgRPtr, const std::string &,const std::string &)> cb;
     std::string value;
   };
 
@@ -58,7 +58,7 @@ private:
 
   const int argc;
   char **   argv;
-  CheckArg* parent;
+  CheckArgRPtr parent;
 
   std::string appname;
   std::string descr;
@@ -72,7 +72,7 @@ private:
   std::string next_is_val_of;
 
   friend class CheckArg;
-  friend int checkarg::show_autohelp(CheckArgPtr, const std::string &, const std::string &);
+  friend int checkarg::show_autohelp(CheckArgRPtr, const std::string &, const std::string &);
 };
 
 #if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER) || defined(__WIN32__)

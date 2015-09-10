@@ -38,13 +38,14 @@
 
 // forward declarations
 class CheckArg;
-typedef CheckArg* CheckArgPtr;
+typedef std::shared_ptr<CheckArg> CheckArgPtr;
+typedef CheckArg* const CheckArgRPtr;
 class CheckArgPrivate;
 typedef std::shared_ptr<CheckArgPrivate> CheckArgPrivatePtr;
 
 // autohelp callback
 namespace checkarg{
-  int show_autohelp(CheckArgPtr, const std::string &, const std::string &);
+  int show_autohelp(CheckArgRPtr, const std::string &, const std::string &);
 };
 
 // the checkarg class
@@ -58,9 +59,9 @@ public:
 
   // pre-parse add functions
   int add(const char sopt, const std::string &lopt, const std::string &help, bool has_val=false);
-  int add(const char sopt, const std::string &lopt, std::function<int(CheckArgPtr, const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
+  int add(const char sopt, const std::string &lopt, std::function<int(CheckArgRPtr, const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
   int add(const std::string &lopt, const std::string &help, bool has_val=false);
-  int add(const std::string &lopt, std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
+  int add(const std::string &lopt, std::function<int(CheckArgRPtr,const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false);
 
   int add_autohelp();
 
@@ -91,7 +92,7 @@ private:
    * if add_autohelp() was called
    * \see add_autohelp()
    */
-  friend int checkarg::show_autohelp(CheckArgPtr, const std::string &, const std::string &);
+  friend int checkarg::show_autohelp(CheckArgRPtr, const std::string &, const std::string &);
 };
 
 // return codes

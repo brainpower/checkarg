@@ -136,15 +136,15 @@ CheckArg::CheckArg(const int argc, char ** argv, const std::string &appname, con
 }
 
 // private c'tors
-CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname)
+CheckArgPrivate::CheckArgPrivate(CheckArgRPtr ca, const int argc, char** argv, const std::string &appname)
   : argc(argc), argv(argv), parent(ca), appname(appname), pos_arg_sep(false),
     usage_line(appname + " [options]") {}
 
-CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc)
+CheckArgPrivate::CheckArgPrivate(CheckArgRPtr ca, const int argc, char** argv, const std::string &appname, const std::string &desc)
   : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), pos_arg_sep(false),
     usage_line(appname + " [options]") {}
 
-CheckArgPrivate::CheckArgPrivate(CheckArg* ca, const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix)
+CheckArgPrivate::CheckArgPrivate(CheckArgRPtr ca, const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix)
   : argc(argc), argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix), pos_arg_sep(false),
     usage_line(appname + " [options]") {}
 
@@ -254,7 +254,7 @@ int CheckArg::add(const char sopt, const std::string &lopt, const std::string &h
  * \see CAError
  */
 int CheckArg::add(const char sopt, const std::string &lopt,
-                  std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb,
+                  std::function<int(CheckArgRPtr,const std::string &, const std::string &)> cb,
                   const std::string &help, const bool has_val){
   p->valid_args[lopt].has_val = has_val;
   p->valid_args[lopt].sopt    = sopt;
@@ -288,7 +288,7 @@ int CheckArg::add(const std::string &lopt, const std::string &help, const bool h
  * \see CAError
  */
 int CheckArg::add(const std::string &lopt,
-                  std::function<int(CheckArgPtr,const std::string &, const std::string &)> cb,
+                  std::function<int(CheckArgRPtr,const std::string &, const std::string &)> cb,
                   const std::string &help, const bool has_val){
   p->valid_args[lopt].has_val = has_val;
   p->valid_args[lopt].cb      = cb;
@@ -466,7 +466,7 @@ int CheckArgPrivate::arg_short(const std::string &arg){
 int CheckArgPrivate::call_cb(const std::string &arg){
   auto cbpos = valid_args.find(arg);
   if( cbpos != valid_args.end() && cbpos->second.cb ){
-    int cbret = cbpos->second.cb(CheckArgPtr(parent), arg, cbpos->second.value);
+    int cbret = cbpos->second.cb(parent, arg, cbpos->second.value);
     if(cbret != CA_ALLOK) {
       // if callback returns anything other than CA_ALLOK, there's been an error
       return ca_error(CA_CALLBACK, ": %d!", cbret);
@@ -476,7 +476,7 @@ int CheckArgPrivate::call_cb(const std::string &arg){
 }
 
 
-int checkarg::show_autohelp(CheckArgPtr ca, const std::string&, const std::string &val){
+int checkarg::show_autohelp(CheckArgRPtr ca, const std::string&, const std::string &val){
   stringstream ss;
   size_t space = 0;
   for( auto &kv : ca->p->valid_args )
