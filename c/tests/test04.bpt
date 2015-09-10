@@ -1,0 +1,27 @@
+
+name="non_value_options"
+type="c"
+sources=("test04.c" "../libcheckarg.a")
+
+prepare(){
+  compile_sources
+}
+
+run(){
+
+  test_rc "return code non-value opt" 100 -a
+  test_rc "return code non-value opt" 100 --alpha
+  test_rc "return code non-value opt cb" 101 -b
+  test_rc "return code non-value opt cb" 101 --beta
+  test_rc "return code non-value opt long" 102 --gamma
+  test_rc "return code non-value opt long cb" 103 --delta
+  test_rc "return code non-value opt cb" 104 -e
+  test_rc "return code non-value opt cb" 104 --epsilon
+  test_rc "return code non-value opt long cb" 105 --zeta
+
+}
+
+clean(){
+  true
+}
+# vim: ft=sh
