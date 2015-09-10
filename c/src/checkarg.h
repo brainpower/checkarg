@@ -35,6 +35,7 @@
 typedef struct _CheckArg CheckArg;
 typedef struct _CheckArgPrivate CheckArgPrivate;
 typedef int (*CheckArgFP)(CheckArg*, const char *,const char *);
+typedef CheckArg* CheckArgPtr;
 
 struct _CheckArg {
   CheckArgPrivate *p;
