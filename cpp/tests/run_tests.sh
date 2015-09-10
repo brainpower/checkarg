@@ -53,6 +53,24 @@ test_stdout(){
   rm -f "$tmpout"
 }
 
+test_stdout_str(){
+  local tname="$1"
+  local expect="$2"
+  shift 2
+  local tmpout="${name}.${tname// /_}.out"
+
+  printf "   - Running test: ${tname}... "
+	tmpout="$(./$name "$@")"
+
+  if [[ "$expect" == "$tmpout" ]]; then
+    printf "[ ok ]\n"
+  else
+    printf "[ failed ]\n"
+  	echo "Exp: '$expect'"
+  	echo "Got: '$tmpout'"
+  fi
+}
+
 cd "${script_dir}"
 for test in *.bpt; do
     (
