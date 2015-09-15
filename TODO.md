@@ -49,6 +49,9 @@ General
 - maybe support checking of the type of the values of options.
   types could be string, int, float, ... maybe file, path or dir...
 
+- maybe support no-prefixes, like ```--no-install``` as counterpart to ```--install```
+  use value opts for that, which will be set to true or false respectively
+
 C++ Port
 ========
 - ...
