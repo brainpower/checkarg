@@ -80,6 +80,10 @@ public:
   // check if an arg was given on command line
   bool isset(const std::string &arg) const;
 
+  // print autohelp or usage line
+  void show_help();
+  void show_usage();
+
   // get error string for errno
   static std::string str_err(const int errno);
 

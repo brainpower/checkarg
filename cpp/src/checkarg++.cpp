@@ -96,9 +96,9 @@ map <int,string>
 CheckArgPrivate::errors = {
 	{CA_ALLOK,  "Everything is fine"},
 	{CA_ERROR,  "An Error occurred"},
-	{CA_INVARG, "Unknown command line argument"},
-	{CA_INVVAL, "Value given to non-value argument"},
-	{CA_MISSVAL, "Missing value of argument"},
+	{CA_INVARG, "Unknown command line option"},
+	{CA_INVVAL, "Value given to non-value option"},
+	{CA_MISSVAL, "Missing value of option"},
 	{CA_CALLBACK, "Callback returned with error code"},
 };
 
@@ -327,6 +327,8 @@ int CheckArg::parse(){
   }
 
   // free strings not necessary anymore, e.g. those for '--help'
+  /* // show_help() prevents that now, as it could be called any time
+   * // if you want to minimize memory, destroy the whole CheckArg object after use.
   p->appname.clear();
   p->appendix.clear();
   p->usage_line.clear();
@@ -336,6 +338,7 @@ int CheckArg::parse(){
   p->next_is_val_of.clear();
   for( auto arg : p->valid_args)
     arg.second.help.clear();
+  */
 
   return ret;
 }
@@ -365,6 +368,49 @@ bool CheckArg::isset(const std::string &arg) const {
   auto pos = p->valid_args.find(arg);
   return pos != p->valid_args.end() && !(pos->second.value.empty());
 }
+
+/**
+ * \brief print the current usage line to stdout
+ */
+void
+CheckArg::show_usage(){
+  cout << "Usage: " << p->usage_line << " " << p->posarg_help_usage << endl;
+}
+
+/**
+ * \brief print current help on stdout
+ */
+void
+CheckArg::show_help(){
+  stringstream ss;
+  size_t space = 0;
+  for( auto &kv : p->valid_args )
+    space = max(space, kv.first.size() );
+
+  space += 2; // add 2 more spaces
+
+  ss << "Usage: " << p->usage_line << " " << p->posarg_help_usage << endl;
+
+  if(!p->descr.empty()) ss << endl << p->descr << endl;
+
+  ss << endl << "Options:" << endl;
+  for(auto it=p->valid_args.begin(); it != p->valid_args.end(); ++it){
+    if(it->second.sopt) ss << "   -" << it->second.sopt << ",";
+    else ss << "      ";
+    ss << " --" << it->first << string(space-it->first.size(), ' ')
+       << it->second.help << endl;
+  }
+  if(!p->posarg_help_descr.empty())
+    ss << endl
+       << "Positional Arguments:" << endl
+       << p->posarg_help_descr << endl;
+  if(!p->appendix.empty()) ss << endl << p->appendix << endl;
+
+  cout << ss.str() << flush;
+}
+
+
+// private members:
 
 int CheckArgPrivate::arg(const std::string &arg){
   if( ! pos_arg_sep ){
@@ -475,38 +521,14 @@ int CheckArgPrivate::call_cb(const std::string &arg){
   return CA_ALLOK;
 }
 
-
 int checkarg::show_autohelp(CheckArgRPtr ca, const std::string&, const std::string &val){
-  stringstream ss;
-  size_t space = 0;
-  for( auto &kv : ca->p->valid_args )
-    space = max(space, kv.first.size() );
-
-  space += 2; // add 2 more spaces
-
-  ss << "Usage: " << ca->p->usage_line << " " << ca->p->posarg_help_usage << endl;
-
-  if(!ca->p->descr.empty()) ss << endl << ca->p->descr << endl;
-
-  ss << endl << "Options:" << endl;
-  for(auto it=ca->p->valid_args.begin(); it != ca->p->valid_args.end(); ++it){
-    if(it->second.sopt) ss << "   -" << it->second.sopt << ",";
-    else ss << "      ";
-    ss << " --" << it->first << string(space-it->first.size(), ' ')
-       << it->second.help << endl;
-  }
-  if(!ca->p->posarg_help_descr.empty())
-    ss << endl
-       << "Positional Arguments:" << endl
-       << ca->p->posarg_help_descr << endl;
-  if(!ca->p->appendix.empty()) ss << endl << ca->p->appendix << endl;
-
-  cout << ss.str() << flush;
-
+	ca->show_help();
   exit(0); // always exit after showing help
 }
 
-#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER) || defined(__WIN32__)
+#ifdef CA_PRINTERR
+#	if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER) || defined(__WIN32__)
+
 #include <cstring>
 int vasprintf(char** strp, const char* format, va_list ap)
 {
@@ -529,4 +551,6 @@ int vasprintf(char** strp, const char* format, va_list ap)
   // Do the actual printing into our newly created string
   return vsprintf(*strp, format, ap);
 }
+
+#	endif
 #endif
