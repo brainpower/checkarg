@@ -8,7 +8,7 @@ General
 - add ```ca.show_usage()``` and ```ca.show_help()``` to manually show the help or usage message,
   so for example one can output the usage line if expected positional arguments are missing
 
-    => DONE: cpp TODO: c, bash, java
+    => DONE: cpp, c TODO: bash, java
 
 - Maybe add support for easier managing of multiple options,
   like ```programm -vvv``` or ```program -i file1 -i file2```.<br>
