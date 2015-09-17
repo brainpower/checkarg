@@ -31,9 +31,9 @@
 const char* errors[] = {
   /*CA_ALLOK*/    "Everything is fine",
   /*CA_ERROR*/    "An Error occurred",
-  /*CA_INVARG*/   "Unknown command line argument",
-  /*CA_INVVAL*/   "Value given to non-value argument",
-  /*CA_MISSVAL*/  "Missing value of argument",
+  /*CA_INVARG*/   "Unknown command line option",
+  /*CA_INVVAL*/   "Value given to non-value option",
+  /*CA_MISSVAL*/  "Missing value of option",
   /*CA_CALLBACK*/ "Callback returned with error code",
   /*CA_ALLOC_ERR*/"Allocation of memory failed",
 };
@@ -187,6 +187,8 @@ checkarg_parse(CheckArg *ca) {
   }
 
   /* free strings not neccessary anymore */
+  /* this is prevented by checkarg_show_help now.
+   * if you want to reduce memory, delete whole CheckArg after use
   free(ca->p->appname);    ca->p->appname    = NULL;
   free(ca->p->appendix);   ca->p->appendix   = NULL;
   free(ca->p->usage_line); ca->p->usage_line = NULL;
@@ -194,8 +196,8 @@ checkarg_parse(CheckArg *ca) {
   free(ca->p->posarg_help_descr); ca->p->posarg_help_descr = NULL;
   free(ca->p->posarg_help_usage); ca->p->posarg_help_usage = NULL;
   free(ca->p->next_is_val_of);    ca->p->next_is_val_of    = NULL;
+	*/
 
-  /* TODO: free help messages */
   /* TODO: resize pos_args */
 
   return ret;
@@ -265,9 +267,16 @@ checkarg_str_err(const int errno) {
   return errors[errno];
 }
 
+void
+checkarg_show_usage(CheckArg *ca){
+  if(ca->p->posarg_help_usage)
+    printf("Usage: %s %s\n", ca->p->usage_line, ca->p->posarg_help_usage);
+  else
+    printf("Usage: %s \n", ca->p->usage_line);
+}
 
-int
-checkarg_show_autohelp(CheckArg *ca, const char* larg, const char* val){
+void
+checkarg_show_help(CheckArg *ca){
   size_t space = 0;
   size_t tmp = 0;
   Opt *it = ca->p->valid_args;
@@ -280,10 +289,7 @@ checkarg_show_autohelp(CheckArg *ca, const char* larg, const char* val){
   /* two more than opt length, so theres some space between the columns */
   space += 2;
 
-  if(ca->p->posarg_help_usage)
-    printf("Usage: %s %s\n", ca->p->usage_line, ca->p->posarg_help_usage);
-  else
-    printf("Usage: %s \n", ca->p->usage_line);
+	checkarg_show_usage(ca);
 
   if(ca->p->descr)
     printf("\n%s\n", ca->p->descr);
@@ -307,7 +313,11 @@ checkarg_show_autohelp(CheckArg *ca, const char* larg, const char* val){
   if(ca->p->appendix){
     printf("\n%s\n", ca->p->appendix);
   }
+}
 
+int
+checkarg_show_autohelp(CheckArg *ca, const char* larg, const char* val){
+	checkarg_show_help(ca);
   exit(0); /* always exit after showing help */
 }
 
