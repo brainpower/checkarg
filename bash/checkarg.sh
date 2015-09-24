@@ -383,15 +383,11 @@ function _checkarg_arg_short(){
 			else
 				eval "_checkarg_args_values[$lopt]='x'" # mark non-value option as seen
 
-				if [[ "${_checkarg_args[$lopt]}" = 0 ]]; then
-					if [[ -n "${_checkarg_args_cb[$lopt]}" ]]; then
-						${_checkarg_args_cb[$lopt]} "$lopt" ""
-						return $?
-					else
-						return 0
-					fi
+				if [[ -n "${_checkarg_args_cb[$lopt]}" ]]; then
+					${_checkarg_args_cb[$lopt]} "$lopt" ""; ret="$?"
+
+					[ "$ret" -gt 0 ] && return "$ret"
 				fi
-				return 0
 
 			fi
 		else
