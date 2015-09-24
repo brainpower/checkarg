@@ -63,6 +63,7 @@ C Port
 
 Bash/Zsh Port
 =============
+- add tests for bug fixed in 02cba1928b
 - ...
 
 Java Port
