@@ -1,0 +1,23 @@
+
+name="test06.sh"
+type="bash"
+sources=("test06.sh" "../checkarg.sh")
+
+prepare(){
+  true
+}
+
+run(){
+	test_rc "all options set" 0 -abcd
+	test_rc "all options set" 0 -ab -cd
+	test_rc "all options set" 0 -abc -d
+	test_rc "all options set" 0 -abc --delta
+	test_rc "all options set" 0 -ab --gamma -d
+	test_rc "all options set" 0 -ac --beta --delta
+	test_rc "all options set" 0 --alpha -bcd
+}
+
+clean(){
+  true
+}
+# vim: ft=sh
