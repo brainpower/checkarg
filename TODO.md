@@ -52,6 +52,11 @@ General
 
 - maybe support no-prefixes, like ```--no-install``` as counterpart to ```--install```
   use value opts for that, which will be set to true or false respectively
+  
+- maybe support getopts-like prefix handling. With getopts a long option can be recognized
+  by giving any unique prefix of that option.
+  For example giving ```--inst``` may be recognized as ```--install``` if there is no other option starting with 'inst'.
+  This should probably only activated if desired, since it might have a substancial performance impact.
 
 C++ Port
 ========
