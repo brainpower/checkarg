@@ -14,7 +14,7 @@ General
   like ```programm -vvv``` or ```program -i file1 -i file2```.<br>
   Currently you'd have to use a callback,
   which would be called on every occurance of an option.<br>
-  Like ```int verbose_cb() { verbose_level++; }``` to support ```-vvv```.<br>
+  Like ```[&verbose_level]() -> int { verbose_level++; }``` to support ```-vvv```.<br>
   Havn't come up with any easy implementation of this yet.<br>
   I'll probably have to add another map for value options,
   like map&lt;string,vector&lt;string&gt;&gt;... <br>
