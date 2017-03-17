@@ -227,7 +227,7 @@ function checkarg_parse(){
 		_checkarg_arg "$arg";
 		ret="$?"
 
-		[[ "$ret" != 0 ]] && break;
+		[[ "$ret" != 0 ]] && return "$ret";
 	done
 
 	if [[ -n "$_checkarg_next_is_val_of" ]]; then

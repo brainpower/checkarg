@@ -320,7 +320,7 @@ int CheckArg::parse(){
   int ret = CA_ALLOK;
   for(int i=1; i<p->argc; ++i){ // start with 1 here, because argv[0] is special
     ret = p->arg(p->argv[i]);
-    if( ret != CA_ALLOK ) break;
+    if( ret != CA_ALLOK ) goto error;
   }
   if( ! p->next_is_val_of.empty() ){
     return p->ca_error(CA_MISSVAL, ": %s!", p->argv[p->argc-1]);
@@ -339,7 +339,7 @@ int CheckArg::parse(){
   for( auto arg : p->valid_args)
     arg.second.help.clear();
   */
-
+error:
   return ret;
 }
 

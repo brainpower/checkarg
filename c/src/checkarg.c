@@ -179,12 +179,16 @@ checkarg_parse(CheckArg *ca) {
 
   for(i=1; i<ca->p->argc; ++i){
     ret = checkarg_arg(ca, ca->p->argv[i]);
-    if( ret != CA_ALLOK ) break;
+    if( ret != CA_ALLOK ) goto error;
   }
 
   if( ca->p->next_is_val_of ) {
     return ca_error(CA_MISSVAL, ": %s!", ca->p->argv[ca->p->argc-1] );
   }
+
+  /* TODO: resize pos_args */
+
+error:
 
   /* free strings not neccessary anymore */
   /* this is prevented by checkarg_show_help now.
@@ -198,7 +202,6 @@ checkarg_parse(CheckArg *ca) {
   free(ca->p->next_is_val_of);    ca->p->next_is_val_of    = NULL;
 	*/
 
-  /* TODO: resize pos_args */
 
   return ret;
 }
