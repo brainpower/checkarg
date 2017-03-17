@@ -25,7 +25,7 @@ The Java and C ports dont have much documentation in them, yet.
 
 === Bash
 
-Put the 'checkarg.sh' file inside the bash/ directory somewhere your Shell script can reach it
+Put the _checkarg.sh_ file inside the bash/ directory somewhere your Shell script can reach it
 and source it. For example like this:
 
 [source,sh]
@@ -38,7 +38,7 @@ source /usr/local/lib/checkarg/checkarg.sh
 Compile the sources and put the resulting library where your linker can find it.
 The Makefile can do that for you on *nix systems.
 
-Include the CheckArg public header, 'src/checkarg.h' for C or 'src/checkarg++.hpp' for C++
+Include the CheckArg public header, _src/checkarg.h_ for C or _src/checkarg++.hpp_ for C++
 and link against the compiled library.
 You can use both shared and static linking, CheckArg works with both methods.
 
@@ -50,14 +50,14 @@ Therefore errors will always be printed with debug builds.
 
 === Java
 
-Compile the 'CheckArg.java' using your Java compiler and put the 'CheckArg.class' file somewhere your Java interpreter can find it. For example using Java's classpath.
+Compile the _CheckArg.java_ using your Java compiler and put the _CheckArg.class_ file somewhere your Java interpreter can find it. For example using Java's classpath.
 You may need to import it after that if you've put it into a separate package.
 
 
 
 === Examples
 
-You can take look at the test*.sh, test*.c, test*.cpp or test*.java files in the tests/ directories.
+You can take look at the _test*.sh_, _test*.c_, _test*.cpp_ or _test*.java_ files in the _tests/_ directories.
 
 
 == Classes Reference
@@ -132,8 +132,11 @@ Construct a `CheckArg` object.
 ==== Destructors
 
 In C++ the object is destroyed automatically if its on the stack or explicitly with delete when allocated with new.
+
 In Java the garbage collector takes care of this.
+
 In Bash there is no destructors.
+
 
 In C you'll have to free the pointer you got from the constructor using:
 [source,c]
@@ -142,6 +145,7 @@ void checkarg_free(CheckArg *ca);
 ----
 
 Frees the memory allocated by `ca`.
+
 WARNING: Don't use `free`(3) on a CheckArg object, it doesn't free all the internally allocated memory.
 
 
@@ -171,10 +175,11 @@ cb::
 int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help);   // <1>
 int CheckArg.add(final char sopt, final String lopt, final String help)                 // <2>
 int checkarg_add(CheckArg*, const char sopt, const char *lopt, const char *help);       // <3>
-checkarg_add <sopt> <lopt> <help>                                                       #  <4>
+checkarg_add <sopt> <lopt> <help>                                                       // <4>
 ----
 
 Add option with short and long name and help message to list of known options.
+
 NOTE: This is a convenience function which calls the appropriate <<short-long-val,add_value>> with has_val=false.
 
 Example:
@@ -193,10 +198,11 @@ ca.add('v', "verbose", "Output more detailed information.");
 int CheckArg::add(const std::string &lopt, const std::string &help);    // <1>
 int CheckArg.add(final String lopt, final String help)                  // <2>
 int checkarg_add_long(CheckArg*, const char *lopt, const char *help);   // <3>
-checkarg_add_long <lopt> <help>                                         #  <4>
+checkarg_add_long <lopt> <help>                                         // <4>
 ----
 
 Add option with only a long name and its help message to the list of known options.
+
 NOTE: This is a convenience function which calls <<long-only-val,add_long_value>> with has_val=false.
 
 
@@ -208,7 +214,7 @@ NOTE: This is a convenience function which calls <<long-only-val,add_long_value>
 int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, bool has_val=false);         // <1>
 int CheckArg.add(final char sopt, final String lopt, final String help, final boolean has_val)                    // <2>
 int checkarg_add_value(CheckArg*, const char sopt, const char *lopt, const char *help, const uint8_t has_val);    // <3>
-checkarg_add <sopt> <lopt> <help> [has_val]                                                                       #  <4>
+checkarg_add <sopt> <lopt> <help> [has_val]                                                                       // <4>
 ----
 
 Add option with short and long name, help message and value, if `has_val` is true, to list of known options.
@@ -222,7 +228,7 @@ Add option with short and long name, help message and value, if `has_val` is tru
 int CheckArg::add(const std::string &lopt, const std::string &help, bool has_val=false);            // <1>
 int CheckArg.add(final String lopt, final String help, final boolean has_val)                       // <2>
 int checkarg_add_long_value(CheckArg*, const char *lopt, const char *help, const int8_t has_val);   // <3>
-checkarg_add_long <lopt> <help> [has_val]                                                           #  <4>
+checkarg_add_long <lopt> <help> [has_val]                                                           // <4>
 ----
 
 Add option with long name, help message and value, if `has_val` is true, to list of known options.
@@ -239,7 +245,9 @@ checkarg_add_cb <sopt> <lopt> <cb> <help>                                       
 ----
 
 Add option with short and long name, help message and a callback function to list of known options.
+
 TIP: See the <<callbacks>> section of this document for more info on callbacks.
+
 NOTE: This is a convenience function which calls the appropriate <<short-long-cb-val,add_cb_value>> with has_val=false.
 
 
@@ -256,6 +264,7 @@ checkarg_add_cb <sopt> <lopt> <cb> <help> [has_val]                             
 ----
 
 Add option with short and long name, help message, a callback function and value, if `has_val` is true, to list of known options.
+
 TIP: See the <<callbacks>> section of this document for more info on callbacks.
 
 
@@ -271,7 +280,9 @@ checkarg_add_long_cb <lopt> <cb> <help>                                         
 
 
 Add option with long name, help message and a callback function to list of known options.
+
 TIP: See the <<callbacks>> section of this document for more info on callbacks.
+
 NOTE: This is a convenience function which calls <<long-only-cb-val,add_long_cb_value>> with has_val=false.
 
 
@@ -288,16 +299,20 @@ checkarg_add_long_cb <lopt> <cb> <help> [has_val]                               
 ----
 
 Add option with long name, help message, a callback function and value, if `has_val` is true, to list of known options.
+
 TIP: See the <<callbacks>> section of this document for more info on callbacks.
 
 
 ===== Automatic help
 
-NOTE: This is a convenience function which essentially calls <<short-long-cb-val,add_cb_value>> like this:
+[NOTE]
+....
+This is a convenience function which essentially calls <<short-long-cb-val,add_cb_value>> like this:
 
 ----
 add('h', "help", checkarg::show_autohelp, "show this help message and exit", false);
 ----
+....
 
 The callback used for this is a short helper which calls <<show_help,show_help()>> and exits the program with status 0.
 
