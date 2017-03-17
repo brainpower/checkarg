@@ -57,7 +57,42 @@ You may need to import it after that if you've put it into a separate package.
 
 === Examples
 
-You can take look at the _test*.sh_, _test*.c_, _test*.cpp_ or _test*.java_ files in the _tests/_ directories.
+A basic usage example in C++ could look like this:
+
+[source,cpp]
+----
+#include <checkarg++.hpp>
+#include <fstream>
+
+int main( int argc, char **argv ){
+	CheckArg ca;    // object on stack, will be destroyed when main exits
+
+	ca.add('V', "version", "Show version information and exit");
+	ca.add(     "input",   "Specify input file", true );
+
+	ca.add_autohelp();
+
+	ca.parse();   // from now on, isset() and value() works. add() is useless now, though!
+
+	if( ca.isset("version") ){
+		printf("Foobar Version 1.2.3 from 2017-03-17");
+		return 0;
+	}
+
+	int val;
+	if( ca.isset("input") ){
+		std::ifstream fin( ca.value("input"), std::ifstream::in );
+		while(fin.good()){
+			// ...
+		}
+		fin.close()
+	}
+	// ...
+}
+----
+
+
+You can take look at the _test*.sh_, _test*.c_, _test*.cpp_ or _test*.java_ files in the _tests/_ directories for more examples.
 
 
 == Classes Reference
