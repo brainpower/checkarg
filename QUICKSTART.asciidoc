@@ -65,9 +65,7 @@ You can take look at the _test*.sh_, _test*.c_, _test*.cpp_ or _test*.java_ file
 CheckArg mainly consists of the single class `CheckArg`.
 
 
-=== CheckArg
-
-==== Constructors
+=== Constructors
 
 All Constructors commonly take a subset the following parameters:
 
@@ -83,7 +81,7 @@ argc::
 argv::
 	The vector of arguments passed to the executable. You'll want to pass the main functions argv here. Java (args) and C/C++ only.
 
-===== Bash
+==== Bash
 
 [source,bash]
 ----
@@ -93,7 +91,7 @@ argv::
 Initialize internal datastructures with given parameters.
 Parameters desc and appendix are optional, appname is required.
 
-===== C
+==== C
 
 [source,c]
 ----
@@ -104,7 +102,7 @@ Returns a pointer to a new `CheckArg` object.
 The parameters desc and appendix are optional and can be set to NULL.
 All other Parameters are required.
 
-===== C++
+==== C++
 
 [source,cpp]
 ----
@@ -116,7 +114,7 @@ CheckArg(const int argc, char** argv, const std::string &appname, const std::str
 Construct the `CheckArg` object.
 
 
-===== Java
+==== Java
 
 [source,java]
 ----
@@ -129,7 +127,7 @@ Construct a `CheckArg` object.
 
 
 
-==== Destructors
+=== Destructors
 
 In C++ the object is destroyed automatically if its on the stack or explicitly with delete when allocated with new.
 
@@ -150,7 +148,7 @@ WARNING: Don't use `free`(3) on a CheckArg object, it doesn't free all the inter
 
 
 
-==== Adding
+=== Adding
 
 Parameters accepted by the adding member functions are:
 
@@ -168,8 +166,14 @@ cb::
 	Callbacks are given the CheckArg object, the long option name and the value if there is one.
 
 
+The function signatures are numbered as follows:
 
-===== Short and long
+(1) C++
+(2) Java
+(3) C
+(4) Bash
+
+==== Short and long
 
 ----
 int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help);   // <1>
@@ -192,7 +196,7 @@ ca.add('v', "verbose", "Output more detailed information.");
 
 
 
-===== Long only
+==== Long only
 
 ----
 int CheckArg::add(const std::string &lopt, const std::string &help);    // <1>
@@ -208,7 +212,7 @@ NOTE: This is a convenience function which calls <<long-only-val,add_long_value>
 
 
 [[short-long-val]]
-===== Short and long with value
+==== Short and long with value
 
 ----
 int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, bool has_val=false);         // <1>
@@ -222,7 +226,7 @@ Add option with short and long name, help message and value, if `has_val` is tru
 
 
 [[long-only-val]]
-===== Long only with value
+==== Long only with value
 
 ----
 int CheckArg::add(const std::string &lopt, const std::string &help, bool has_val=false);            // <1>
@@ -235,7 +239,7 @@ Add option with long name, help message and value, if `has_val` is true, to list
 
 
 
-===== Short and long with callback
+==== Short and long with callback
 
 ----
 int CheckArg::add(const char sopt, const std::string &lopt, std::function<int(CheckArgRPtr, const std::string &, const std::string &)> cb, const std::string &help); // <1>
@@ -254,7 +258,7 @@ NOTE: This is a convenience function which calls the appropriate <<short-long-cb
 
 
 [[short-long-cb-val]]
-===== Short and long with callback and value
+==== Short and long with callback and value
 
 ----
 int CheckArg::add(const char sopt, const std::string &lopt, std::function<int(CheckArgRPtr, const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false); // <1>
@@ -269,7 +273,7 @@ TIP: See the <<callbacks>> section of this document for more info on callbacks.
 
 
 
-===== Long only with callback
+==== Long only with callback
 
 ----
 int CheckArg::add(const std::string &lopt, std::function<int(CheckArgRPtr,const std::string &, const std::string &)> cb, const std::string &help);  // <1>
@@ -289,7 +293,7 @@ NOTE: This is a convenience function which calls <<long-only-cb-val,add_long_cb_
 
 
 [[long-only-cb-val]]
-===== Long only with callback and value
+==== Long only with callback and value
 
 ----
 int CheckArg::add(const std::string &lopt, std::function<int(CheckArgRPtr,const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false); // <1>
@@ -303,7 +307,7 @@ Add option with long name, help message, a callback function and value, if `has_
 TIP: See the <<callbacks>> section of this document for more info on callbacks.
 
 
-===== Automatic help
+==== Automatic help
 
 [NOTE]
 ====
@@ -317,16 +321,11 @@ add('h', "help", checkarg::show_autohelp, "show this help message and exit", fal
 The callback used for this is a short helper which calls <<show_help,show_help()>> and exits the program with status 0.
 
 
-<1> C++
-<2> Java
-<3> C
-<4> Bash
-
 
 [[callbacks]]
-===== Callbacks
+==== Callbacks
 
-====== Bash
+===== Bash
 
 In Bash callbacks can be any valid bash command.
 The callback is called with the long option name and its value if set.
@@ -346,7 +345,7 @@ checkarg_add_cb 'v' 'verbose' 'increase_verbosity' "Increase verbosity"
 checkarg_add_cb 's' 'something' 'debug' "Should print this option and its value" 1
 ----
 
-====== C
+===== C
 
 Callbacks in C have the following signature:
 [source,c]
@@ -358,7 +357,7 @@ Return CA_ALLOK or 0 if everything went fine, any other int if not.
 Any non-CA_ALLOK return code will cause checkarg_parse to abort parsing and return CA_CALLBACK.
 
 
-====== C++
+===== C++
 
 Callbacks in C++ have the following signature:
 [source,cpp]
@@ -370,7 +369,7 @@ Return CA_ALLOK or 0 if everything went fine, any other int if not.
 Any non-CA_ALLOK return code will cause checkarg_parse to abort parsing and return CA_CALLBACK.
 
 
-====== Java
+===== Java
 
 Callbacks in Java are Opjects of class Callable<Void>.
 Any Exception thrown inside call() will cause the parser to abort parsing and return CA_CALLBACK.
@@ -390,9 +389,9 @@ class MyVerboseCallback implements Callable<Void> {
 ca.add('v', "verbose", new MyVerboseCallback(ca), "Give verbose level as number in range 1-3.", true);
 ----
 
-==== Other Members
+=== Other Members
 
-===== Start parsing
+==== Start parsing
 
 ----
 int CheckArg::parse()
@@ -404,7 +403,7 @@ checkarg_parse <args>...
 Parse the command line arguments. Call this after you added all the options you want to be recognized.
 Returns CA_ALLOK if successful. Other members of CAError enum if errors happen.
 
-===== Checking for options
+==== Checking for options
 
 ----
 bool CheckArg::isset(const std::string &lopt) const;
@@ -437,7 +436,7 @@ checkarg_value <lopt>
 Returns the value stored for the given option.
 The return value is *undefined* if the option doesn't have a value (has_val was false when added).
 
-===== Get positional Arguments
+==== Get positional Arguments
 
 
 ----
@@ -456,7 +455,7 @@ C only.
 Number of positinal arguments in array returned by `checkarg_pos_args`.
 
 [[show_help]]
-===== Show help messages
+==== Show help messages
 
 ----
 void CheckArg::show_help()
@@ -479,7 +478,7 @@ Prints the Usage-line to stdout.
 Not implemented in java port, yet.
 Not implemented in bash port, yet, but doable by reading from internal variables. (They may change unexpectedly!)
 
-===== Customizing the automatic help message
+==== Customizing the automatic help message
 
 ----
 void CheckArg::set_posarg_help(const std::string &usage, const std::string &descr );
