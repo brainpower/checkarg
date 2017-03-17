@@ -14,7 +14,7 @@ Ports to other languages may follow as I need them.
 
 TIP: I'll refer to the shell script port as bash, but you can also use it with zsh or maybe other shells with compatible syntax.
 
-This document is intended to be a "Quick Start Guide" and wont go much into details.
+This document is intended to be a "Quick Start Guide" and wont go much into details. +
 Read the comments in the C++ sources for more info.
 You can use doxygen to generate a more detailed documentation from them.
 
@@ -65,7 +65,7 @@ A basic usage example in C++ could look like this:
 #include <fstream>
 
 int main( int argc, char **argv ){
-	CheckArg ca;    // object on stack, will be destroyed when main exits
+	CheckArg ca(argc, argv, "example01");    // object on stack, will be destroyed when main exits
 
 	ca.add('V', "version", "Show version information and exit");
 	ca.add(     "input",   "Specify input file", true );
