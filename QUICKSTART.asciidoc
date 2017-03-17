@@ -306,13 +306,13 @@ TIP: See the <<callbacks>> section of this document for more info on callbacks.
 ===== Automatic help
 
 [NOTE]
-....
+====
 This is a convenience function which essentially calls <<short-long-cb-val,add_cb_value>> like this:
 
 ----
 add('h', "help", checkarg::show_autohelp, "show this help message and exit", false);
 ----
-....
+====
 
 The callback used for this is a short helper which calls <<show_help,show_help()>> and exits the program with status 0.
 
