@@ -1,0 +1,501 @@
+= CheckArg API Documentation
+brainpower <brainpower@mailbox.org>
+v0.1.1, 2017-03-17
+:imagesdir: doc/assets/img
+:homepage: https://github.com/brainpower/checkarg
+:source-highlighter: pygments
+
+== Introduction
+
+CheckArg is a lightweight and easy to use command line parser.
+
+The main implementation was made in C++ and then ported to other languages, including C, bash/zsh and Java.
+Ports to other languages may follow as I need them.
+
+TIP: I'll refer to the shell script port as bash, but you can also use it with zsh or maybe other shells with compatible syntax.
+
+This document is intended to be a "Quick Start Guide" and wont go much into details.
+Read the comments in the C++ sources for more info.
+You can use doxygen to generate a more detailed documentation from them.
+
+The bash sources have comments, too, but they're not doxygen compatible.
+The Java and C ports dont have much documentation in them, yet.
+
+== Usage
+
+=== Bash
+
+Put the 'checkarg.sh' file inside the bash/ directory somewhere your Shell script can reach it
+and source it. For example like this:
+
+[source,sh]
+----
+source /usr/local/lib/checkarg/checkarg.sh
+----
+
+=== C / C++
+
+Compile the sources and put the resulting library where your linker can find it.
+The Makefile can do that for you on *nix systems.
+
+Include the CheckArg public header, 'src/checkarg.h' for C or 'src/checkarg++.hpp' for C++
+and link against the compiled library.
+You can use both shared and static linking, CheckArg works with both methods.
+
+If you define CA_PRINTERR when compiling the library, CheckArg will print error messages
+otherwise it'll stay silent and let the program handle error messages.
+
+If NDEBUG is not defined, CA_PRINTERR will be defined by default.
+Therefore errors will always be printed with debug builds.
+
+=== Java
+
+Compile the 'CheckArg.java' using your Java compiler and put the 'CheckArg.class' file somewhere your Java interpreter can find it. For example using Java's classpath.
+You may need to import it after that if you've put it into a separate package.
+
+
+
+=== Examples
+
+You can take look at the test*.sh, test*.c, test*.cpp or test*.java files in the tests/ directories.
+
+
+== Classes Reference
+
+CheckArg mainly consists of the single class `CheckArg`.
+
+
+=== CheckArg
+
+==== Constructors
+
+All Constructors commonly take a subset the following parameters:
+
+appname::
+  The name of the programm. This is used for the executable name in the Usage line.
+desc::
+	Description of the programm. This text is displayed in the help message between Usage and Options and should provide a short description of what your programm does.
+appendix::
+  This text is appended at the end of the help message. You can use this to provide additional info, usage examples or a more detailed description.
+
+argc::
+	Number of arguments passed to the executable. You'll want to pass the main functions argc here. C/C++ only.
+argv::
+	The vector of arguments passed to the executable. You'll want to pass the main functions argv here. Java (args) and C/C++ only.
+
+===== Bash
+
+[source,bash]
+----
+ checkarg_init <appname> [desc [appendix]]
+----
+
+Initialize internal datastructures with given parameters.
+Parameters desc and appendix are optional, appname is required.
+
+===== C
+
+[source,c]
+----
+CheckArg* checkarg_new(const int argc, char **argv, const char *appname, const char *desc, const char *appendix)
+----
+
+Returns a pointer to a new `CheckArg` object.
+The parameters desc and appendix are optional and can be set to NULL.
+All other Parameters are required.
+
+===== C++
+
+[source,cpp]
+----
+CheckArg(const int argc, char** argv, const std::string &appname);
+CheckArg(const int argc, char** argv, const std::string &appname, const std::string &desc);
+CheckArg(const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix);
+----
+
+Construct the `CheckArg` object.
+
+
+===== Java
+
+[source,java]
+----
+CheckArg(String args[], final String appname)
+CheckArg(String args[], final String appname, final String desc )
+CheckArg(String args[], final String appname, final String desc, final String appendix )
+----
+
+Construct a `CheckArg` object.
+
+
+
+==== Destructors
+
+In C++ the object is destroyed automatically if its on the stack or explicitly with delete when allocated with new.
+In Java the garbage collector takes care of this.
+In Bash there is no destructors.
+
+In C you'll have to free the pointer you got from the constructor using:
+[source,c]
+----
+void checkarg_free(CheckArg *ca);
+----
+
+Frees the memory allocated by `ca`.
+WARNING: Don't use `free`(3) on a CheckArg object, it doesn't free all the internally allocated memory.
+
+
+
+==== Adding
+
+Parameters accepted by the adding member functions are:
+
+sopt::
+	Short option character. Example: 'h' for '-h'.
+lopt::
+	Long option name. Example "help" for "--help".
+help::
+	Description of the option displayed in the help message.
+has_val::
+	Boolean value. True if option has a value, false if not. Default: false.
+cb::
+	Callback to be called whenever an option is encountered while parsing. +
+	For example cb for sopt "v" would be called three times when "-v -v -v" is given. +
+	Callbacks are given the CheckArg object, the long option name and the value if there is one.
+
+
+
+===== Short and long
+
+----
+int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help);   // <1>
+int CheckArg.add(final char sopt, final String lopt, final String help)                 // <2>
+int checkarg_add(CheckArg*, const char sopt, const char *lopt, const char *help);       // <3>
+checkarg_add <sopt> <lopt> <help>                                                       #  <4>
+----
+
+Add option with short and long name and help message to list of known options.
+NOTE: This is a convenience function which calls the appropriate <<short-long-val,add_value>> with has_val=false.
+
+Example:
+[source,cpp]
+----
+CheckArg ca;
+// ...
+ca.add('v', "verbose", "Output more detailed information.");
+----
+
+
+
+===== Long only
+
+----
+int CheckArg::add(const std::string &lopt, const std::string &help);    // <1>
+int CheckArg.add(final String lopt, final String help)                  // <2>
+int checkarg_add_long(CheckArg*, const char *lopt, const char *help);   // <3>
+checkarg_add_long <lopt> <help>                                         #  <4>
+----
+
+Add option with only a long name and its help message to the list of known options.
+NOTE: This is a convenience function which calls <<long-only-val,add_long_value>> with has_val=false.
+
+
+
+[[short-long-val]]
+===== Short and long with value
+
+----
+int CheckArg::add(const char sopt, const std::string &lopt, const std::string &help, bool has_val=false);         // <1>
+int CheckArg.add(final char sopt, final String lopt, final String help, final boolean has_val)                    // <2>
+int checkarg_add_value(CheckArg*, const char sopt, const char *lopt, const char *help, const uint8_t has_val);    // <3>
+checkarg_add <sopt> <lopt> <help> [has_val]                                                                       #  <4>
+----
+
+Add option with short and long name, help message and value, if `has_val` is true, to list of known options.
+
+
+
+[[long-only-val]]
+===== Long only with value
+
+----
+int CheckArg::add(const std::string &lopt, const std::string &help, bool has_val=false);            // <1>
+int CheckArg.add(final String lopt, final String help, final boolean has_val)                       // <2>
+int checkarg_add_long_value(CheckArg*, const char *lopt, const char *help, const int8_t has_val);   // <3>
+checkarg_add_long <lopt> <help> [has_val]                                                           #  <4>
+----
+
+Add option with long name, help message and value, if `has_val` is true, to list of known options.
+
+
+
+===== Short and long with callback
+
+----
+int CheckArg::add(const char sopt, const std::string &lopt, std::function<int(CheckArgRPtr, const std::string &, const std::string &)> cb, const std::string &help); // <1>
+int CheckArg.add(final char sopt, final String lopt, final String help, final Callable<Void> cb)                                                                     // <2>
+int checkarg_add_cb(CheckArg*, const char sopt, const char *lopt, CheckArgFP cb, const char *help);                                                                  // <3>
+checkarg_add_cb <sopt> <lopt> <cb> <help>                                                                                                                            // <4>
+----
+
+Add option with short and long name, help message and a callback function to list of known options.
+TIP: See the <<callbacks>> section of this document for more info on callbacks.
+NOTE: This is a convenience function which calls the appropriate <<short-long-cb-val,add_cb_value>> with has_val=false.
+
+
+
+
+[[short-long-cb-val]]
+===== Short and long with callback and value
+
+----
+int CheckArg::add(const char sopt, const std::string &lopt, std::function<int(CheckArgRPtr, const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false); // <1>
+int CheckArg.add(final char sopt, final String lopt, final String help, final Callable<Void> cb, final boolean has_val)                                                                  // <2>
+int checkarg_add_cb_value(CheckArg*, const char sopt, const char *lopt, CheckArgFP cb, const char *help, const uint8_t has_val);                                                         // <3>
+checkarg_add_cb <sopt> <lopt> <cb> <help> [has_val]                                                                                                                                      // <4>
+----
+
+Add option with short and long name, help message, a callback function and value, if `has_val` is true, to list of known options.
+TIP: See the <<callbacks>> section of this document for more info on callbacks.
+
+
+
+===== Long only with callback
+
+----
+int CheckArg::add(const std::string &lopt, std::function<int(CheckArgRPtr,const std::string &, const std::string &)> cb, const std::string &help);  // <1>
+int CheckArg.add(final String lopt, final String help, final Callable<Void> cb)                                                                     // <2>
+int checkarg_add_long_cb(CheckArg*, const char *lopt, CheckArgFP cb, const char *help);                                                             // <3>
+checkarg_add_long_cb <lopt> <cb> <help>                                                                                                             // <4>
+----
+
+
+Add option with long name, help message and a callback function to list of known options.
+TIP: See the <<callbacks>> section of this document for more info on callbacks.
+NOTE: This is a convenience function which calls <<long-only-cb-val,add_long_cb_value>> with has_val=false.
+
+
+
+
+[[long-only-cb-val]]
+===== Long only with callback and value
+
+----
+int CheckArg::add(const std::string &lopt, std::function<int(CheckArgRPtr,const std::string &, const std::string &)> cb, const std::string &help, bool has_val=false); // <1>
+int CheckArg.add(final String lopt, final String help, final Callable<Void> cb, final boolean has_val)                                                                 // <2>
+int checkarg_add_long_cb_value(CheckArg*, const char *lopt, CheckArgFP cb, const char *help, const uint8_t has_val);                                                   // <3>
+checkarg_add_long_cb <lopt> <cb> <help> [has_val]                                                                                                                      // <4>
+----
+
+Add option with long name, help message, a callback function and value, if `has_val` is true, to list of known options.
+TIP: See the <<callbacks>> section of this document for more info on callbacks.
+
+
+===== Automatic help
+
+NOTE: This is a convenience function which essentially calls <<short-long-cb-val,add_cb_value>> like this:
+
+----
+add('h', "help", checkarg::show_autohelp, "show this help message and exit", false);
+----
+
+The callback used for this is a short helper which calls <<show_help,show_help()>> and exits the program with status 0.
+
+
+<1> C++
+<2> Java
+<3> C
+<4> Bash
+
+
+[[callbacks]]
+===== Callbacks
+
+====== Bash
+
+In Bash callbacks can be any valid bash command.
+The callback is called with the long option name and its value if set.
+Any non-zero return code of the callback will cause checkarg_parse to abort parsing.
+
+For Example:
+[source,bash]
+----
+function increase_verbosity(){
+	(( verbose_level++ ))
+}
+function debug(){
+	echo "Option $1 with value $2 was given."
+}
+
+checkarg_add_cb 'v' 'verbose' 'increase_verbosity' "Increase verbosity"
+checkarg_add_cb 's' 'something' 'debug' "Should print this option and its value" 1
+----
+
+====== C
+
+Callbacks in C have the following signature:
+[source,c]
+----
+int callback_name(CheckArg* ca, const char* lopt, const char* val);
+----
+
+Return CA_ALLOK or 0 if everything went fine, any other int if not.
+Any non-CA_ALLOK return code will cause checkarg_parse to abort parsing and return CA_CALLBACK.
+
+
+====== C++
+
+Callbacks in C++ have the following signature:
+[source,cpp]
+----
+int callback_name(CheckArgRPtr ca, const std::string &lopt, const std::string &val);
+----
+
+Return CA_ALLOK or 0 if everything went fine, any other int if not.
+Any non-CA_ALLOK return code will cause checkarg_parse to abort parsing and return CA_CALLBACK.
+
+
+====== Java
+
+Callbacks in Java are Opjects of class Callable<Void>.
+Any Exception thrown inside call() will cause the parser to abort parsing and return CA_CALLBACK.
+Sadly there is no easy way of passing an options value to such a Callback yet, as call() does not accept any parameters.
+You'll have to store a reference to the CheckArg object in your callback and use the value() member.
+
+An example Callback could look like this:
+[source,java]
+----
+class MyVerboseCallback implements Callable<Void> {
+	MyCallback(CheckArg ca){ this.ca = ca; }
+	public Void call(){
+		final String val = this.ca.value("verbose");
+		SomeOutputer.setVerboseLevel(val);
+	}
+}
+ca.add('v', "verbose", new MyVerboseCallback(ca), "Give verbose level as number in range 1-3.", true);
+----
+
+==== Other Members
+
+===== Start parsing
+
+----
+int CheckArg::parse()
+int CheckArg.parse()
+int checkarg_parse(CheckArg *ca)
+checkarg_parse <args>...
+----
+
+Parse the command line arguments. Call this after you added all the options you want to be recognized.
+Returns CA_ALLOK if successful. Other members of CAError enum if errors happen.
+
+===== Checking for options
+
+----
+bool CheckArg::isset(const std::string &lopt) const;
+boolean isset(final String lopt)
+uint8_t checkarg_isset(CheckArg *ca, const char *lopt);
+checkarg_isset <lopt>
+----
+
+Returns a boolean value indicating if an option was passed on the command line (true) or not (false).
+
+In C 1 means true, 0 means false.
+In Bash 0 means true, 1 false.
+That way you can, in any language, put the isset call directly into the if, for example like this:
+
+[source,bash]
+----
+if checkarg_isset "input"; then
+	input_file="$(checkarg_value "input")"
+fi
+----
+
+
+----
+std::string value(const std::string &arg) const;
+String value(final String arg)
+const char* checkarg_value(CheckArg*, const char*);
+checkarg_value <lopt>
+----
+
+Returns the value stored for the given option.
+The return value is *undefined* if the option doesn't have a value (has_val was false when added).
+
+===== Get positional Arguments
+
+
+----
+std::vector<std::string> pos_args() const;
+List<String> pos_args()
+const char** checkarg_pos_args(CheckArg*);
+----
+
+Returns all arguments passed which are not an option or an option value.
+In bash positional arguments are directly accessible via the `checkarg_pos_args` array.
+
+
+ size_t checkarg_pos_args_count(CheckArg*);
+
+C only.
+Number of positinal arguments in array returned by `checkarg_pos_args`.
+
+[[show_help]]
+===== Show help messages
+
+----
+void CheckArg::show_help()
+
+void checkarg_show_help(CheckArgPtr);
+_checkarg_show_help
+----
+
+Prints the full help message to stdout.
+Not implemented in java port yet.
+
+----
+void CheckArg::show_usage()
+
+void checkarg_show_usage(CheckArgPtr);
+printf "Usage: %s [options] %s\n" "$_checkarg_appname" "$_checkarg_posarg_usage"
+----
+
+Prints the Usage-line to stdout.
+Not implemented in java port, yet.
+Not implemented in bash port, yet, but doable by reading from internal variables. (They may change unexpectedly!)
+
+===== Customizing the automatic help message
+
+----
+void CheckArg::set_posarg_help(const std::string &usage, const std::string &descr );
+void CheckArg.set_posarg_help(final String usage, final String descr)
+----
+
+The text in usage will be appended to the usage line.
+The text in description will be inserted as "Positional Arguments" section after the Options section of the help message.
+
+An example:
+
+----
+ca.set_posarg_help("<files>...", "files\tSpecify one or more files to read from.")
+----
+
+would produce a help message like:
+
+----
+Usage: appname [options] <files>...
+-- SNIP --
+Positional Arguments:
+
+files      Specify one or more files to read from
+
+----
+
+----
+void CheckArg::set_usage_line(const std::string &str);
+void CheckArg.set_usage_line(final String usage)
+
+
+----
+
+Set a completely custom usage line.
