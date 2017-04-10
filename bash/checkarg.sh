@@ -434,7 +434,13 @@ function _checkarg_arg_long(){
 function _checkarg_show_help(){
 	local space=0
 
-	for key in ${!_checkarg_args[@]}; do
+	if [[ -z $ZSH_VERSION ]]; then
+		local keys=( "${!_checkarg_args[@]}" )
+	else
+		local keys=( "${(@k)_checkarg_args}" )
+	fi
+
+	for key in "${keys[@]}"; do
 		space="$(( space > ${#key} ? space : ${#key} ))"
 	done
 
@@ -446,7 +452,7 @@ function _checkarg_show_help(){
 
 	printf "Options:\n"
 
-	for key in ${!_checkarg_args[@]}; do
+	for key in ${keys[@]}; do
 
 		sopt="$(_checkarg_find_sopt "$key")"
 		if [[ -z "$sopt" ]]; then
@@ -470,7 +476,13 @@ function _checkarg_show_help(){
 }
 
 function _checkarg_find_sopt(){
-	for key in "${!_checkarg_short_long[@]}"; do
+	if [[ -z $ZSH_VERSION ]]; then
+		local keys=( "${!_checkarg_short_long[@]}" )
+	else
+		local keys=( "${(@k)_checkarg_short_long}" )
+	fi
+
+	for key in "${keys[@]}"; do
 		if [[ "${_checkarg_short_long[$key]}" == "$1" ]]; then
 			printf -- "$key"
 			return
