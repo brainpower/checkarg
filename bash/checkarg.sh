@@ -433,11 +433,12 @@ function _checkarg_arg_long(){
 
 function _checkarg_show_help(){
 	local space=0
+	local keys
 
 	if [[ -z $ZSH_VERSION ]]; then
-		local keys=( "${!_checkarg_args[@]}" )
+		keys=( "${!_checkarg_args[@]}" )
 	else
-		local keys=( "${(@k)_checkarg_args}" )
+		keys=( "${(@k)_checkarg_args}" )
 	fi
 
 	for key in "${keys[@]}"; do
@@ -476,10 +477,11 @@ function _checkarg_show_help(){
 }
 
 function _checkarg_find_sopt(){
+	local keys
 	if [[ -z $ZSH_VERSION ]]; then
-		local keys=( "${!_checkarg_short_long[@]}" )
+		keys=( "${!_checkarg_short_long[@]}" )
 	else
-		local keys=( "${(@k)_checkarg_short_long}" )
+		keys=( "${(@k)_checkarg_short_long}" )
 	fi
 
 	for key in "${keys[@]}"; do
