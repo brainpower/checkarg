@@ -1,14 +1,12 @@
 General
 =======
-- support option and (positinal-)argument separator: --
-    like in git checkout --option -- file1 file2
-
-    => DONE
-
 - add ```ca.show_usage()``` and ```ca.show_help()``` to manually show the help or usage message,
   so for example one can output the usage line if expected positional arguments are missing
 
     => DONE: cpp, c TODO: bash, java
+    
+- add marker for options with values in help message, currently one can't see if an option takes a value or not
+  if it isn mentioned in the help message.
 
 - Maybe add support for easier managing of multiple options,
   like ```programm -vvv``` or ```program -i file1 -i file2```.<br>
