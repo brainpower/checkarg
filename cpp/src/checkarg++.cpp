@@ -485,7 +485,7 @@ int CheckArgPrivate::arg_long(const std::string &arg){
 
 int CheckArgPrivate::arg_short(const std::string &arg){
   size_t len = arg.size();
-  for(int i=0; i < len; ++i){
+  for(size_t i=0; i < len; ++i){
     auto pos = short2long.find(arg[i]);
     if( pos != short2long.end() ){ // there is such a short arg registered
       if( valid_args[pos->second].has_val ) { // if has val,
