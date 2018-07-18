@@ -1,20 +1,28 @@
+sudo: required
+
+services:
+  - docker
+
+arch:
+  packages:
+    - ninja
+    - meson
+
+  script:
+    - cd $SRCDIR
+    - meson builddir
+    - ninja -C builddir
+
 language: cpp
+
 env:
   - SRCDIR=c
   - SRCDIR=cpp
   - SRCDIR=bash
+
 compiler:
   - gcc
   - clang
-install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get -qq update
-  - sudo apt-get -qq install g++-7
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
-  - $CC --version
-  - $CXX --version
+
 script:
-  - cd $SRCDIR
-  - make
-  - make check
+  - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
