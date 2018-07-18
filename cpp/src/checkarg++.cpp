@@ -208,12 +208,12 @@ std::string
 CheckArg::str_err(const int errno){ return CheckArgPrivate::errors[errno]; }
 
 int
-CheckArgPrivate::ca_error(int eno, const std::string &info, ...) const {
 #ifdef CA_PRINTERR
+CheckArgPrivate::ca_error(int eno, const char *info, ...) const {
   va_list al;
   va_start(al, info);
   char *buff;
-  int i=vasprintf(&buff,info.c_str(),al);
+  int i=vasprintf(&buff,info,al);
   if (i > -1){
     std::cerr << "Error: " << errors[eno] << buff << std::endl;
     free(buff);
