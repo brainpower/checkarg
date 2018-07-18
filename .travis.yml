@@ -10,8 +10,9 @@ arch:
 
   script:
     - cd $SRCDIR
-    - meson builddir
-    - ninja -C builddir
+    - [[ -f meson.build ]] && meson builddir
+    - [[ -f meson.build ]] && ninja -C builddir
+    - [[ -f Makefile ]] && make
 
 language: cpp
 
