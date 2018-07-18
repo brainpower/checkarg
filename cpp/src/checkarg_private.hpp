@@ -20,12 +20,8 @@
  * THE SOFTWARE.
 */
 
+#include "config.h"
 #include "checkarg++.hpp"
-
-#ifdef CA_PRINTERR
-#include <cstdarg>
-#include <iostream>
-#endif
 
 class CheckArgPrivate {
 private:
@@ -75,6 +71,7 @@ private:
   friend int checkarg::show_autohelp(CheckArgRPtr, const std::string &, const std::string &);
 };
 
-#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER) || defined(__WIN32__)
-  extern int vasprintf(char** strp, const char* format, va_list ap);
+#if not HAS_VASPRINTF
+	extern int vasprintf(char** strp, const char* format, va_list ap);
 #endif
+

@@ -1,6 +1,6 @@
 
 project('checkarg++', 'cpp',
-	default_options: ['cpp_std=c++14'],
+	default_options: ['cpp_std=c++14', 'b_ndebug=if-release'],
 	version: '1.2.0'
 )
 
@@ -15,9 +15,16 @@ headers = [
 # }}}
 
 # {{{ config
+compiler = meson.get_compiler('cpp')
 conf_inc = include_directories('.')
 cdata = configuration_data()
 cdata.set_quoted('CA_VER_STRING', meson.project_version())
+
+cdata.set10('CA_PRINTERR', get_option('printerr'))
+
+cdata.set10('HAS_VASPRINTF',
+	compiler.has_function('vasprintf', prefix : '#include <stdio.h>')
+)
 # }}}
 
 # {{{ binaries

@@ -22,6 +22,11 @@
 
 #include "checkarg++.hpp"
 #include "checkarg_private.hpp"
+
+#if CA_PRINTERR
+#include <cstdarg>
+#endif
+
 #include <sstream>
 #include <iostream>
 using namespace std;
@@ -208,8 +213,8 @@ std::string
 CheckArg::str_err(const int errno){ return CheckArgPrivate::errors[errno]; }
 
 int
-#ifdef CA_PRINTERR
 CheckArgPrivate::ca_error(int eno, const char *info, ...) const {
+#if CA_PRINTERR
   va_list al;
   va_start(al, info);
   char *buff;
@@ -526,8 +531,8 @@ int checkarg::show_autohelp(CheckArgRPtr ca, const std::string&, const std::stri
   exit(0); // always exit after showing help
 }
 
-#ifdef CA_PRINTERR
-#	if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER) || defined(__WIN32__)
+#if CA_PRINTERR
+#	if not HAS_VASPRINTF
 
 #include <cstring>
 int vasprintf(char** strp, const char* format, va_list ap)
@@ -554,3 +559,4 @@ int vasprintf(char** strp, const char* format, va_list ap)
 
 #	endif
 #endif
+

@@ -1,0 +1,3 @@
+# meson options
+
+option('printerr', type: 'boolean', value: true, description: 'If "on" checkarg will print errors. "auto" enables it if a debug buildtype is selected.')

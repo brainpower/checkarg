@@ -31,10 +31,6 @@
 #include <vector>
 #include <functional>
 
-#ifndef NDEBUG
-#define CA_PRINTERR
-#endif
-
 
 // forward declarations
 class CheckArg;
