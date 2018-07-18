@@ -223,6 +223,7 @@ CheckArgPrivate::ca_error(int eno, const char *info, ...) const {
     std::cerr << "Error: " << errors[eno] << buff << std::endl;
     free(buff);
   }
+  va_end(al);
 #endif
   return eno;
 }
