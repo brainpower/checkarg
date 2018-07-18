@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 brainpower <brainpower at mailbox dot org>
+ * Copyright (c) 2013-2018 brainpower <brainpower at mailbox dot org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,6 @@
 
 #ifndef CHECKARG_H
 #define CHECKARG_H
-
-#define CA_VER_STRING "1.2.0"
-
-#ifndef NDEBUG
-#define CA_PRINTERR
-#endif
 
 #include <stdint.h>
 #include <stddef.h> /* size_t */

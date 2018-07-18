@@ -22,8 +22,9 @@ cdata.set_quoted('CA_VER_STRING', meson.project_version())
 
 cdata.set10('CA_PRINTERR', get_option('printerr'))
 
-cdata.set10('HAS_VASPRINTF',
-	compiler.has_function('vasprintf', prefix : '#include <stdio.h>')
+cdata.set10(
+	'HAS_VASPRINTF',
+	compiler.has_function('vasprintf', prefix : '#include <cstdio>')
 )
 # }}}
 
