@@ -10,9 +10,8 @@ archlinux:
 
   script:
     - cd $SRCDIR
-    - "[[ -f meson.build ]] && meson builddir"
-    - "[[ -f meson.build ]] && ninja -C builddir"
-    - "[[ -f Makefile ]] && make"
+    - "if [[ -f meson.build ]]; then  meson builddir && ninja -C builddir; fi"
+    - "if [[ -f Makefile ]]; then make; fi"
 
 language: cpp
 
