@@ -107,7 +107,7 @@ _checkarg_next_is_val_of=''
 # $2: description (opt.)
 # $3: appendix (opt.)
 ##
-function checkarg_init(){
+checkarg_init(){
 	if [[ -z "$1" ]]; then
 		return 1
 	else
@@ -131,7 +131,7 @@ function checkarg_init(){
 # $4: has_val: specify if option has a value, (opt.)
 #              0 for no (default), 1 for yes
 ##
-function checkarg_add(){
+checkarg_add(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z $3 ]]; then
 		return 1
 	else
@@ -152,7 +152,7 @@ function checkarg_add(){
 # $5: has_val: specify if option has a value, (opt.)
 #              0 for no (default), 1 for yes
 ##
-function checkarg_add_cb(){
+checkarg_add_cb(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z $4 ]]; then
 		return 1
 	else
@@ -172,7 +172,7 @@ function checkarg_add_cb(){
 # $3: has_val: specify if option has a value, (opt.)
 #              0 for no (default), 1 for yes
 ##
-function checkarg_add_long(){
+checkarg_add_long(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]]; then
 		return 1
 	fi
@@ -191,7 +191,7 @@ function checkarg_add_long(){
 # $4: has_val: specify if option has a value, (opt.)
 #              0 for no (default), 1 for yes
 ##
-function checkarg_add_long_cb(){
+checkarg_add_long_cb(){
 	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z $3 ]]; then
 		return 1
 	fi
@@ -205,7 +205,7 @@ function checkarg_add_long_cb(){
 # an automatically generated help-message.
 ##
 
-function checkarg_add_autohelp(){
+checkarg_add_autohelp(){
 	checkarg_add_cb 'h' "help" "_checkarg_show_help" "show this help message and exit"
 }
 
@@ -220,7 +220,7 @@ function checkarg_add_autohelp(){
 # of valid arguments before calling this.
 # Preferably using the checkarg_add* functions.
 ##
-function checkarg_parse(){
+checkarg_parse(){
 	local ret=0
 
 	for arg in "$@"; do
@@ -245,27 +245,27 @@ function checkarg_parse(){
 
 # $1: text to be appended to usage line for positional args
 # $2: description of the positional args
-function checkarg_set_posarg_help(){
+checkarg_set_posarg_help(){
 	_checkarg_posarg_descr="$2"
 	_checkarg_posarg_usage="$1"
 }
 
 # $1: set the usage line used in autohelp
-function checkarg_set_usage_line(){
+checkarg_set_usage_line(){
 	_checkarg_usage_line="$1"
 }
 
 # $1: long opt name
 # returns 0 if opt was given, 1 if not
-function checkarg_isset(){
+checkarg_isset(){
 	[[ -n "${_checkarg_args_values[$1]}" ]]
 }
 
 # $1: long opt name
 # prints argument value
-function checkarg_value(){
+checkarg_value(){
 	if [[ -n "${_checkarg_args_values[$1]}" ]]; then
-		printf "${_checkarg_args_values[$1]}"
+		printf "%s" "${_checkarg_args_values[$1]}"
 	else
 		return 1
 	fi
@@ -273,7 +273,7 @@ function checkarg_value(){
 
 # $1: errno
 # prints error message
-function checkarg_strerr(){
+checkarg_strerr(){
 	local ret=1
 	case "$1" in
 		0|CA_ALLOK)
@@ -313,7 +313,7 @@ function checkarg_strerr(){
 ##
 
 # $1: arg
-function _checkarg_arg(){
+_checkarg_arg(){
 	local ret=0
 
 	# if the separator '--' was given, all following args are posargs,
@@ -357,7 +357,7 @@ function _checkarg_arg(){
 	return 0
 }
 
-function _checkarg_arg_short(){
+_checkarg_arg_short(){
 	local len=${#1} # length of the arg
 
 	for i in $(eval echo "{0..$(( len - 1))}") ; do
@@ -398,7 +398,7 @@ function _checkarg_arg_short(){
 }
 
 # $1: long opt without dashes
-function _checkarg_arg_long(){
+_checkarg_arg_long(){
 	# if theres an '=' in the arg, check the first part
 	local arg="${1%%=*}"
 	local value="${1#*=}"
@@ -431,7 +431,7 @@ function _checkarg_arg_long(){
 	fi
 }
 
-function _checkarg_show_help(){
+_checkarg_show_help(){
 	local space=0
 	local keys
 
@@ -445,15 +445,19 @@ function _checkarg_show_help(){
 		space="$(( space > ${#key} ? space : ${#key} ))"
 	done
 
-	printf "Usage: %s [options]%s\n\n" "$_checkarg_appname" "$_checkarg_posarg_usage"
+  if [[ -z "$_checkarg_usage_line" ]]; then
+	  printf "Usage: %s [options]%s\n\n" "$_checkarg_appname" "$_checkarg_posarg_usage"
+  else
+    printf "%s\n\n" "$_checkarg_usage_line"
+  fi
 
 	if [[ -n "$_checkarg_descr" ]]; then
-		printf "$_checkarg_descr\n\n"
+		printf "%s\n\n" "$_checkarg_descr"
 	fi
 
 	printf "Options:\n"
 
-	for key in ${keys[@]}; do
+	for key in "${keys[@]}"; do
 
 		sopt="$(_checkarg_find_sopt "$key")"
 		if [[ -z "$sopt" ]]; then
@@ -476,7 +480,7 @@ function _checkarg_show_help(){
 	exit 0
 }
 
-function _checkarg_find_sopt(){
+_checkarg_find_sopt(){
 	local keys
 	if [[ -z $ZSH_VERSION ]]; then
 		keys=( "${!_checkarg_short_long[@]}" )
@@ -486,7 +490,7 @@ function _checkarg_find_sopt(){
 
 	for key in "${keys[@]}"; do
 		if [[ "${_checkarg_short_long[$key]}" == "$1" ]]; then
-			printf -- "$key"
+			printf "%s" "$key"
 			return
 		fi
 	done
