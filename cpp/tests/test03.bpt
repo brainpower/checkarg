@@ -1,7 +1,7 @@
 
 name="checkarg_pos_arg_sep"
 type="cpp"
-sources=("test03.cpp" "../libcheckarg++.a")
+sources=("test03.cpp" "../builddir/libcheckarg++.a")
 
 prepare(){
   compile_sources

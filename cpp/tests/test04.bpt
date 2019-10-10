@@ -1,7 +1,7 @@
 
 name="non_value_options"
 type="cpp"
-sources=("test04.cpp" "../libcheckarg++.a")
+sources=("test04.cpp" "../builddir/libcheckarg++.a")
 
 prepare(){
   compile_sources

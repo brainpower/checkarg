@@ -1,9 +1,9 @@
 Usage: test02 [options] [files...]
 
 Options:
-   -i, --input  file to read from
    -h, --help   show this help message and exit
    -t, --test   run pos_arg test
+   -i, --input  file to read from
 
 Positional Arguments:
 one or more output files

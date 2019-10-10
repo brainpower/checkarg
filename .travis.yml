@@ -10,7 +10,7 @@ archlinux:
 
   script:
     - cd $SRCDIR
-    - "if [[ -f meson.build ]]; then  meson builddir && ninja -C builddir; fi"
+    - "if [[ -f meson.build ]]; then meson builddir -Ddefault_library=both && ninja -C builddir && tests/run_tests.sh; fi"
     - "if [[ -f Makefile ]]; then make check; fi"
 
 language: cpp

@@ -1,7 +1,7 @@
 
 name="value_options"
 type="cpp"
-sources=("test05.cpp" "../libcheckarg++.a")
+sources=("test05.cpp" "../builddir/libcheckarg++.a")
 
 prepare(){
   compile_sources

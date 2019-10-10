@@ -1,7 +1,7 @@
 
 name="checkarg_setters"
 type="cpp"
-sources=("test02.cpp" "../libcheckarg++.a")
+sources=("test02.cpp" "../builddir/libcheckarg++.a")
 
 prepare(){
   compile_sources
