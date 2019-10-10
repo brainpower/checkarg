@@ -11,7 +11,7 @@ archlinux:
   script:
     - cd $SRCDIR
     - "if [[ -f meson.build ]]; then  meson builddir && ninja -C builddir; fi"
-    - "if [[ -f Makefile ]]; then make; fi"
+    - "if [[ -f Makefile ]]; then make check; fi"
 
 language: cpp
 
