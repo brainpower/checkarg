@@ -1,12 +1,11 @@
 # Maintainer: oi_wtf aka. brainpower <brainpower at gulli dot com>
 pkgname=checkarg-cpp-git
-pkgver=0.1.0
+pkgver=0.1.1.r127.g044a6f0
 pkgrel=1
 pkgdesc="The CheckArg commandline parser"
 arch=('i686' 'x86_64')
 url="https://github.com/brainpower/checkarg"
 license=('GPL')
-depends=('sfml-git' 'sfgui-git')
 makedepends=('cmake' 'git')
 provides=('checkarg-cpp')
 conflicts=('checkarg-cpp')
@@ -24,13 +23,14 @@ pkgver() {
 build() {
   cd "${srcdir}/checkarg/cpp"
 
-  make
+  arch-meson builddir
+  ninja -C builddir
 }
 
 package() {
   cd "${srcdir}/checkarg/cpp"
 
-  make DESTDIR="$pkgdir/" install
+  DESTDIR="$pkgdir/" ninja -C builddir install
 
 }
 

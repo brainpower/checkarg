@@ -38,7 +38,7 @@
 #
 ###
 #
-# Copyright (c) 2013-2015 brainpower <brainpower at mailbox dot org>
+# Copyright (c) 2013-2020 brainpower <brainpower at mailbox dot org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -108,18 +108,17 @@ _checkarg_next_is_val_of=''
 # $3: appendix (opt.)
 ##
 checkarg_init(){
-	if [[ -z "$1" ]]; then
+	if [[ "$#" == 0 ]]; then
 		return 1
-	else
+  fi
 
-		_checkarg_appname="$1"
-		if [[ -n "$2" ]]; then
-			_checkarg_descr="$2"
-		fi
-		if [[ -n "$3" ]]; then
-			_checkarg_appendix="$3"
-		fi
-	fi
+  _checkarg_appname="$1"
+  if [[ "$#" -gt 1 ]]; then
+    _checkarg_descr="$2"
+  fi
+  if [[ "$#" -gt 2 ]]; then
+    _checkarg_appendix="$3"
+  fi
 }
 
 ##
@@ -132,13 +131,13 @@ checkarg_init(){
 #              0 for no (default), 1 for yes
 ##
 checkarg_add(){
-	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z $3 ]]; then
+	if [[ "$#" -lt 3 ]]; then
 		return 1
-	else
-		eval "_checkarg_short_long[$1]='$2'"
-		eval "_checkarg_args[$2]='${4:-0}'"
-		eval "_checkarg_args_help[$2]='$3'"
 	fi
+
+  eval "_checkarg_short_long[$1]='$2'"
+  eval "_checkarg_args[$2]='${4:-0}'"
+  eval "_checkarg_args_help[$2]='$3'"
 }
 
 ##
@@ -153,14 +152,14 @@ checkarg_add(){
 #              0 for no (default), 1 for yes
 ##
 checkarg_add_cb(){
-	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z $4 ]]; then
+	if [[ "$#" -lt 4 ]]; then
 		return 1
-	else
-		eval "_checkarg_short_long[$1]='$2'"
-		eval "_checkarg_args[$2]='${5:-0}'"
-		eval "_checkarg_args_help[$2]='$4'"
-		eval "_checkarg_args_cb[$2]='$3'"
 	fi
+
+  eval "_checkarg_short_long[$1]='$2'"
+  eval "_checkarg_args[$2]='${5:-0}'"
+  eval "_checkarg_args_help[$2]='$4'"
+  eval "_checkarg_args_cb[$2]='$3'"
 }
 
 ##
@@ -173,7 +172,7 @@ checkarg_add_cb(){
 #              0 for no (default), 1 for yes
 ##
 checkarg_add_long(){
-	if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+	if [[ "$#" -lt 2 ]]; then
 		return 1
 	fi
 
@@ -192,7 +191,7 @@ checkarg_add_long(){
 #              0 for no (default), 1 for yes
 ##
 checkarg_add_long_cb(){
-	if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z $3 ]]; then
+	if [[ "$#" -lt 3 ]]; then
 		return 1
 	fi
 
@@ -246,24 +245,37 @@ checkarg_parse(){
 # $1: text to be appended to usage line for positional args
 # $2: description of the positional args
 checkarg_set_posarg_help(){
+  if [[ $# -lt 2 ]]; then
+    return 1
+  fi
+
 	_checkarg_posarg_descr="$2"
 	_checkarg_posarg_usage="$1"
 }
 
 # $1: set the usage line used in autohelp
 checkarg_set_usage_line(){
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	_checkarg_usage_line="$1"
 }
 
 # $1: long opt name
 # returns 0 if opt was given, 1 if not
 checkarg_isset(){
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	[[ -n "${_checkarg_args_values[$1]}" ]]
 }
 
 # $1: long opt name
 # prints argument value
 checkarg_value(){
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	if [[ -n "${_checkarg_args_values[$1]}" ]]; then
 		printf "%s" "${_checkarg_args_values[$1]}"
 	else
@@ -273,7 +285,10 @@ checkarg_value(){
 
 # $1: errno
 # prints error message
-checkarg_strerr(){
+checkarg_strerr() {
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	local ret=1
 	case "$1" in
 		0|CA_ALLOK)
@@ -313,7 +328,10 @@ checkarg_strerr(){
 ##
 
 # $1: arg
-_checkarg_arg(){
+_checkarg_arg() {
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	local ret=0
 
 	# if the separator '--' was given, all following args are posargs,
@@ -358,6 +376,9 @@ _checkarg_arg(){
 }
 
 _checkarg_arg_short(){
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	local len=${#1} # length of the arg
 
 	for i in $(eval echo "{0..$(( len - 1))}") ; do
@@ -399,6 +420,9 @@ _checkarg_arg_short(){
 
 # $1: long opt without dashes
 _checkarg_arg_long(){
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	# if theres an '=' in the arg, check the first part
 	local arg="${1%%=*}"
 	local value="${1#*=}"
@@ -481,6 +505,9 @@ _checkarg_show_help(){
 }
 
 _checkarg_find_sopt(){
+  if [[ $# -lt 1 ]]; then
+    return 1
+  fi
 	local keys
 	if [[ -z $ZSH_VERSION ]]; then
 		keys=( "${!_checkarg_short_long[@]}" )
@@ -498,7 +525,7 @@ _checkarg_find_sopt(){
 }
 
 if [[ $_revert_nounset -gt 0 ]]; then
-	set +o nounset
+  set +o nounset
 fi
 
 fi # CHECKARG_SH
