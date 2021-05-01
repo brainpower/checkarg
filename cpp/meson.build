@@ -67,3 +67,8 @@ pkgcfg.generate(
 	filebase: 'checkarg++',
 	description: 'A command line argument parser for C++.'
 )
+
+
+if get_option('tests')
+  subdir('tests')
+endif
