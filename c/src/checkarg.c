@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
-
+#include <assert.h>
 
 const char* errors[] = {
   /*CA_ALLOK*/    "Everything is fine",
@@ -270,16 +270,40 @@ checkarg_str_err(const int errno) {
   return errors[errno];
 }
 
-void
-checkarg_show_usage(CheckArg *ca){
-  if(ca->p->posarg_help_usage)
-    printf("Usage: %s %s\n", ca->p->usage_line, ca->p->posarg_help_usage);
-  else
-    printf("Usage: %s \n", ca->p->usage_line);
+/**
+ * returns a dynamically allocated pointer which must be freed by the user
+ */
+char* checkarg_usage(CheckArg *ca) {
+  size_t len = 8; // "Usage: " + "\0"
+  len += strlen(ca->p->usage_line);
+  if (ca->p->posarg_help_usage) {
+    len += strlen(ca->p->posarg_help_usage) + 1; // +1 for the space
+  }
+
+  char* line = malloc(len);
+  if (!line) return NULL;
+
+  if (ca->p->posarg_help_usage) {
+    snprintf(line, len, "Usage: %s %s", ca->p->usage_line, ca->p->posarg_help_usage);
+  } else {
+    snprintf(line, len, "Usage: %s", ca->p->usage_line);
+  }
+
+  return line;
 }
 
 void
-checkarg_show_help(CheckArg *ca){
+checkarg_show_usage(CheckArg *ca){
+  char* line = checkarg_usage(ca);
+  printf("%s\n", line);
+  free(line);
+}
+
+/**
+ * returns a dynamically allocated pointer which must be freed by the user
+ */
+char*
+checkarg_autohelp(CheckArg *ca){
   size_t space = 0;
   size_t tmp = 0;
   Opt *it = ca->p->valid_args;
@@ -292,30 +316,78 @@ checkarg_show_help(CheckArg *ca){
   /* two more than opt length, so theres some space between the columns */
   space += 2;
 
-	checkarg_show_usage(ca);
+	char *usage = checkarg_usage(ca);
+	size_t msglen =
+	  strlen(usage) +
+	  12 + // newline after usage + strlen("\nOptions\n") + final \0
+	  (ca->p->descr ? strlen(ca->p->descr) + 2 : 0) + // +2 -> 2*'\n'
+	  (ca->p->posarg_help_descr ? 24 + strlen(ca->p->posarg_help_descr) : 0) +
+	  (ca->p->appendix ? 2 + strlen(ca->p->appendix): 0);
 
-  if(ca->p->descr)
-    printf("\n%s\n", ca->p->descr);
+  it = ca->p->valid_args;
+  do {
+    // 10 == 6 char for short options + 3 chars for ' --' + a newline
+    // space is the width of the long options
+    msglen += 10 + space + strlen(it->help);
+  } while( (it = it->next ) );
 
-  printf("\nOptions:\n");
+  size_t malloced_len = msglen;
+	char *msg = malloc(msglen);
+	if (!msg) {
+	  free(usage);
+	  return NULL;
+  }
+  int pnum = snprintf(msg, msglen, "%s\n", usage);
+  msglen -= pnum; // next snprintf can write pnum less chars
+  char *cur = msg + pnum; // next snprintf shall start at the end of the already written stuff
+
+  if(ca->p->descr) {
+    pnum = snprintf(cur, msglen, "\n%s\n", ca->p->descr);
+    msglen -= pnum;
+    cur += pnum;
+  }
+
+  pnum = snprintf(cur, msglen, "\nOptions:\n");
+  msglen -= pnum;
+  cur += pnum;
 
   it = ca->p->valid_args;
   do {
     if(it->sopt)
-      printf("   -%c,", it->sopt);
+      pnum = snprintf(cur, msglen, "   -%c,", it->sopt);
     else
-      printf("      ");
+      pnum = snprintf(cur, msglen, "      ");
+    msglen -= pnum;
+    cur += pnum;
 
-    printf(" --%s%*s%s\n", it->lopt, (int)(space-strlen(it->lopt)), "", it->help);
+    pnum = snprintf(cur, msglen, " --%s%*s%s\n", it->lopt, (int)(space-strlen(it->lopt)), "", it->help);
+    msglen -= pnum;
+    cur += pnum;
+    assert( msglen > 0 && (cur - msg < malloced_len) );
   } while( (it = it->next ) );
 
   if(ca->p->posarg_help_descr){
-    printf("\nPositional Arguments:\n%s\n", ca->p->posarg_help_descr);
+    pnum = snprintf(cur, msglen, "\nPositional Arguments:\n%s\n", ca->p->posarg_help_descr);
+    msglen -= pnum;
+    cur += pnum;
   }
 
   if(ca->p->appendix){
-    printf("\n%s\n", ca->p->appendix);
+    pnum = snprintf(cur, msglen, "\n%s\n", ca->p->appendix);
+    msglen -= pnum;
+    cur += pnum;
   }
+  assert( msglen == 1 ); // 1 because snprintf does not count the trailing \0
+
+  free(usage);
+  return msg;
+}
+
+void
+checkarg_show_help(CheckArg *ca) {
+  char* msg = checkarg_autohelp(ca);
+  printf("%s", msg);
+  free(msg);
 }
 
 int

@@ -67,8 +67,11 @@ uint8_t      checkarg_isset(CheckArg*, const char*);
 
 const char*  checkarg_str_err(const int errno);
 
-void checkarg_show_help(CheckArgPtr);
-void checkarg_show_usage(CheckArgPtr);
+char*  checkarg_usage(CheckArg*);
+char*  checkarg_autohelp(CheckArg*);
+
+void checkarg_show_help(CheckArg*);
+void checkarg_show_usage(CheckArg*);
 
 int checkarg_show_autohelp(CheckArg*, const char* larg, const char* val);
 
