@@ -31,7 +31,7 @@
 const char* errors[] = {
   /*CA_ALLOK*/    "Everything is fine",
   /*CA_ERROR*/    "An Error occurred",
-  /*CA_INVARG*/   "Unknown command line option",
+  /*CA_INVOPT*/   "Unknown command line option",
   /*CA_INVVAL*/   "Value given to non-value option",
   /*CA_MISSVAL*/  "Missing value of option",
   /*CA_CALLBACK*/ "Callback returned with error code",
@@ -583,7 +583,7 @@ int checkarg_arg_long(CheckArg *ca, const char *lopt){
   }
 
   /* else: no valid arg found -> invarg */
-  ret = ca_error(CA_INVARG, ": --%s!", real_opt);
+  ret = ca_error(CA_INVOPT, ": --%s!", real_opt);
   free(real_opt);
   return ret;
 
@@ -632,7 +632,7 @@ int checkarg_arg_short(CheckArg *ca, const char *args){
           return ret;
       }
     } else {
-      return ca_error(CA_INVARG, ": -%c!", *it);
+      return ca_error(CA_INVOPT, ": -%c!", *it);
     }
   }
   return CA_ALLOK;

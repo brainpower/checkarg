@@ -1,17 +1,5 @@
 #include "test.hpp"
 
-// FIXME: remove these and actually port the features from C++ variant
-enum {
-  CA_VT_NONE = 0,
-  CA_VT_REQUIRED = 1,
-};
-enum {
-  CA_INVOPT = CA_INVARG,
-};
-
-
-
-
 bool cb_ran = false;
 string out;
 

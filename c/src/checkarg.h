@@ -78,7 +78,7 @@ int checkarg_show_autohelp(CheckArg*, const char* larg, const char* val);
 enum CAError{
   CA_ALLOK=0,
   CA_ERROR,
-  CA_INVARG,
+  CA_INVOPT,
   CA_INVVAL,
   CA_MISSVAL,
   CA_CALLBACK,
