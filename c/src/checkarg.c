@@ -350,7 +350,12 @@ clean:
 /* WARNING: you have to free 'next' yourself if used, like in valid_args_free */
 void opt_free(Opt *o){
 	if(o){
-		free(o->value);
+	  if (o->has_val) {
+	    // value is either NULL if opt was not parsed or:
+	    // if has_val is true, value may have been strdup'ed and must be free'd
+	    // otherwise points to the literal "x", which is static
+		  free(o->value);
+    }
 		free(o->help);
 		free(o->lopt);
 		free(o);
