@@ -366,9 +366,9 @@ int ca_error(int eno, const char *fmt, ...) {
   va_list al;
   va_start(al, fmt);
 
-  printf("Error: %s", errors[eno]);
-  vprintf(fmt, al);
-  printf("\n");
+  fprintf(stderr, "Error: %s", errors[eno]);
+  vfprintf(stderr, fmt, al);
+  fprintf(stderr, "\n");
 
 	va_end(al);
   return eno;
