@@ -2,7 +2,7 @@
 // Copyright (c) 2013-2021 brainpower <brainpower at mailbox dot org>
 
 #include "config.h"
-#include "checkarg++.hpp"
+#include "checkargpp.hpp"
 
 #include <algorithm>
 #include <locale>

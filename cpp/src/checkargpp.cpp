@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2013-2021 brainpower <brainpower at mailbox dot org>
 
-#include "checkarg++.hpp"
-#include "checkarg_private.hpp"
+#include "checkargpp.hpp"
+#include "checkargpp_private.hpp"
 
 #if CA_PRINTERR
 #include <cstdarg>

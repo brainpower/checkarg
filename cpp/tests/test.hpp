@@ -1,4 +1,4 @@
-#include "checkarg++.hpp"
+#include "checkargpp.hpp"
 
 #include <iterator> // needed for std::ostram_iterator
 #include <ostream>

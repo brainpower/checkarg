@@ -6,11 +6,11 @@ project('checkarg++', 'cpp',
 
 # {{{ files
 sources = [
-	'./src/checkarg++.cpp'
+	'./src/checkargpp.cpp'
 ]
 #public headers
 headers = [
-	'./src/checkarg++.hpp'
+	'./src/checkargpp.hpp'
 ]
 # }}}
 
@@ -44,7 +44,7 @@ configure_file(
 )
 
 checkargpp_lib = library(
-	'checkarg++', sources,
+	'checkargpp', sources,
 	version: meson.project_version(),
 	pic: true,
 	install: true,
@@ -63,7 +63,7 @@ checkargpp_dep = declare_dependency(
 
 install_headers(
 	headers,
-	subdir: 'checkarg++'
+	subdir: 'checkargpp'
 )
 
 # }}}
@@ -72,10 +72,10 @@ install_headers(
 pkgcfg = import('pkgconfig')
 pkgcfg.generate(
 	libraries: checkargpp_dep,
-	subdirs: ['checkarg++', ],
+	subdirs: ['checkargpp', ],
 	version: meson.project_version(),
-	name: 'libcheckarg++',
-	filebase: 'checkarg++',
+	name: 'libcheckargpp',
+	filebase: 'checkargpp',
 	description: 'A command line argument parser for C++.',
 )
 
