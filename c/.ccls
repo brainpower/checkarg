@@ -1,0 +1,6 @@
+clang
+%h -x
+%c -std=c11
+-Ibuild
+-Ibuilddir
+-Isrc
