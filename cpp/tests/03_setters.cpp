@@ -1,11 +1,4 @@
-#include "catch2/catch.hpp"
-#include "../src/checkarg++.hpp"
-
-#include <vector>
-#include <iostream>
-
-using std::vector;
-using std::string;
+#include "test.hpp"
 
 TEST_CASE("setters: positional argument help", "setters") {
   vector<string> argv = {

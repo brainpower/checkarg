@@ -1,6 +1,7 @@
 #include "checkarg++.hpp"
 
 #include <iterator> // needed for std::ostram_iterator
+#include <ostream>
 #include <string>
 #include <vector>
 

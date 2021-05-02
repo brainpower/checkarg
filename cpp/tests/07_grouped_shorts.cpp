@@ -23,6 +23,7 @@ TEST_CASE("grouped short options", "[grouped]") {
 	ca.add('b', "beta",    [](auto, const auto&, const auto&) -> int {return 0;}, "opt b");
 	ca.add('c', "gamma",               "opt gamma");
 	ca.add('d', "delta",   [](auto, const auto&, const auto&) -> int {return 0;}, "opt delta");
+	ca.add('e', "epsy",                "opt e");
 
   int rc = ca.parse();
 
@@ -33,4 +34,5 @@ TEST_CASE("grouped short options", "[grouped]") {
   REQUIRE(ca.isset("beta"));
   REQUIRE(ca.isset("gamma"));
   REQUIRE(ca.isset("delta"));
+  REQUIRE(!ca.isset("epsy"));
 }

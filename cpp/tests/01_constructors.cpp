@@ -1,14 +1,4 @@
-
-#include "catch2/catch.hpp"
-
-#include "checkarg++.hpp"
-
-#include <cstring>
-#include <string>
-#include <vector>
-
-using std::vector;
-using std::string;
+#include "test.hpp"
 
 TEST_CASE("constructor: simple", "[constructor]"){
   int argc = 1;
