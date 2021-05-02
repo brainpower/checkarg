@@ -33,8 +33,8 @@ TEST_CASE("parsing: help using --help", "[parsing]") {
     "Usage: test01 [options]\n"
     "\n"
     "Options:\n"
-    "   -h, --help         show this help message and exit\n"
-    "   -i, --input=INPUT  file to read from\n"
+    "   -h, --help   show this help message and exit\n"
+    "   -i, --input  file to read from\n"
   ); // callback had access to CA object
 }
 

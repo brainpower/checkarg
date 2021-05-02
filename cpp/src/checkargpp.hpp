@@ -64,53 +64,53 @@ public:
     const char sopt,
     const std::string &lopt,
     const std::string &help,
-    const CAValueType has_val = CA_VT_NONE
+    const CAValueType value_type = CA_VT_NONE
   );
   int add(
     const char sopt,
     const std::string &lopt,
     const std::string &help,
-    const std::string &value_name,
-    const CAValueType has_val = CA_VT_REQUIRED
-  );
-  int add(
-    const char sopt,
-    const std::string &lopt,
-    std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
-    const std::string &help,
-    const CAValueType has_val = CA_VT_NONE
+    const CAValueType value_type,
+    const std::string &value_name
   );
   int add(
     const char sopt,
     const std::string &lopt,
     std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
     const std::string &help,
-    const std::string &value_name,
-    const CAValueType has_val = CA_VT_REQUIRED
+    const CAValueType value_type = CA_VT_NONE
+  );
+  int add(
+    const char sopt,
+    const std::string &lopt,
+    std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
+    const std::string &help,
+    const CAValueType value_type,
+    const std::string &value_name
   );
   int add(
     const std::string &lopt,
     const std::string &help,
-    const CAValueType has_val = CA_VT_NONE
+    const CAValueType value_type = CA_VT_NONE
   );
   int add(
     const std::string &lopt,
     const std::string &help,
-    const std::string &value_name,
-    const CAValueType has_val = CA_VT_REQUIRED
+    const CAValueType value_type,
+    const std::string &value_name
   );
   int add(
     const std::string &lopt,
     std::function<int(CheckArg *const,const std::string &, const std::string &)> cb,
     const std::string &help,
-    const CAValueType has_val = CA_VT_NONE
+    const CAValueType value_type = CA_VT_NONE
   );
   int add(
     const std::string &lopt,
     std::function<int(CheckArg *const,const std::string &, const std::string &)> cb,
     const std::string &help,
-    const std::string &value_name,
-    const CAValueType has_val = CA_VT_REQUIRED
+    const CAValueType value_type,
+    const std::string &value_name
   );
 
   int add_autohelp();

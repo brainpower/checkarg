@@ -98,12 +98,12 @@ using checkarg::str_to_upper;
 
 map <int,string>
 CheckArgPrivate::errors = {
-	{CA_ALLOK,  "Everything is fine"},
-	{CA_ERROR,  "An Error occurred"},
-	{CA_INVOPT, "Unknown command line option"},
-	{CA_INVVAL, "Value given to non-value option"},
-	{CA_MISSVAL, "Missing value of option"},
-	{CA_CALLBACK, "Callback returned with error code"},
+  {CA_ALLOK,  "Everything is fine"},
+  {CA_ERROR,  "An Error occurred"},
+  {CA_INVOPT, "Unknown command line option"},
+  {CA_INVVAL, "Value given to non-value option"},
+  {CA_MISSVAL, "Missing value of option"},
+  {CA_CALLBACK, "Callback returned with error code"},
 };
 
 // c'tors
@@ -176,7 +176,7 @@ CheckArg::CheckArg(const vector<string> &argv)
 }
 
 CheckArg::CheckArg(const int argc, char **argv)
-	: p(new CheckArgPrivate(this, vector<string>(argv,argv+argc), fs::path(argv[0]).filename())) {
+  : p(new CheckArgPrivate(this, vector<string>(argv,argv+argc), fs::path(argv[0]).filename())) {
 }
 #endif
 
@@ -307,9 +307,6 @@ int CheckArg::add(
     .sopt       = sopt,
     .help       = help,
   };
-  if (value_type != CA_VT_NONE) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
   p->short2long[sopt] = lopt;
   return CA_ALLOK;
 }
@@ -327,15 +324,20 @@ int CheckArg::add(
     const char sopt,
     const string &lopt,
     const string &help,
-    const string &value_name,
-    const CAValueType value_type
+    const CAValueType value_type,
+    const string &value_name
 ) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
     .help       = help,
-    .value_name = value_name,
   };
+  if (value_name.empty()) {
+    p->valid_args[lopt].value_name = str_to_upper(lopt);
+  }
+  else {
+    p->valid_args[lopt].value_name = value_name;
+  }
   p->short2long[sopt] = lopt;
   return CA_ALLOK;
 }
@@ -363,10 +365,6 @@ int CheckArg::add(
     .help       = help,
   };
   p->short2long[sopt] = lopt;
-
-  if (value_type != CA_VT_NONE) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
   return CA_ALLOK;
 }
 
@@ -385,16 +383,22 @@ int CheckArg::add(
     const string &lopt,
     std::function<int(CheckArg *const,const string &, const string &)> cb,
     const string &help,
-    const string &value_name,
-    const CAValueType value_type
+    const CAValueType value_type,
+    const string &value_name
 ) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
     .cb         = cb,
     .help       = help,
-    .value_name = value_name,
   };
+
+  if (value_name.empty()) {
+    p->valid_args[lopt].value_name = str_to_upper(lopt);
+  }
+  else {
+    p->valid_args[lopt].value_name = value_name;
+  }
   p->short2long[sopt]         = lopt;
   return CA_ALLOK;
 }
@@ -417,9 +421,6 @@ int CheckArg::add(
     .help       = help
   };
 
-  if (value_type != CA_VT_NONE) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
   return CA_ALLOK;
 }
 
@@ -434,15 +435,21 @@ int CheckArg::add(
 int CheckArg::add(
     const string &lopt,
     const string &help,
-    const string &value_name,
-    const CAValueType value_type
+    const CAValueType value_type,
+    const string &value_name
 ) {
 
   p->valid_args[lopt] = {
     .value_type = value_type,
     .help       = help,
-    .value_name = value_name,
   };
+
+  if (value_name.empty()) {
+    p->valid_args[lopt].value_name = str_to_upper(lopt);
+  }
+  else {
+    p->valid_args[lopt].value_name = value_name;
+  }
 
   return CA_ALLOK;
 }
@@ -468,9 +475,6 @@ int CheckArg::add(
     .help    = help
   };
 
-  if (value_type != CA_VT_NONE) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
   return CA_ALLOK;
 }
 
@@ -487,15 +491,21 @@ int CheckArg::add(
     const string &lopt,
     std::function<int(CheckArg *const,const string &, const string &)> cb,
     const string &help,
-    const string &value_name,
-    const CAValueType value_type
+    const CAValueType value_type,
+    const string &value_name
 ){
   p->valid_args[lopt] = {
     .value_type = value_type,
     .cb         = cb,
     .help       = help,
-    .value_name = value_name,
   };
+
+  if (value_name.empty()) {
+    p->valid_args[lopt].value_name = str_to_upper(lopt);
+  }
+  else {
+    p->valid_args[lopt].value_name = value_name;
+  }
   return CA_ALLOK;
 }
 
@@ -522,7 +532,7 @@ int CheckArg::add_autohelp(){
  * \see CAError
  */
 int CheckArg::parse(){
-	// FIXME: give args here? but then CA would have to return a ParsedArgs object or something?
+  // FIXME: give args here? but then CA would have to return a ParsedArgs object or something?
   int ret = CA_ALLOK;
   // for(auto &arg : p->argv | std::views::drop(1)) { // start with 1 here, because argv[0] is special
   auto end = p->argv.cend();
@@ -620,8 +630,12 @@ CheckArg::autohelp(){
   stringstream ss;
   size_t space = 0;
   for( auto &kv : p->valid_args ) {
-    auto vsize = kv.second.value_name.size();
-    if (vsize > 0) ++vsize; // account for the equals sign
+    size_t vsize = 0;
+    if (kv.second.value_type != CA_VT_NONE) {
+      vsize = kv.second.value_name.size();
+      // FIXME: maybe always show equals sign to mark value options with empty name?
+      if (vsize > 0) ++vsize; // account for the equals sign
+    }
     space = std::max(space, kv.first.size() + vsize);
   }
 
@@ -644,14 +658,20 @@ CheckArg::autohelp(){
     ss << " --" << it->first;
 
     switch (opt.value_type) {
-      case CA_VT_REQUIRED:
-        ss << "=" << opt.value_name
-           << string(space - it->first.size() - opt.value_name.size() - 1, ' ');
-        break;
       //case CA_VT_OPTIONAL:
-      //  ss << "=[" << opt.value_name << "]"
-      //     << string(space - it->first.size() - opt.value_name.size() - 3, ' ');
-      //  break;
+      // if (!opt.value_name.empty()) {
+      //   ss << "=[" << opt.value_name << "]"
+      //      << string(space - it->first.size() - opt.value_name.size() - 3, ' ');
+      //   break;
+      // }
+      // // fallthrough to default is intended
+      case CA_VT_REQUIRED:
+        if (!opt.value_name.empty()) {
+          ss << "=" << opt.value_name
+             << string(space - it->first.size() - opt.value_name.size() - 1, ' ');
+          break;
+        }
+        // fallthrough to default is intended
       default:
         ss << string(space - it->first.size(), ' ');
         break;
@@ -789,7 +809,7 @@ int CheckArgPrivate::call_cb(const string &arg){
 }
 
 int checkarg::show_autohelp(CheckArg *const ca, const string&, const string &val){
-	ca->show_help();
+  ca->show_help();
   exit(0); // always exit after showing help
 }
 
@@ -807,7 +827,7 @@ string checkarg::str_to_upper(const string &src) {
 
 
 #if CA_PRINTERR
-#	if not HAS_VASPRINTF
+#  if not HAS_VASPRINTF
 
 #include <cstring>
 int vasprintf(char** strp, const char* format, va_list ap)
@@ -832,5 +852,5 @@ int vasprintf(char** strp, const char* format, va_list ap)
   return vsprintf(*strp, format, ap);
 }
 
-#	endif
+#  endif
 #endif
