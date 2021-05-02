@@ -29,9 +29,3 @@ using std::vector;
 
 typedef std::unique_ptr<CheckArg, decltype(&checkarg_free)> CheckArgUPtr;
 
-
-// FIXME: remove these and actually port the features from C++ variant
-enum {
-  CA_VT_NONE     = 0,
-  CA_VT_REQUIRED = 1,
-};

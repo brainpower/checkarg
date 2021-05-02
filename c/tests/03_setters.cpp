@@ -10,8 +10,8 @@ TEST_CASE("setters: positional argument help", "setters") {
     &checkarg_free);
 
   checkarg_add_autohelp(ca.get());
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
-  checkarg_add_value(ca.get(), 't', "test", "run tests", CA_VT_REQUIRED);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
+  checkarg_add(ca.get(), 't', "test", "run tests", CA_VT_REQUIRED, NULL);
 
   checkarg_set_posarg_help(ca.get(), "[files...]", "one or more output files");
 
@@ -30,9 +30,6 @@ TEST_CASE("setters: positional argument help", "setters") {
     "Usage: test02 [options] [files...]\n"
     "\n"
     "Options:\n"
-    /* "   -h, --help         show this help message and exit\n" */
-    /* "   -i, --input=INPUT  file to read from\n" */
-    /* "   -t, --test=TEST    run tests\n" */
     "   -h, --help   show this help message and exit\n"
     "   -i, --input  file to read from\n"
     "   -t, --test   run tests\n"
@@ -52,8 +49,8 @@ TEST_CASE("setters: override usage line", "setters") {
     &checkarg_free);
 
   checkarg_add_autohelp(ca.get());
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
-  checkarg_add_value(ca.get(), 't', "test", "run tests", CA_VT_REQUIRED);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
+  checkarg_add(ca.get(), 't', "test", "run tests", CA_VT_REQUIRED, NULL);
 
   checkarg_set_usage_line(ca.get(), "this is a really stupid usage line");
 
@@ -73,9 +70,6 @@ TEST_CASE("setters: override usage line", "setters") {
     "Usage: this is a really stupid usage line\n"
     "\n"
     "Options:\n"
-    /* "   -h, --help         show this help message and exit\n" */
-    /* "   -i, --input=INPUT  file to read from\n" */
-    /* "   -t, --test=TEST    run tests\n" */
     "   -h, --help   show this help message and exit\n"
     "   -i, --input  file to read from\n"
     "   -t, --test   run tests\n"

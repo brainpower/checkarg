@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 const char *errors[] = {
   /*CA_ALLOK    */ "Everything is fine",
@@ -36,7 +37,8 @@ const char *errors[] = {
   /*CA_MISSVAL  */ "Missing value of option",
   /*CA_CALLBACK */ "Callback returned with error code",
   /*CA_ALLOC_ERR*/ "Allocation of memory failed",
-};
+  /*CA_BUG      */
+  "A wild Bug appeared. This means code has been executed, that should never been"};
 
 
 /* c'tors */
@@ -118,16 +120,11 @@ checkarg_free(CheckArg *ca) {
 }
 
 int
-checkarg_add(CheckArg *ca, const char sopt, const char *lopt, const char *help) {
-  return checkarg_add_value(ca, sopt, lopt, help, 0);
-}
-
-int
-checkarg_add_value(
+checkarg_add(
   CheckArg *ca, const char sopt, const char *lopt, const char *help,
-  const uint8_t has_val) {
+  const uint8_t value_type, const char *value_name) {
 
-  Opt *opt = opt_new(sopt, lopt, NULL, help, has_val);
+  Opt *opt = opt_new(sopt, lopt, NULL, help, value_type, value_name);
   if (!opt) return CA_ALLOC_ERR; /* malloc failed */
 
   return valid_args_insert(ca, opt);
@@ -135,51 +132,39 @@ checkarg_add_value(
 
 int
 checkarg_add_cb(
-  CheckArg *ca, const char sopt, const char *lopt, CheckArgFP cb, const char *help) {
-  return checkarg_add_cb_value(ca, sopt, lopt, cb, help, 0);
-}
-
-int
-checkarg_add_cb_value(
   CheckArg *ca, const char sopt, const char *lopt, CheckArgFP cb, const char *help,
-  const uint8_t has_val) {
-  Opt *opt = opt_new(sopt, lopt, cb, help, has_val);
+  const uint8_t value_type, const char *value_name) {
+
+  Opt *opt = opt_new(sopt, lopt, cb, help, value_type, value_name);
   if (!opt) return CA_ALLOC_ERR;
 
   return valid_args_insert(ca, opt);
 }
 
 int
-checkarg_add_long(CheckArg *ca, const char *lopt, const char *help) {
-  return checkarg_add_long_value(ca, lopt, help, 0);
-}
+checkarg_add_long(
+  CheckArg *ca, const char *lopt, const char *help, const uint8_t value_type,
+  const char *value_name) {
 
-int
-checkarg_add_long_value(
-  CheckArg *ca, const char *lopt, const char *help, const int8_t has_val) {
-  Opt *opt = opt_new(0, lopt, NULL, help, has_val);
+  Opt *opt = opt_new(0, lopt, NULL, help, value_type, value_name);
   if (!opt) return CA_ALLOC_ERR;
   return valid_args_insert(ca, opt);
 }
 
 int
-checkarg_add_long_cb(CheckArg *ca, const char *lopt, CheckArgFP cb, const char *help) {
-  return checkarg_add_long_cb_value(ca, lopt, cb, help, 0);
-}
-
-int
-checkarg_add_long_cb_value(
+checkarg_add_long_cb(
   CheckArg *ca, const char *lopt, CheckArgFP cb, const char *help,
-  const uint8_t has_val) {
-  Opt *opt = opt_new(0, lopt, cb, help, has_val);
+  const uint8_t value_type, const char *value_name) {
+
+  Opt *opt = opt_new(0, lopt, cb, help, value_type, value_name);
   if (!opt) return CA_ALLOC_ERR;
   return valid_args_insert(ca, opt);
 }
 
 int
 checkarg_add_autohelp(CheckArg *ca) {
-  Opt *opt =
-    opt_new('h', "help", checkarg_show_autohelp, "show this help message and exit", 0);
+  Opt *opt = opt_new(
+    'h', "help", checkarg_show_autohelp, "show this help message and exit", 0, NULL);
   if (!opt) return CA_ALLOC_ERR;
   return valid_args_insert(ca, opt);
 }
@@ -320,12 +305,13 @@ checkarg_show_usage(CheckArg *ca) {
 char *
 checkarg_autohelp(CheckArg *ca) {
   size_t space = 0;
-  size_t tmp   = 0;
   Opt *it      = ca->p->valid_args;
 
   do {
-    tmp   = strlen(it->lopt);
-    space = space > tmp ? space : tmp;
+    size_t tmp = strlen(it->lopt);
+    /* 1 for the '=' between the option and the value name */
+    if (it->value_name && *(it->value_name)) tmp += (1 + strlen(it->value_name));
+    if (space < tmp) space = tmp;
   }
   while ((it = it->next));
 
@@ -346,7 +332,7 @@ checkarg_autohelp(CheckArg *ca) {
   it = ca->p->valid_args;
   do {
     /* 10 == 6 char for short options + 3 chars for ' --' + a newline
-     * space is the width of the long options */
+     * space is the width of the long options, incl. value_name */
     msglen += 10 + space + strlen(it->help);
   }
   while ((it = it->next));
@@ -382,9 +368,17 @@ checkarg_autohelp(CheckArg *ca) {
     msglen -= pnum;
     cur += pnum;
 
-    pnum = snprintf(
-      cur, msglen, " --%s%*s%s\n", it->lopt, (int)(space - strlen(it->lopt)), "",
-      it->help);
+    if (it->value_name && *(it->value_name)) {
+      /* -1 for the '=' */
+      int tmp = space - strlen(it->lopt) - strlen(it->value_name) - 1;
+      pnum    = snprintf(
+        cur, msglen, " --%s=%s%*s%s\n", it->lopt, it->value_name, tmp, "", it->help);
+    }
+    else {
+      pnum = snprintf(
+        cur, msglen, " --%s%*s%s\n", it->lopt, (int)(space - strlen(it->lopt)), "",
+        it->help);
+    }
     msglen -= pnum;
     cur += pnum;
 
@@ -435,9 +429,19 @@ checkarg_show_autohelp(CheckArg *ca, const char *larg, const char *val) {
 Opt *
 opt_new(
   const char sopt, const char *lopt, CheckArgFP cb, const char *help,
-  const uint8_t has_val) {
+  const uint8_t value_type, const char *value_name) {
+
   Opt *opt = (Opt *)malloc(sizeof(Opt));
   if (!opt) return NULL;
+
+  *opt = (Opt){
+    .sopt       = sopt,
+    .value_type = value_type,
+    .cb         = cb,
+    .value      = NULL,
+    .value_name = NULL,
+    .next       = NULL,
+  };
 
   opt->lopt = strdup(lopt);
   if (!opt->lopt) goto clean;
@@ -445,11 +449,16 @@ opt_new(
   opt->help = strdup(help);
   if (!opt->help) goto clean;
 
-  opt->sopt    = sopt;
-  opt->has_val = has_val;
-  opt->cb      = cb;
-  opt->value   = NULL;
-  opt->next    = NULL;
+  if (value_type > 0 && value_name) {
+    if (*value_name) {
+      opt->value_name = strdup(value_name);
+      if (!opt->value_name) goto clean;
+    } else {
+      opt->value_name = strdup(lopt);
+      string_toupper(opt->value_name);
+    }
+  }
+
   return opt;
 
 clean:
@@ -461,9 +470,9 @@ clean:
 void
 opt_free(Opt *o) {
   if (o) {
-    if (o->has_val) {
+    if (o->value_type != CA_VT_NONE) {
       // value is either NULL if opt was not parsed or:
-      // if has_val is true, value may have been strdup'ed and must be free'd
+      // if value_type > 0, value may have been strdup'ed and must be free'd
       // otherwise points to the literal "x", which is static
       free(o->value);
     }
@@ -501,6 +510,57 @@ valid_args_free(Opt *vaptr) {
 
 int
 valid_args_insert(CheckArg *ca, Opt *opt) {
+  /* this inserts a new opt before the one that has a higher sort order
+   * that way the list stays sorted, insertion is now O(n), though
+   * except when inserting in reverse sort order, then its O(1) */
+  if (ca->p->valid_args) {
+    Opt *it = ca->p->valid_args;
+
+    // fprintf(stderr, "comparing: %s with %s\n", opt->lopt, it->lopt);
+    if (strcmp(opt->lopt, it->lopt) < 0) {
+      // fprintf(stderr, "strcmp was < 0, %s is new head\n", opt->lopt);
+      /* opt must be before it */
+      opt->next              = it;
+      ca->p->valid_args      = opt;
+      ca->p->valid_args_last = opt->next;
+      return CA_ALLOK;
+    }
+    /* the if after the for loop appends the opt if strcmp was >= 0 */
+
+    for (; it->next; it = it->next) {
+      // fprintf(stderr, "comparing: %s with %s\n", opt->lopt, it->next->lopt);
+      if (strcmp(opt->lopt, it->next->lopt) < 0) {
+        // fprintf(stderr, "strcmp was < 0, %s inserted before %s\n", opt->lopt,
+        // it->next->lopt);
+        /* opt appears before it->next in lexicographical order,
+         * so insert here, so next will be the first after opt */
+        Opt *tmp  = it->next;
+        it->next  = opt;
+        opt->next = tmp;
+        return CA_ALLOK;
+      }
+    }
+
+    if (!it->next) {
+      // fprintf(stderr, "strcmp was always > 0, %s is new tail\n", opt->lopt);
+      /* we had reached the end without inserting, so append */
+      it->next               = opt;
+      ca->p->valid_args_last = opt;
+      return CA_ALLOK;
+    }
+
+    assert(1); /* this should never happen */
+    return CA_BUG;
+  }
+
+  /* the first insert */
+  ca->p->valid_args      = opt;
+  ca->p->valid_args_last = opt;
+  return CA_ALLOK;
+}
+
+int
+valid_args_append(CheckArg *ca, Opt *opt) {
   if (ca->p->valid_args_last) {
     ca->p->valid_args_last->next = opt;
     ca->p->valid_args_last       = opt;
@@ -600,13 +660,13 @@ checkarg_arg_long(CheckArg *ca, const char *lopt) {
 
   opt = valid_args_find(ca, real_opt);
   if (opt) {
-    if (opt->has_val && value) {
+    if (opt->value_type != CA_VT_NONE && value) {
       if (opt->value)
         free(opt->value); /* in case someone specifies an option with value twice */
       opt->value = strdup(value);
       if (!opt->value) goto alloc_error;
     }
-    else if (opt->has_val) {
+    else if (opt->value_type != CA_VT_NONE) {
       ca->p->next_is_val_of = strdup(real_opt);
       if (!ca->p->next_is_val_of) goto alloc_error;
     }
@@ -617,7 +677,7 @@ checkarg_arg_long(CheckArg *ca, const char *lopt) {
       opt->value = "x"; /* mark option as seen, any value except NULL is ok here */
     }
 
-    if (!opt->has_val || value) {
+    if (opt->value_type == CA_VT_NONE || value) {
       ret = call_cb(ca, opt);
       free(real_opt);
       return ret;
@@ -651,7 +711,7 @@ checkarg_arg_short(CheckArg *ca, const char *args) {
   for (it = args; *it; ++it) {
     opt = valid_args_find_sopt(ca, *it);
     if (opt) { /* short option found */
-      if (opt->has_val) {
+      if (opt->value_type != CA_VT_NONE) {
         if (*(++it)) { /* there's a remainder, assign it as value */
           if (opt->value)
             free(opt->value); /* in case someone specifies an option with value twice */
@@ -685,10 +745,8 @@ alloc_error:
 
 int
 call_cb(CheckArg *ca, Opt *opt) {
-  int ret = CA_ALLOK;
-
   if (opt->cb) {
-    ret = opt->cb(ca, opt->lopt, opt->value);
+    int ret = opt->cb(ca, opt->lopt, opt->value);
     if (ret != CA_ALLOK) { return ca_error(CA_CALLBACK, ": %d!", ret); }
   }
   return CA_ALLOK;
@@ -699,6 +757,14 @@ pos_args_append(CheckArg *ca, const char *arg) {
   const char **tmp = ca->p->pos_args + ca->p->pos_args_count;
   *tmp             = arg;
   ++(ca->p->pos_args_count);
+}
+
+void
+string_toupper(char *s) {
+  while (*s) {
+    *s = toupper(*s);
+    ++s;
+  }
 }
 
 /* vim: set ft=c : */

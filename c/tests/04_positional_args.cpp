@@ -9,7 +9,7 @@ TEST_CASE("positional args: general usage", "[positional]") {
   CheckArgUPtr ca(
     checkarg_new(argv.size(), (char **)argv.data(), "test04", NULL, NULL),
     &checkarg_free);
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
   int ret = checkarg_parse(ca.get());
 
@@ -35,7 +35,7 @@ TEST_CASE("positional args: args with dashes", "[positional]") {
   CheckArgUPtr ca(
     checkarg_new(argv.size(), (char **)argv.data(), "test04", NULL, NULL),
     &checkarg_free);
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
   int ret = checkarg_parse(ca.get());
 
@@ -63,8 +63,8 @@ TEST_CASE("positional args: missing value before '--'", "[positional]") {
   CheckArgUPtr ca(
     checkarg_new(argv.size(), (char **)argv.data(), "test04", NULL, NULL),
     &checkarg_free);
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
-  checkarg_add(ca.get(), 'j', "jay", "just a jay");
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
+  checkarg_add(ca.get(), 'j', "jay", "just a jay", 0, NULL);
 
   int ret = checkarg_parse(ca.get());
 

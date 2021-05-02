@@ -28,12 +28,13 @@
 
 typedef struct _Opt Opt;
 struct _Opt {
-  uint8_t has_val;
+  uint8_t value_type;
   char sopt;
   char *lopt;
   char *help;
   CheckArgFP cb;
   char *value;
+  char *value_name;
   Opt *next;
 };
 
@@ -61,7 +62,7 @@ int checkarg_call_cb(CheckArg *, const char *arg);
 
 Opt *opt_new(
   const char sopt, const char *lopt, CheckArgFP cb, const char *help,
-  const uint8_t has_val);
+  const uint8_t value_type, const char *value_name);
 void opt_free(Opt *o);
 
 int ca_error(int eno, const char *fmt, ...);
@@ -75,6 +76,10 @@ void pos_args_append(CheckArg *, const char *);
 void pos_args_free(const char **);
 
 int call_cb(CheckArg *, Opt *);
+
+// fixme should return the number of converted chars,
+// and or error code
+void string_toupper(char *);
 
 #endif /* CHECKARG_PRIVATE_H */
 

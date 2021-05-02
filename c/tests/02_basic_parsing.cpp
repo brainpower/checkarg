@@ -41,8 +41,8 @@ TEST_CASE("parsing: help using --help", "[parsing]") {
   /*   "show this help message and exit" */
   /* ); */
   checkarg_add_cb(
-    ca.get(), 'h', "help", &callback_help, "show this help message and exit");
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", 1);
+    ca.get(), 'h', "help", &callback_help, "show this help message and exit", 0, NULL);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
   auto ret = checkarg_parse(ca.get());
 
   CHECK(ret == CA_ALLOK);  // -h ran fine
@@ -68,7 +68,7 @@ TEST_CASE("parsing: correct option and value", "[parsing]") {
   CheckArgUPtr ca(
     checkarg_new(argv.size(), (char **)argv.data(), "test01", NULL, NULL),
     &checkarg_free);
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
   auto ret = checkarg_parse(ca.get());
 
@@ -90,7 +90,7 @@ TEST_CASE("parsing: invalid option", "[parsing]") {
   CheckArgUPtr ca(
     checkarg_new(argv.size(), (char **)argv.data(), "test01", NULL, NULL),
     &checkarg_free);
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
   auto ret = checkarg_parse(ca.get());
 
@@ -106,7 +106,7 @@ TEST_CASE("parsing: missing value", "[parsing]") {
   CheckArgUPtr ca(
     checkarg_new(argv.size(), (char **)argv.data(), "test01", NULL, NULL),
     &checkarg_free);
-  checkarg_add_value(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
   auto ret = checkarg_parse(ca.get());
 

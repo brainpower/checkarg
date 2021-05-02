@@ -41,24 +41,21 @@ CheckArg *checkarg_new(
 
 void checkarg_free(CheckArg *);
 
-int checkarg_add(CheckArg *, const char sopt, const char *lopt, const char *help);
-int checkarg_add_value(
+int checkarg_add(
   CheckArg *, const char sopt, const char *lopt, const char *help,
-  const uint8_t has_val);
+  const uint8_t value_type, const char *value_name);
 
 int checkarg_add_cb(
-  CheckArg *, const char sopt, const char *lopt, CheckArgFP cb, const char *help);
-int checkarg_add_cb_value(
   CheckArg *, const char sopt, const char *lopt, CheckArgFP cb, const char *help,
-  const uint8_t has_val);
+  const uint8_t value_type, const char *value_name);
 
-int checkarg_add_long(CheckArg *, const char *lopt, const char *help);
-int checkarg_add_long_value(
-  CheckArg *, const char *lopt, const char *help, const int8_t has_val);
+int checkarg_add_long(
+  CheckArg *, const char *lopt, const char *help, const uint8_t value_type,
+  const char *value_name);
 
-int checkarg_add_long_cb(CheckArg *, const char *lopt, CheckArgFP cb, const char *help);
-int checkarg_add_long_cb_value(
-  CheckArg *, const char *lopt, CheckArgFP cb, const char *help, const uint8_t has_val);
+int checkarg_add_long_cb(
+  CheckArg *, const char *lopt, CheckArgFP cb, const char *help,
+  const uint8_t value_type, const char *value_name);
 
 int checkarg_add_autohelp(CheckArg *);
 
@@ -93,6 +90,13 @@ enum CAError {
   CA_MISSVAL,
   CA_CALLBACK,
   CA_ALLOC_ERR,
+  CA_BUG,
+};
+
+enum CAValueType {
+  CA_VT_NONE = 0,
+  CA_VT_REQUIRED,
+  // CA_VT_OPTIONAL,
 };
 
 #endif /* CHECKARG_H */

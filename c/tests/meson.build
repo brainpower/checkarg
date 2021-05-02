@@ -15,8 +15,7 @@ tests = {
   '05_non_value':       'options with no values',
   '06_value':           'options with values',
   '07_grouped_shorts':  'options grouped short',
-  # not implemented yet
-  #'08_value_names':     'value names',
+  '08_value_names':     'value names',
 }
 
 foreach filename, name : tests

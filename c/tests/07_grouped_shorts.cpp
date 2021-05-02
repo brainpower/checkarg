@@ -26,11 +26,11 @@ TEST_CASE("grouped short options", "[grouped]") {
     &checkarg_free);
 
   // clang-format off
-	checkarg_add   (ca.get(), 'a', "alpha",           "opt a");
-	checkarg_add_cb(ca.get(), 'b', "beta",  callback, "opt b");
-	checkarg_add   (ca.get(), 'c', "gamma",           "opt gamma");
-	checkarg_add_cb(ca.get(), 'd', "delta", callback, "opt delta");
-	checkarg_add   (ca.get(), 'e', "epsy",            "opt epsy");
+	checkarg_add   (ca.get(), 'a', "alpha",           "opt a", 0, NULL);
+	checkarg_add_cb(ca.get(), 'b', "beta",  callback, "opt b", 0, NULL);
+	checkarg_add   (ca.get(), 'c', "gamma",           "opt gamma", 0, NULL);
+	checkarg_add_cb(ca.get(), 'd', "delta", callback, "opt delta", 0, NULL);
+	checkarg_add   (ca.get(), 'e', "epsy",            "opt epsy", 0, NULL);
   // clang-format on
 
   int rc = checkarg_parse(ca.get());
