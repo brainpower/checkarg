@@ -1,15 +1,17 @@
 #include "test.hpp"
 
 
-TEST_CASE("constructor: simple", "[constructor]"){
+TEST_CASE("constructor: simple", "[constructor]") {
   int argc = 1;
-  const char* argv[] = {
+
+  const char *argv[] = {
     "/usr/bin/name",
     NULL,
   };
 
 
-  CheckArgUPtr ca(checkarg_new(argc, (char**)argv, "name", NULL, NULL), &checkarg_free);
+  CheckArgUPtr ca(
+    checkarg_new(argc, (char **)argv, "name", NULL, NULL), &checkarg_free);
 
   auto ret = checkarg_parse(ca.get());
   REQUIRE(ret == CA_ALLOK);
@@ -28,12 +30,14 @@ TEST_CASE("constructor: simple", "[constructor]"){
   }
 }
 
-TEST_CASE("constructor: simple (vector)", "[constructor]"){
+TEST_CASE("constructor: simple (vector)", "[constructor]") {
   const vector<string> argv = {
     "/usr/bin/name",
   };
 
-  CheckArgUPtr ca(checkarg_new(argv.size(), (char**)argv.data(), "name", NULL, NULL), &checkarg_free);
+  CheckArgUPtr ca(
+    checkarg_new(argv.size(), (char **)argv.data(), "name", NULL, NULL),
+    &checkarg_free);
 
   auto ret = checkarg_parse(ca.get());
   REQUIRE(ret == CA_ALLOK);
@@ -51,7 +55,7 @@ TEST_CASE("constructor: simple (vector)", "[constructor]"){
 }
 
 
-#if 0 // HAS_BASENAME
+#if 0  // HAS_BASENAME
 TEST_CASE("constructor: app name autodetect", "[constructor]"){
   const vector<string> argv = {
     "/usr/bin/name",
@@ -74,4 +78,3 @@ TEST_CASE("constructor: app name autodetect", "[constructor]"){
   }
 }
 #endif
-

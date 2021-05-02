@@ -10,11 +10,12 @@ catch2_dep = dependency('catch2', version: '>2', fallback: 'catch2')
 tests = {
   '01_constructors':    'constructors',
   '02_basic_parsing':   'basic parsing',
-  #'03_setters':         'setters',
-  #'04_positional_args': 'positional arg separator',
-  #'05_non_value':       'options with no values',
-  #'06_value':           'options with values',
-  #'07_grouped_shorts':  'options grouped short',
+  '03_setters':         'setters',
+  '04_positional_args': 'positional arg separator',
+  '05_non_value':       'options with no values',
+  '06_value':           'options with values',
+  '07_grouped_shorts':  'options grouped short',
+  # not implemented yet
   #'08_value_names':     'value names',
 }
 
