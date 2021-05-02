@@ -26,17 +26,21 @@ TEST_CASE("options: short value", "[opt-val]") {
   ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
   ca.add(
     'b', "beta",
-    [&](auto, auto &o, auto &v) -> int { cb_option = o; cb_value = v; return 0; },
-    "non-value opt b",
-    CA_VT_REQUIRED
-  );
-  ca.add(     "gamma",               "non-value long opt gamma", CA_VT_REQUIRED);
+    [&](auto, auto &o, auto &v) -> int {
+      cb_option = o;
+      cb_value  = v;
+      return 0;
+    },
+    "non-value opt b", CA_VT_REQUIRED);
+  ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
   ca.add(
     "delta",
-    [&](auto, auto &o, auto &v) -> int { cb_option = o; cb_value = v; return 0; },
-    "non-value long opt delta",
-    CA_VT_REQUIRED
-  );
+    [&](auto, auto &o, auto &v) -> int {
+      cb_option = o;
+      cb_value  = v;
+      return 0;
+    },
+    "non-value long opt delta", CA_VT_REQUIRED);
   ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
 
   int rc = ca.parse();
@@ -48,13 +52,12 @@ TEST_CASE("options: short value", "[opt-val]") {
   CHECK(!ca.isset("delta"));
   CHECK(!ca.isset("epsilon"));
 
-  REQUIRE(("val-"+option) == ca.value(option));
+  REQUIRE(("val-" + option) == ca.value(option));
 
   if (option == "beta") {
     CHECK("beta" == cb_option);
-    REQUIRE(("val-"+option) == cb_value);
+    REQUIRE(("val-" + option) == cb_value);
   }
-
 }
 
 TEST_CASE("options: long value", "[opt-val]") {
@@ -82,17 +85,21 @@ TEST_CASE("options: long value", "[opt-val]") {
   ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
   ca.add(
     'b', "beta",
-    [&](auto, auto &o, auto &v) -> int { cb_option = o; cb_value = v; return 0; },
-    "non-value opt b",
-    CA_VT_REQUIRED
-  );
-  ca.add(     "gamma",               "non-value long opt gamma", CA_VT_REQUIRED);
+    [&](auto, auto &o, auto &v) -> int {
+      cb_option = o;
+      cb_value  = v;
+      return 0;
+    },
+    "non-value opt b", CA_VT_REQUIRED);
+  ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
   ca.add(
     "delta",
-    [&](auto, auto &o, auto &v) -> int { cb_option = o; cb_value = v; return 0; },
-    "non-value long opt delta",
-    CA_VT_REQUIRED
-  );
+    [&](auto, auto &o, auto &v) -> int {
+      cb_option = o;
+      cb_value  = v;
+      return 0;
+    },
+    "non-value long opt delta", CA_VT_REQUIRED);
   ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
 
   int rc = ca.parse();
@@ -102,17 +109,16 @@ TEST_CASE("options: long value", "[opt-val]") {
   REQUIRE(ca.isset(option));
   CHECK(!ca.isset("epsilon"));
 
-  REQUIRE(("val-"+option) == ca.value(option));
+  REQUIRE(("val-" + option) == ca.value(option));
 
   if (option == "beta" || option == "delta") {
     CHECK(option == cb_option);
-    REQUIRE(("val-"+option) == cb_value);
+    REQUIRE(("val-" + option) == cb_value);
   }
-
 }
 
 TEST_CASE("options: missing value", "[opt-val]") {
-  string option = GENERATE("-a", "--alpha", "-b", "--beta", "--gamma", "--delta");
+  string option       = GENERATE("-a", "--alpha", "-b", "--beta", "--gamma", "--delta");
   vector<string> argv = {
     "/test06",
     option,
@@ -121,18 +127,12 @@ TEST_CASE("options: missing value", "[opt-val]") {
   CheckArg ca(argv, "test06");
   ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
   ca.add(
-    'b', "beta",
-    [&](auto, auto &o, auto &v) -> int { return 0; },
-    "non-value opt b",
-    CA_VT_REQUIRED
-  );
-  ca.add(     "gamma",               "non-value long opt gamma", CA_VT_REQUIRED);
+    'b', "beta", [&](auto, auto &o, auto &v) -> int { return 0; }, "non-value opt b",
+    CA_VT_REQUIRED);
+  ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
   ca.add(
-    "delta",
-    [&](auto, auto &o, auto &v) -> int { return 0; },
-    "non-value long opt delta",
-    CA_VT_REQUIRED
-  );
+    "delta", [&](auto, auto &o, auto &v) -> int { return 0; },
+    "non-value long opt delta", CA_VT_REQUIRED);
   ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
 
   int rc = ca.parse();
@@ -144,15 +144,16 @@ TEST_CASE("options: empty value", "[opt-val]") {
   vector<string> argv;
   SECTION("empty string separated from option") {
     string option = GENERATE("-a", "--alpha", "-b", "--beta", "--gamma", "--delta");
-    argv = {
+    argv          = {
       "/test06",
-      option, "",
+      option,
+      "",
     };
   }
   SECTION("empty string combined with option") {
     // this does not work with short options, there is no '=' for those
     string option = GENERATE("--alpha=", "--beta=", "--gamma=", "--delta=");
-    argv = {
+    argv          = {
       "/test06",
       option,
     };
@@ -161,24 +162,18 @@ TEST_CASE("options: empty value", "[opt-val]") {
   CheckArg ca(argv, "test06");
   ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
   ca.add(
-    'b', "beta",
-    [&](auto, auto &o, auto &v) -> int { return 0; },
-    "non-value opt b",
-    CA_VT_REQUIRED
-  );
-  ca.add(     "gamma",               "non-value long opt gamma", CA_VT_REQUIRED);
+    'b', "beta", [&](auto, auto &o, auto &v) -> int { return 0; }, "non-value opt b",
+    CA_VT_REQUIRED);
+  ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
   ca.add(
-    "delta",
-    [&](auto, auto &o, auto &v) -> int { return 0; },
-    "non-value long opt delta",
-    CA_VT_REQUIRED
-  );
+    "delta", [&](auto, auto &o, auto &v) -> int { return 0; },
+    "non-value long opt delta", CA_VT_REQUIRED);
   ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
 
   int rc = ca.parse();
 
   INFO("option was:" << argv[1]);
-  REQUIRE(CA_ALLOK == rc); // an empty string as value should not trigger a CA_MISSVAL
+  REQUIRE(CA_ALLOK == rc);  // an empty string as value should not trigger a CA_MISSVAL
 }
 
 TEST_CASE("options: special values", "[opt-val]") {
@@ -188,13 +183,15 @@ TEST_CASE("options: special values", "[opt-val]") {
   SECTION("long and separated") {
     argv = {
       "/test06",
-      "--input", value,
+      "--input",
+      value,
     };
   }
   SECTION("short and separated") {
     argv = {
       "/test06",
-      "-i", value,
+      "-i",
+      value,
     };
   }
   SECTION("long and combined") {

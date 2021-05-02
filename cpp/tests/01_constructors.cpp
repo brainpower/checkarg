@@ -1,13 +1,13 @@
 #include "test.hpp"
 
-TEST_CASE("constructor: simple", "[constructor]"){
-  int argc = 1;
-  const char* argv[] = {
+TEST_CASE("constructor: simple", "[constructor]") {
+  int argc           = 1;
+  const char *argv[] = {
     "/usr/bin/name",
     NULL,
   };
 
-  CheckArg ca(argc, (char**)argv, "name");
+  CheckArg ca(argc, (char **)argv, "name");
 
   auto ret = ca.parse();
   REQUIRE(ret == CA_ALLOK);
@@ -26,7 +26,7 @@ TEST_CASE("constructor: simple", "[constructor]"){
   }
 }
 
-TEST_CASE("constructor: simple (vector)", "[constructor]"){
+TEST_CASE("constructor: simple (vector)", "[constructor]") {
   const vector<string> argv = {
     "/usr/bin/name",
   };
@@ -50,7 +50,7 @@ TEST_CASE("constructor: simple (vector)", "[constructor]"){
 
 
 #ifdef HAS_STD_FILESYSTEM
-TEST_CASE("constructor: app name autodetect", "[constructor]"){
+TEST_CASE("constructor: app name autodetect", "[constructor]") {
   const vector<string> argv = {
     "/usr/bin/name",
   };
@@ -72,4 +72,3 @@ TEST_CASE("constructor: app name autodetect", "[constructor]"){
   }
 }
 #endif
-

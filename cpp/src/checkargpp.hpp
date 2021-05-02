@@ -4,26 +4,26 @@
 #ifndef CHECKARG_HPP
 #define CHECKARG_HPP
 
-#include <memory> // shared_ptr
-#include <string>
-#include <map>
-#include <vector>
 #include <functional>
+#include <map>
+#include <memory>  // shared_ptr
+#include <string>
+#include <vector>
 
 
 // forward declarations
 class CheckArg;
 
 namespace checkarg {
-  class CheckArgPrivate;
+class CheckArgPrivate;
 
-  // autohelp callback
-  int show_autohelp(CheckArg *const, const std::string &, const std::string &);
-};
+// autohelp callback
+int show_autohelp(CheckArg *const, const std::string &, const std::string &);
+};  // namespace checkarg
 
 // return codes
 enum CAError {
-  CA_ALLOK=0,
+  CA_ALLOK = 0,
   CA_ERROR,
   CA_INVOPT,
   CA_INVVAL,
@@ -42,17 +42,24 @@ class CheckArg {
 
 public:
   // c'tors
-  CheckArg(const int argc, char** argv, const std::string &appname);
-  CheckArg(const int argc, char** argv, const std::string &appname, const std::string &desc);
-  CheckArg(const int argc, char** argv, const std::string &appname, const std::string &desc, const std::string &appendix);
+  CheckArg(const int argc, char **argv, const std::string &appname);
+  CheckArg(
+    const int argc, char **argv, const std::string &appname, const std::string &desc);
+  CheckArg(
+    const int argc, char **argv, const std::string &appname, const std::string &desc,
+    const std::string &appendix);
 
   CheckArg(const std::vector<std::string> &argv, const std::string &appname);
-  CheckArg(const std::vector<std::string> &argv, const std::string &appname, const std::string &desc);
-  CheckArg(const std::vector<std::string> &argv, const std::string &appname, const std::string &desc, const std::string &appendix);
+  CheckArg(
+    const std::vector<std::string> &argv, const std::string &appname,
+    const std::string &desc);
+  CheckArg(
+    const std::vector<std::string> &argv, const std::string &appname,
+    const std::string &desc, const std::string &appendix);
 
 #ifdef HAS_STD_FILESYSTEM
   // these try to autodetect `appname` from basename(argv[0])
-  CheckArg(const int argc, char**argv);
+  CheckArg(const int argc, char **argv);
   explicit CheckArg(const std::vector<std::string> &argv);
 #endif
 
@@ -61,57 +68,35 @@ public:
 
   // pre-parse add functions
   int add(
-    const char sopt,
-    const std::string &lopt,
-    const std::string &help,
-    const CAValueType value_type = CA_VT_NONE
-  );
+    const char sopt, const std::string &lopt, const std::string &help,
+    const CAValueType value_type = CA_VT_NONE);
   int add(
-    const char sopt,
-    const std::string &lopt,
-    const std::string &help,
-    const CAValueType value_type,
-    const std::string &value_name
-  );
+    const char sopt, const std::string &lopt, const std::string &help,
+    const CAValueType value_type, const std::string &value_name);
   int add(
-    const char sopt,
+    const char sopt, const std::string &lopt,
+    std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
+    const std::string &help, const CAValueType value_type = CA_VT_NONE);
+  int add(
+    const char sopt, const std::string &lopt,
+    std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
+    const std::string &help, const CAValueType value_type,
+    const std::string &value_name);
+  int add(
+    const std::string &lopt, const std::string &help,
+    const CAValueType value_type = CA_VT_NONE);
+  int add(
+    const std::string &lopt, const std::string &help, const CAValueType value_type,
+    const std::string &value_name);
+  int add(
     const std::string &lopt,
     std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
-    const std::string &help,
-    const CAValueType value_type = CA_VT_NONE
-  );
+    const std::string &help, const CAValueType value_type = CA_VT_NONE);
   int add(
-    const char sopt,
     const std::string &lopt,
     std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
-    const std::string &help,
-    const CAValueType value_type,
-    const std::string &value_name
-  );
-  int add(
-    const std::string &lopt,
-    const std::string &help,
-    const CAValueType value_type = CA_VT_NONE
-  );
-  int add(
-    const std::string &lopt,
-    const std::string &help,
-    const CAValueType value_type,
-    const std::string &value_name
-  );
-  int add(
-    const std::string &lopt,
-    std::function<int(CheckArg *const,const std::string &, const std::string &)> cb,
-    const std::string &help,
-    const CAValueType value_type = CA_VT_NONE
-  );
-  int add(
-    const std::string &lopt,
-    std::function<int(CheckArg *const,const std::string &, const std::string &)> cb,
-    const std::string &help,
-    const CAValueType value_type,
-    const std::string &value_name
-  );
+    const std::string &help, const CAValueType value_type,
+    const std::string &value_name);
 
   int add_autohelp();
 
@@ -119,7 +104,7 @@ public:
   int parse();
 
   // set some autohelp strings
-  void set_posarg_help(const std::string &usage, const std::string &descr );
+  void set_posarg_help(const std::string &usage, const std::string &descr);
   void set_usage_line(const std::string &str);
 
   // getters
@@ -140,7 +125,6 @@ public:
   static std::string str_err(const int errno);
 
 private:
-
   std::unique_ptr<checkarg::CheckArgPrivate> p;
 
   /**
@@ -148,8 +132,9 @@ private:
    * if add_autohelp() was called
    * \see add_autohelp()
    */
-  friend int checkarg::show_autohelp(CheckArg *const, const std::string &, const std::string &);
+  friend int
+  checkarg::show_autohelp(CheckArg *const, const std::string &, const std::string &);
 };
 
 
-#endif //CHECKARG_HPP
+#endif  // CHECKARG_HPP

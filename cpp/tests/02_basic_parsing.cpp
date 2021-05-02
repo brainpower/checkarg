@@ -16,19 +16,17 @@ TEST_CASE("parsing: help using --help", "[parsing]") {
   // ca.add_autohelp();
   ca.add(
     'h', "help",
-    [&out,&cb_ran](CheckArg *const ca, const string &, const string &) -> int {
+    [&out, &cb_ran](CheckArg *const ca, const string &, const string &) -> int {
       cb_ran = true;
-      out = ca->autohelp();
+      out    = ca->autohelp();
       return CA_ALLOK;
     },
-    "show this help message and exit",
-    CA_VT_NONE
-  );
+    "show this help message and exit", CA_VT_NONE);
   ca.add('i', "input", "file to read from", CA_VT_REQUIRED);
   auto ret = ca.parse();
 
-  CHECK(ret == CA_ALLOK); // -h ran fine
-  CHECK(cb_ran); // callback actually ran
+  CHECK(ret == CA_ALLOK);  // -h ran fine
+  CHECK(cb_ran);           // callback actually ran
   REQUIRE(out ==
     "Usage: test01 [options]\n"
     "\n"
@@ -40,10 +38,11 @@ TEST_CASE("parsing: help using --help", "[parsing]") {
 
 // FIXME: check CA_ERROR return code
 
-TEST_CASE("parsing: correct option and value", "[parsing]"){
+TEST_CASE("parsing: correct option and value", "[parsing]") {
   const vector<string> argv = {
     "/usr/bin/name",
-    "-i", "input.in",
+    "-i",
+    "input.in",
   };
 
   CheckArg ca(argv, "name");
@@ -51,13 +50,13 @@ TEST_CASE("parsing: correct option and value", "[parsing]"){
 
   auto ret = ca.parse();
 
-  REQUIRE(ret == CA_ALLOK); // value ok
-  REQUIRE(ca.isset("input")); // option detected
-  REQUIRE(ca.value("input") == "input.in"); // value stored correctly
+  REQUIRE(ret == CA_ALLOK);                  // value ok
+  REQUIRE(ca.isset("input"));                // option detected
+  REQUIRE(ca.value("input") == "input.in");  // value stored correctly
 }
 
 
-TEST_CASE("parsing: invalid option", "[parsing]"){
+TEST_CASE("parsing: invalid option", "[parsing]") {
   const vector<string> argv = {
     "/usr/bin/name",
     "-x",
@@ -68,10 +67,10 @@ TEST_CASE("parsing: invalid option", "[parsing]"){
 
   auto ret = ca.parse();
 
-  REQUIRE(ret == CA_INVOPT); // invalid option
+  REQUIRE(ret == CA_INVOPT);  // invalid option
 }
 
-TEST_CASE("parsing: missing value", "[parsing]"){
+TEST_CASE("parsing: missing value", "[parsing]") {
   const vector<string> argv = {
     "/usr/bin/name",
     "-i",
@@ -82,6 +81,5 @@ TEST_CASE("parsing: missing value", "[parsing]"){
 
   auto ret = ca.parse();
 
-  REQUIRE(ret == CA_MISSVAL); // missing value
+  REQUIRE(ret == CA_MISSVAL);  // missing value
 }
-

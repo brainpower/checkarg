@@ -5,15 +5,15 @@
 #include "checkargpp_private.hpp"
 
 #if CA_PRINTERR
-#include <cstdarg>
+#  include <cstdarg>
 #endif
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 // #include <format>
 
 #ifdef HAS_STD_FILESYSTEM
-#include <filesystem>
+#  include <filesystem>
 namespace fs = std::filesystem;
 #endif
 
@@ -73,17 +73,17 @@ using checkarg::str_to_upper;
  * In the first command, 'i' is considered the value of -f,
  * other_file a positional argument, not the value of either -f or -i.
  *
- * In the docs I'll call the GNU style and POSIX style options "long" and "short" options, respectively.
+ * In the docs I'll call the GNU style and POSIX style options "long" and "short"
+ * options, respectively.
  *
- * Old style or traditional style options are *not* supported and I don't plan to do so.<br>
- * You may convince me otherwise, though.<br>
- * Old style options (like tar supports) look like this:
- *   tar xfL <value_for_f> <value_for_L>
+ * Old style or traditional style options are *not* supported and I don't plan to do
+ * so.<br> You may convince me otherwise, though.<br> Old style options (like tar
+ * supports) look like this: tar xfL <value_for_f> <value_for_L>
  *
  *
- * Using CheckArg as a developer can be divided in two phases, pre-parse() and post-parse().
- * In the pre-parse phase, you'll define your commandline options using the add() members.
- * In the post-parse phase, you can check, which options where given
+ * Using CheckArg as a developer can be divided in two phases, pre-parse() and
+ * post-parse(). In the pre-parse phase, you'll define your commandline options using
+ * the add() members. In the post-parse phase, you can check, which options where given
  * and get their values, if they've got one.
  *
  * Callbacks will, for now, be called while parsing,
@@ -96,10 +96,9 @@ using checkarg::str_to_upper;
  * so in favor of being lightweight, they're not implementet for now.
  */
 
-map <int,string>
-CheckArgPrivate::errors = {
-  {CA_ALLOK,  "Everything is fine"},
-  {CA_ERROR,  "An Error occurred"},
+map<int, string> CheckArgPrivate::errors = {
+  {CA_ALLOK, "Everything is fine"},
+  {CA_ERROR, "An Error occurred"},
   {CA_INVOPT, "Unknown command line option"},
   {CA_INVVAL, "Value given to non-value option"},
   {CA_MISSVAL, "Missing value of option"},
@@ -114,9 +113,8 @@ CheckArgPrivate::errors = {
  * \param argv the list of arguments, you'll want to pass argv from main()
  * \param appname the name of your application, will be used in the usage-line
  */
-CheckArg::CheckArg(const int argc, char ** argv, const string &appname)
-  : p(new CheckArgPrivate(this, vector<string>(argv, argv+argc), appname)){
-}
+CheckArg::CheckArg(const int argc, char **argv, const string &appname)
+    : p(new CheckArgPrivate(this, vector<string>(argv, argv + argc), appname)) {}
 /**
  * \brief constructs a CheckArg object
  * \param argc the number of arguments, you'll want to pass argc gotten from main()
@@ -124,9 +122,9 @@ CheckArg::CheckArg(const int argc, char ** argv, const string &appname)
  * \param appname the name of your application, will be used in the usage-line
  * \param desc description of your programm, used in help
  */
-CheckArg::CheckArg(const int argc, char ** argv, const string &appname, const string &desc)
-  : p(new CheckArgPrivate(this, vector<string>(argv, argv+argc), appname, desc)){
-}
+CheckArg::CheckArg(
+  const int argc, char **argv, const string &appname, const string &desc)
+    : p(new CheckArgPrivate(this, vector<string>(argv, argv + argc), appname, desc)) {}
 /**
  * \brief constructs a CheckArg object
  * \param argc the number of arguments, you'll want to pass argc gotten from main()
@@ -135,9 +133,11 @@ CheckArg::CheckArg(const int argc, char ** argv, const string &appname, const st
  * \param desc description of your programm, used in help
  * \param appendix text which will be added at the end of help
  */
-CheckArg::CheckArg(const int argc, char ** argv, const string &appname, const string &desc, const string &appendix)
-  : p(new CheckArgPrivate(this, vector<string>(argv,argv+argc), appname,desc,appendix)){
-}
+CheckArg::CheckArg(
+  const int argc, char **argv, const string &appname, const string &desc,
+  const string &appendix)
+    : p(new CheckArgPrivate(
+      this, vector<string>(argv, argv + argc), appname, desc, appendix)) {}
 
 /**
  * \brief constructs a CheckArg object
@@ -146,8 +146,7 @@ CheckArg::CheckArg(const int argc, char ** argv, const string &appname, const st
  * \param appname the name of your application, will be used in the usage-line
  */
 CheckArg::CheckArg(const vector<string> &argv, const string &appname)
-  : p(new CheckArgPrivate(this, argv, appname)){
-}
+    : p(new CheckArgPrivate(this, argv, appname)) {}
 /**
  * \brief constructs a CheckArg object
  * \param argc the number of arguments, you'll want to pass argc gotten from main()
@@ -155,9 +154,9 @@ CheckArg::CheckArg(const vector<string> &argv, const string &appname)
  * \param appname the name of your application, will be used in the usage-line
  * \param desc description of your programm, used in help
  */
-CheckArg::CheckArg(const vector<string> &argv, const string &appname, const string &desc)
-  : p(new CheckArgPrivate(this, argv, appname, desc)){
-}
+CheckArg::CheckArg(
+  const vector<string> &argv, const string &appname, const string &desc)
+    : p(new CheckArgPrivate(this, argv, appname, desc)) {}
 /**
  * \brief constructs a CheckArg object
  * \param argc the number of arguments, you'll want to pass argc gotten from main()
@@ -166,18 +165,18 @@ CheckArg::CheckArg(const vector<string> &argv, const string &appname, const stri
  * \param desc description of your programm, used in help
  * \param appendix text which will be added at the end of help
  */
-CheckArg::CheckArg(const vector<string> &argv, const string &appname, const string &desc, const string &appendix)
-  : p(new CheckArgPrivate(this, argv, appname,desc,appendix)){
-}
+CheckArg::CheckArg(
+  const vector<string> &argv, const string &appname, const string &desc,
+  const string &appendix)
+    : p(new CheckArgPrivate(this, argv, appname, desc, appendix)) {}
 
 #ifdef HAS_STD_FILESYSTEM
 CheckArg::CheckArg(const vector<string> &argv)
-  : p(new CheckArgPrivate(this, argv, fs::path(argv[0]).filename())) {
-}
+    : p(new CheckArgPrivate(this, argv, fs::path(argv[0]).filename())) {}
 
 CheckArg::CheckArg(const int argc, char **argv)
-  : p(new CheckArgPrivate(this, vector<string>(argv,argv+argc), fs::path(argv[0]).filename())) {
-}
+    : p(new CheckArgPrivate(
+      this, vector<string>(argv, argv + argc), fs::path(argv[0]).filename())) {}
 #endif
 
 
@@ -185,29 +184,38 @@ CheckArg::~CheckArg() = default;
 
 
 // private c'tors
-CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, const vector<string> &argv, const string &appname)
-  : argv(argv), parent(ca), appname(appname), pos_arg_sep(false),
-    usage_line(appname + " [options]") {}
+CheckArgPrivate::CheckArgPrivate(
+  CheckArg *const ca, const vector<string> &argv, const string &appname)
+    : argv(argv), parent(ca), appname(appname), pos_arg_sep(false),
+      usage_line(appname + " [options]") {}
 
-CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, const vector<string> &argv, const string &appname, const string &desc)
-  : argv(argv), parent(ca), appname(appname), descr(desc), pos_arg_sep(false),
-    usage_line(appname + " [options]") {}
+CheckArgPrivate::CheckArgPrivate(
+  CheckArg *const ca, const vector<string> &argv, const string &appname,
+  const string &desc)
+    : argv(argv), parent(ca), appname(appname), descr(desc), pos_arg_sep(false),
+      usage_line(appname + " [options]") {}
 
-CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, const vector<string> &argv, const string &appname, const string &desc, const string &appendix)
-  : argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix), pos_arg_sep(false),
-    usage_line(appname + " [options]") {}
+CheckArgPrivate::CheckArgPrivate(
+  CheckArg *const ca, const vector<string> &argv, const string &appname,
+  const string &desc, const string &appendix)
+    : argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix),
+      pos_arg_sep(false), usage_line(appname + " [options]") {}
 
-CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, vector<string> &&argv, const string &appname)
-  : argv(std::move(argv)), parent(ca), appname(appname), pos_arg_sep(false),
-    usage_line(appname + " [options]") {}
+CheckArgPrivate::CheckArgPrivate(
+  CheckArg *const ca, vector<string> &&argv, const string &appname)
+    : argv(std::move(argv)), parent(ca), appname(appname), pos_arg_sep(false),
+      usage_line(appname + " [options]") {}
 
-CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc)
-  : argv(std::move(argv)), parent(ca), appname(appname), descr(desc), pos_arg_sep(false),
-    usage_line(appname + " [options]") {}
+CheckArgPrivate::CheckArgPrivate(
+  CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc)
+    : argv(std::move(argv)), parent(ca), appname(appname), descr(desc),
+      pos_arg_sep(false), usage_line(appname + " [options]") {}
 
-CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc, const string &appendix)
-  : argv(std::move(argv)), parent(ca), appname(appname), descr(desc), appendix(appendix), pos_arg_sep(false),
-    usage_line(appname + " [options]") {}
+CheckArgPrivate::CheckArgPrivate(
+  CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc,
+  const string &appendix)
+    : argv(std::move(argv)), parent(ca), appname(appname), descr(desc),
+      appendix(appendix), pos_arg_sep(false), usage_line(appname + " [options]") {}
 
 /**
  * \brief set help's text for positional arguments
@@ -215,7 +223,7 @@ CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, vector<string> &&argv, cons
  * \param descr text describing the positional arguments, will be used in help
  */
 void
-CheckArg::set_posarg_help(const string &usage, const string &descr ) {
+CheckArg::set_posarg_help(const string &usage, const string &descr) {
   p->posarg_help_usage = usage;
   p->posarg_help_descr = descr;
 }
@@ -265,7 +273,9 @@ CheckArg::pos_args() const {
  * \see CAError
  */
 string
-CheckArg::str_err(const int errno){ return CheckArgPrivate::errors[errno]; }
+CheckArg::str_err(const int errno) {
+  return CheckArgPrivate::errors[errno];
+}
 
 int
 CheckArgPrivate::ca_error(int eno, const char *info, ...) const {
@@ -273,8 +283,8 @@ CheckArgPrivate::ca_error(int eno, const char *info, ...) const {
   va_list al;
   va_start(al, info);
   char *buff;
-  int i=vasprintf(&buff,info,al);
-  if (i > -1){
+  int i = vasprintf(&buff, info, al);
+  if (i > -1) {
     std::cerr << "Error: " << errors[eno] << buff << endl;
     free(buff);
   }
@@ -296,12 +306,10 @@ CheckArgPrivate::ca_error(int eno, const char *info, ...) const {
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const char sopt,
-    const string &lopt,
-    const string &help,
-    const CAValueType value_type
-) {
+int
+CheckArg::add(
+  const char sopt, const string &lopt, const string &help,
+  const CAValueType value_type) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
@@ -320,21 +328,16 @@ int CheckArg::add(
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const char sopt,
-    const string &lopt,
-    const string &help,
-    const CAValueType value_type,
-    const string &value_name
-) {
+int
+CheckArg::add(
+  const char sopt, const string &lopt, const string &help, const CAValueType value_type,
+  const string &value_name) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
     .help       = help,
   };
-  if (value_name.empty()) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
+  if (value_name.empty()) { p->valid_args[lopt].value_name = str_to_upper(lopt); }
   else {
     p->valid_args[lopt].value_name = value_name;
   }
@@ -351,13 +354,11 @@ int CheckArg::add(
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const char sopt,
-    const string &lopt,
-    std::function<int(CheckArg *const,const string &, const string &)> cb,
-    const string &help,
-    const CAValueType value_type
-) {
+int
+CheckArg::add(
+  const char sopt, const string &lopt,
+  std::function<int(CheckArg *const, const string &, const string &)> cb,
+  const string &help, const CAValueType value_type) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
@@ -378,14 +379,11 @@ int CheckArg::add(
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const char sopt,
-    const string &lopt,
-    std::function<int(CheckArg *const,const string &, const string &)> cb,
-    const string &help,
-    const CAValueType value_type,
-    const string &value_name
-) {
+int
+CheckArg::add(
+  const char sopt, const string &lopt,
+  std::function<int(CheckArg *const, const string &, const string &)> cb,
+  const string &help, const CAValueType value_type, const string &value_name) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
@@ -393,13 +391,11 @@ int CheckArg::add(
     .help       = help,
   };
 
-  if (value_name.empty()) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
+  if (value_name.empty()) { p->valid_args[lopt].value_name = str_to_upper(lopt); }
   else {
     p->valid_args[lopt].value_name = value_name;
   }
-  p->short2long[sopt]         = lopt;
+  p->short2long[sopt] = lopt;
   return CA_ALLOK;
 }
 
@@ -411,15 +407,9 @@ int CheckArg::add(
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const string &lopt,
-    const string &help,
-    const CAValueType value_type
-) {
-  p->valid_args[lopt] = {
-    .value_type = value_type,
-    .help       = help
-  };
+int
+CheckArg::add(const string &lopt, const string &help, const CAValueType value_type) {
+  p->valid_args[lopt] = {.value_type = value_type, .help = help};
 
   return CA_ALLOK;
 }
@@ -432,21 +422,17 @@ int CheckArg::add(
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const string &lopt,
-    const string &help,
-    const CAValueType value_type,
-    const string &value_name
-) {
+int
+CheckArg::add(
+  const string &lopt, const string &help, const CAValueType value_type,
+  const string &value_name) {
 
   p->valid_args[lopt] = {
     .value_type = value_type,
     .help       = help,
   };
 
-  if (value_name.empty()) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
+  if (value_name.empty()) { p->valid_args[lopt].value_name = str_to_upper(lopt); }
   else {
     p->valid_args[lopt].value_name = value_name;
   }
@@ -463,17 +449,12 @@ int CheckArg::add(
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const string &lopt,
-    std::function<int(CheckArg *const,const string &, const string &)> cb,
-    const string &help,
-    const CAValueType value_type
-){
-  p->valid_args[lopt] = {
-    .value_type = value_type,
-    .cb      = cb,
-    .help    = help
-  };
+int
+CheckArg::add(
+  const string &lopt,
+  std::function<int(CheckArg *const, const string &, const string &)> cb,
+  const string &help, const CAValueType value_type) {
+  p->valid_args[lopt] = {.value_type = value_type, .cb = cb, .help = help};
 
   return CA_ALLOK;
 }
@@ -487,22 +468,18 @@ int CheckArg::add(
  * \return a return code from CAError
  * \see CAError
  */
-int CheckArg::add(
-    const string &lopt,
-    std::function<int(CheckArg *const,const string &, const string &)> cb,
-    const string &help,
-    const CAValueType value_type,
-    const string &value_name
-){
+int
+CheckArg::add(
+  const string &lopt,
+  std::function<int(CheckArg *const, const string &, const string &)> cb,
+  const string &help, const CAValueType value_type, const string &value_name) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .cb         = cb,
     .help       = help,
   };
 
-  if (value_name.empty()) {
-    p->valid_args[lopt].value_name = str_to_upper(lopt);
-  }
+  if (value_name.empty()) { p->valid_args[lopt].value_name = str_to_upper(lopt); }
   else {
     p->valid_args[lopt].value_name = value_name;
   }
@@ -514,14 +491,15 @@ int CheckArg::add(
  * \brief add auto generated '-\-help' message
  * \return CA_ALLOK
  */
-int CheckArg::add_autohelp(){
+int
+CheckArg::add_autohelp() {
   p->valid_args["help"] = {
-    .value_type = CA_VT_NONE, // add --help with no value
-    .sopt    = 'h',
-    .cb      = checkarg::show_autohelp, // set the autohelp callback
-    .help    = "show this help message and exit",
+    .value_type = CA_VT_NONE,  // add --help with no value
+    .sopt       = 'h',
+    .cb         = checkarg::show_autohelp,  // set the autohelp callback
+    .help       = "show this help message and exit",
   };
-  p->short2long['h'] = "help";   // add -h mapped to --help
+  p->short2long['h'] = "help";  // add -h mapped to --help
   return CA_ALLOK;
 }
 
@@ -531,16 +509,19 @@ int CheckArg::add_autohelp(){
  * \return CA_ALLOK on success, some other code from CAError otherwise
  * \see CAError
  */
-int CheckArg::parse(){
-  // FIXME: give args here? but then CA would have to return a ParsedArgs object or something?
+int
+CheckArg::parse() {
+  // FIXME: give args here? but then CA would have to return a ParsedArgs object or
+  // something?
   int ret = CA_ALLOK;
-  // for(auto &arg : p->argv | std::views::drop(1)) { // start with 1 here, because argv[0] is special
+  // for(auto &arg : p->argv | std::views::drop(1)) { // start with 1 here, because
+  // argv[0] is special
   auto end = p->argv.cend();
-  for(auto arg = p->argv.cbegin()+1; arg != end; ++arg) {
+  for (auto arg = p->argv.cbegin() + 1; arg != end; ++arg) {
     ret = p->arg(*arg);
-    if( ret != CA_ALLOK ) goto error;
+    if (ret != CA_ALLOK) goto error;
   }
-  if( ! p->next_is_val_of.empty() ){
+  if (!p->next_is_val_of.empty()) {
     return p->ca_error(CA_MISSVAL, ": %s! %s", p->argv.back().c_str());
   }
 
@@ -568,12 +549,11 @@ error:
  * \param arg the long name of the option to get the value of
  * \return the value
  */
-string CheckArg::value(const string &arg) const{
+string
+CheckArg::value(const string &arg) const {
 
   auto pos = p->valid_args.find(arg);
-  if( pos != p->valid_args.end() ){
-    return pos->second.value;
-  }
+  if (pos != p->valid_args.end()) { return pos->second.value; }
   return "";
 }
 
@@ -582,7 +562,8 @@ string CheckArg::value(const string &arg) const{
  * \param arg the option specified by it's long name
  * \return true if give, false otherwise
  */
-bool CheckArg::isset(const string &arg) const {
+bool
+CheckArg::isset(const string &arg) const {
   auto pos = p->valid_args.find(arg);
   return pos != p->valid_args.end() && !(pos->second.value.empty());
 }
@@ -591,7 +572,7 @@ bool CheckArg::isset(const string &arg) const {
  * \brief print the current usage line to stdout
  */
 void
-CheckArg::show_usage(){
+CheckArg::show_usage() {
   cout << usage() << endl;
 }
 
@@ -600,7 +581,7 @@ CheckArg::show_usage(){
  * \return usage line
  */
 string
-CheckArg::usage(){
+CheckArg::usage() {
   stringstream ss;
   ss << "Usage: " << p->usage_line;
   if (!p->posarg_help_usage.empty()) ss << " " << p->posarg_help_usage;
@@ -626,64 +607,63 @@ CheckArg::_autohelp() {
  * \return help message
  */
 string
-CheckArg::autohelp(){
+CheckArg::autohelp() {
   stringstream ss;
   size_t space = 0;
-  for( auto &kv : p->valid_args ) {
+  for (auto &kv : p->valid_args) {
     size_t vsize = 0;
     if (kv.second.value_type != CA_VT_NONE) {
       vsize = kv.second.value_name.size();
       // FIXME: maybe always show equals sign to mark value options with empty name?
-      if (vsize > 0) ++vsize; // account for the equals sign
+      if (vsize > 0) ++vsize;  // account for the equals sign
     }
     space = std::max(space, kv.first.size() + vsize);
   }
 
-  space += 2; // add 2 more spaces
+  space += 2;  // add 2 more spaces
 
   ss << "Usage: " << p->usage_line;
-  if (!p->posarg_help_usage.empty())
-    ss << " " << p->posarg_help_usage;
+  if (!p->posarg_help_usage.empty()) ss << " " << p->posarg_help_usage;
   ss << endl;
 
-  if(!p->descr.empty()) ss << endl << p->descr << endl;
+  if (!p->descr.empty()) ss << endl << p->descr << endl;
 
   ss << endl << "Options:" << endl;
-  for(auto it=p->valid_args.begin(); it != p->valid_args.end(); ++it){
+  for (auto it = p->valid_args.begin(); it != p->valid_args.end(); ++it) {
     auto opt = it->second;
 
-    if(opt.sopt) ss << "   -" << opt.sopt << ",";
-    else ss << "      ";
+    if (opt.sopt)
+      ss << "   -" << opt.sopt << ",";
+    else
+      ss << "      ";
 
     ss << " --" << it->first;
 
     switch (opt.value_type) {
-      //case CA_VT_OPTIONAL:
-      // if (!opt.value_name.empty()) {
-      //   ss << "=[" << opt.value_name << "]"
-      //      << string(space - it->first.size() - opt.value_name.size() - 3, ' ');
-      //   break;
-      // }
-      // // fallthrough to default is intended
-      case CA_VT_REQUIRED:
-        if (!opt.value_name.empty()) {
-          ss << "=" << opt.value_name
-             << string(space - it->first.size() - opt.value_name.size() - 1, ' ');
-          break;
-        }
-        // fallthrough to default is intended
-      default:
-        ss << string(space - it->first.size(), ' ');
+    // case CA_VT_OPTIONAL:
+    // if (!opt.value_name.empty()) {
+    //   ss << "=[" << opt.value_name << "]"
+    //      << string(space - it->first.size() - opt.value_name.size() - 3, ' ');
+    //   break;
+    // }
+    // // fallthrough to default is intended
+    case CA_VT_REQUIRED:
+      if (!opt.value_name.empty()) {
+        ss << "=" << opt.value_name
+           << string(space - it->first.size() - opt.value_name.size() - 1, ' ');
         break;
+      }
+      // fallthrough to default is intended
+    default:
+      ss << string(space - it->first.size(), ' ');
+      break;
     }
 
     ss << opt.help << endl;
   }
-  if(!p->posarg_help_descr.empty())
-    ss << endl
-       << "Positional Arguments:" << endl
-       << p->posarg_help_descr << endl;
-  if(!p->appendix.empty()) ss << endl << p->appendix << endl;
+  if (!p->posarg_help_descr.empty())
+    ss << endl << "Positional Arguments:" << endl << p->posarg_help_descr << endl;
+  if (!p->appendix.empty()) ss << endl << p->appendix << endl;
 
   return ss.str();
 }
@@ -699,22 +679,23 @@ CheckArg::show_help() {
 
 // private members:
 
-int CheckArgPrivate::arg(const string &arg){
-  if( ! pos_arg_sep ){
+int
+CheckArgPrivate::arg(const string &arg) {
+  if (!pos_arg_sep) {
     // if the separator '--' was given, all following args are positional
 
-    if( ! next_is_val_of.empty() ){
+    if (!next_is_val_of.empty()) {
       // _next val of should be an opt with value
-      //static_assert( _valid_args[_next_is_val_of].value_type );
+      // static_assert( _valid_args[_next_is_val_of].value_type );
 
       valid_args[next_is_val_of].value = arg;
-      auto ret = call_cb(next_is_val_of);
+      auto ret                         = call_cb(next_is_val_of);
       next_is_val_of.clear();
       return ret;
     }
 
-    if( arg[0] == '-' ){ // it's an arg
-      if( arg[1] == '-' ) { // it's a long one
+    if (arg[0] == '-') {    // it's an arg
+      if (arg[1] == '-') {  // it's a long one
         return arg_long(arg.substr(2));
       }
 
@@ -728,8 +709,9 @@ int CheckArgPrivate::arg(const string &arg){
   return CA_ALLOK;
 }
 
-int CheckArgPrivate::arg_long(const string &arg){
-  if( arg.empty() ){
+int
+CheckArgPrivate::arg_long(const string &arg) {
+  if (arg.empty()) {
     // if the given arg was '--', arg is an empty string
     pos_arg_sep = true;
     return CA_ALLOK;
@@ -737,70 +719,78 @@ int CheckArgPrivate::arg_long(const string &arg){
 
   auto eqpos = arg.find('=');
   string real_arg, val;
-  if( eqpos != string::npos ){
+  if (eqpos != string::npos) {
     real_arg = arg.substr(0, eqpos);
-    val = arg.substr(eqpos+1);
-  } else {
+    val      = arg.substr(eqpos + 1);
+  }
+  else {
     real_arg = arg;
   }
 
   auto pos = valid_args.find(real_arg);
-  if( pos != valid_args.end() ){
-    if( pos->second.value_type && eqpos != string::npos ) {
+  if (pos != valid_args.end()) {
+    if (pos->second.value_type && eqpos != string::npos) {
       // arg has value defined, and value is given by '='
       pos->second.value = val;
-    } else if( pos->second.value_type ){
+    }
+    else if (pos->second.value_type) {
       // value of arg is the next arg, remember that for the next call of arg
       next_is_val_of = real_arg;
-    } else { // there's no value defined by add()
-      if( !val.empty() ){
+    }
+    else {  // there's no value defined by add()
+      if (!val.empty()) {
         // error?
         return ca_error(CA_INVVAL, ": --%s!", real_arg.c_str());
       }
-      pos->second.value = "x"; // mark arg as seen
+      pos->second.value = "x";  // mark arg as seen
     }
 
-    if( !pos->second.value_type || !val.empty()) {
+    if (!pos->second.value_type || !val.empty()) {
       // if arg has no val, or val is found already, call callback now, if there's one
       return call_cb(real_arg);
     }
     return CA_ALLOK;
-  } else {
+  }
+  else {
     return ca_error(CA_INVOPT, ": --%s!", real_arg.c_str());
   }
 }
 
-int CheckArgPrivate::arg_short(const string &arg){
+int
+CheckArgPrivate::arg_short(const string &arg) {
   size_t len = arg.size();
-  for(size_t i=0; i < len; ++i){
+  for (size_t i = 0; i < len; ++i) {
     auto pos = short2long.find(arg[i]);
-    if( pos != short2long.end() ){ // there is such a short arg registered
-      if( valid_args[pos->second].value_type ) { // if has val,
-        if( i < len-1 ){ //remainder is interpreted as val,
-          valid_args[pos->second].value = arg.substr(i+1);
+    if (pos != short2long.end()) {               // there is such a short arg registered
+      if (valid_args[pos->second].value_type) {  // if has val,
+        if (i < len - 1) {                       // remainder is interpreted as val,
+          valid_args[pos->second].value = arg.substr(i + 1);
           return call_cb(pos->second);
-        } else { // or next_arg is treated as val
+        }
+        else {  // or next_arg is treated as val
           next_is_val_of = pos->second;
         }
-        return CA_ALLOK; // no further looping, we're done.
-      } else {
-        valid_args[pos->second].value = "x"; // mark arg as seen
-        auto ret = call_cb(pos->second);
-        if(ret != CA_ALLOK )
-          return ret;
+        return CA_ALLOK;  // no further looping, we're done.
       }
-    } else {
+      else {
+        valid_args[pos->second].value = "x";  // mark arg as seen
+        auto ret                      = call_cb(pos->second);
+        if (ret != CA_ALLOK) return ret;
+      }
+    }
+    else {
       return ca_error(CA_INVOPT, ": -%c!", arg[i]);
     }
   }
   return CA_ALLOK;
 }
 
-int CheckArgPrivate::call_cb(const string &arg){
+int
+CheckArgPrivate::call_cb(const string &arg) {
   auto cbpos = valid_args.find(arg);
-  if( cbpos != valid_args.end() && cbpos->second.cb ){
+  if (cbpos != valid_args.end() && cbpos->second.cb) {
     int cbret = cbpos->second.cb(parent, arg, cbpos->second.value);
-    if(cbret != CA_ALLOK) {
+    if (cbret != CA_ALLOK) {
       // if callback returns anything other than CA_ALLOK, there's been an error
       return ca_error(CA_CALLBACK, ": %d!", cbret);
     }
@@ -808,20 +798,20 @@ int CheckArgPrivate::call_cb(const string &arg){
   return CA_ALLOK;
 }
 
-int checkarg::show_autohelp(CheckArg *const ca, const string&, const string &val){
+int
+checkarg::show_autohelp(CheckArg *const ca, const string &, const string &val) {
   ca->show_help();
-  exit(0); // always exit after showing help
+  exit(0);  // always exit after showing help
 }
 
-string checkarg::str_to_upper(const string &src) {
+string
+checkarg::str_to_upper(const string &src) {
   auto &f = std::use_facet<std::ctype<char>>(std::locale());
   string result;
   result.reserve(src.size());
   std::transform(
-    src.begin(), src.end(),
-    std::back_inserter( result ),
-    [&](string::value_type c) -> string::value_type { return f.toupper(c); }
-  );
+    src.begin(), src.end(), std::back_inserter(result),
+    [&](string::value_type c) -> string::value_type { return f.toupper(c); });
   return result;
 }
 
@@ -829,21 +819,23 @@ string checkarg::str_to_upper(const string &src) {
 #if CA_PRINTERR
 #  if not HAS_VASPRINTF
 
-#include <cstring>
-int vasprintf(char** strp, const char* format, va_list ap)
-{
+#    include <cstring>
+int
+vasprintf(char **strp, const char *format, va_list ap) {
   int count;
   // Find out how long the resulting string is
   count = _vscprintf(format, ap);
   if (count == 0) {
     *strp = strdup("");
-    return *strp == NULL ? -1:0;
-  } else if (count < 0) {
-    // Something went wrong, so return the error code (probably still requires checking of "errno" though)
+    return *strp == NULL ? -1 : 0;
+  }
+  else if (count < 0) {
+    // Something went wrong, so return the error code (probably still requires checking
+    // of "errno" though)
     return count;
   }
-  //Allocate memory for our string
-  *strp = (char*)malloc(count + 1);
+  // Allocate memory for our string
+  *strp = (char *)malloc(count + 1);
   if (*strp == NULL) {
     abort();
     return -1;

@@ -28,7 +28,6 @@ TEST_CASE("setters: positional argument help", "setters") {
     "Positional Arguments:\n"
     "one or more output files\n"
   );
-
 }
 
 TEST_CASE("setters: override usage line", "setters") {
@@ -56,5 +55,4 @@ TEST_CASE("setters: override usage line", "setters") {
     "   -i, --input  file to read from\n"
     "   -t, --test   run tests\n"
   );
-
 }
