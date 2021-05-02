@@ -18,73 +18,76 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
-*/
+ */
 
 #include "checkarg_private.h"
 
-#include <string.h>
-#include <stdlib.h>
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
-const char* errors[] = {
-  /*CA_ALLOK*/    "Everything is fine",
-  /*CA_ERROR*/    "An Error occurred",
-  /*CA_INVOPT*/   "Unknown command line option",
-  /*CA_INVVAL*/   "Value given to non-value option",
-  /*CA_MISSVAL*/  "Missing value of option",
-  /*CA_CALLBACK*/ "Callback returned with error code",
-  /*CA_ALLOC_ERR*/"Allocation of memory failed",
+const char *errors[] = {
+  /*CA_ALLOK    */ "Everything is fine",
+  /*CA_ERROR    */ "An Error occurred",
+  /*CA_INVOPT   */ "Unknown command line option",
+  /*CA_INVVAL   */ "Value given to non-value option",
+  /*CA_MISSVAL  */ "Missing value of option",
+  /*CA_CALLBACK */ "Callback returned with error code",
+  /*CA_ALLOC_ERR*/ "Allocation of memory failed",
 };
 
 
 /* c'tors */
 
-CheckArg*
-checkarg_new(const int argc, char **argv, const char *appname, const char *desc, const char *appendix){
-  CheckArg *ret = NULL;
+CheckArg *
+checkarg_new(
+  const int argc, char **argv, const char *appname, const char *desc,
+  const char *appendix) {
+
+  CheckArg *ret         = NULL;
   CheckArgPrivate *priv = NULL;
 
-  ret = (CheckArg*) malloc(sizeof(CheckArg));
-  if(!ret)
-  	return NULL; /* malloc failed */
+  ret = (CheckArg *)malloc(sizeof(CheckArg));
+  if (!ret) return NULL; /* malloc failed */
 
-  priv = (CheckArgPrivate*)malloc(sizeof(CheckArgPrivate));
-  if(!priv) /* malloc failed */
+  priv = (CheckArgPrivate *)malloc(sizeof(CheckArgPrivate));
+  if (!priv) /* malloc failed */
     goto clean;
 
   ret->p = priv;
 
-	/* initialize struct with zeros #C99# */
-	*priv = (CheckArgPrivate){0};
+  /* initialize struct with zeros #C99# */
+  *priv = (CheckArgPrivate){0};
 
   priv->argv = argv;
   priv->argc = argc;
 
   priv->appname = strdup(appname);
-  if(!priv->appname) goto clean;
+  if (!priv->appname) goto clean;
 
-  priv->usage_line = (char*)malloc(strlen(appname)+11);
-  if(!priv->usage_line) goto clean;
+  priv->usage_line = (char *)malloc(strlen(appname) + 11);
+  if (!priv->usage_line) goto clean;
 
-  *priv->usage_line = '\0'; /* set first char to \0, so strcat will start at the beginning */
+  *priv->usage_line =
+    '\0'; /* set first char to \0, so strcat will start at the beginning */
   strcat(priv->usage_line, priv->appname);
   strcat(priv->usage_line, " [options]");
 
-  if(desc){
+  if (desc) {
     priv->descr = strdup(desc);
-    if(!priv->descr) goto clean;
+    if (!priv->descr) goto clean;
   }
 
-  if(appendix){
+  if (appendix) {
     priv->appendix = strdup(appendix);
-    if(!priv->appendix) goto clean;
+    if (!priv->appendix) goto clean;
   }
 
   /* alloc a bit too much and shrink it to real size in one go later */
-  priv->pos_args = (const char**)malloc(argc*sizeof(char*));
-  if(!priv->pos_args) goto clean;
+  priv->pos_args = (const char **)malloc(argc * sizeof(char *));
+  if (!priv->pos_args) goto clean;
 
   return ret;
 
@@ -95,80 +98,89 @@ clean:
 }
 
 void
-checkarg_free(CheckArg *ca){
-	if(ca && ca->p){ /* makes free of partially initialized ca possible */
-		free(ca->p->appname);
-		free(ca->p->descr);
-		free(ca->p->appendix);
-		free(ca->p->usage_line);
-		free(ca->p->next_is_val_of);
-		free(ca->p->posarg_help_descr);
-		free(ca->p->posarg_help_usage);
+checkarg_free(CheckArg *ca) {
+  if (ca && ca->p) { /* makes free of partially initialized ca possible */
+    free(ca->p->appname);
+    free(ca->p->descr);
+    free(ca->p->appendix);
+    free(ca->p->usage_line);
+    free(ca->p->next_is_val_of);
+    free(ca->p->posarg_help_descr);
+    free(ca->p->posarg_help_usage);
 
-		/* "arrays" and lists */
-		pos_args_free(ca->p->pos_args );
-		valid_args_free(ca->p->valid_args);
+    /* "arrays" and lists */
+    pos_args_free(ca->p->pos_args);
+    valid_args_free(ca->p->valid_args);
 
-		free(ca->p);
-	}
-	free(ca);
+    free(ca->p);
+  }
+  free(ca);
 }
 
 int
-checkarg_add(CheckArg *ca, const char sopt, const char *lopt, const char *help){
+checkarg_add(CheckArg *ca, const char sopt, const char *lopt, const char *help) {
   return checkarg_add_value(ca, sopt, lopt, help, 0);
 }
 
 int
-checkarg_add_value(CheckArg *ca, const char sopt, const char *lopt, const char *help, const uint8_t has_val){
+checkarg_add_value(
+  CheckArg *ca, const char sopt, const char *lopt, const char *help,
+  const uint8_t has_val) {
+
   Opt *opt = opt_new(sopt, lopt, NULL, help, has_val);
-  if(!opt)
-    return CA_ALLOC_ERR; /* malloc failed */
+  if (!opt) return CA_ALLOC_ERR; /* malloc failed */
 
   return valid_args_insert(ca, opt);
 }
 
 int
-checkarg_add_cb(CheckArg *ca, const char sopt, const char *lopt, CheckArgFP cb, const char *help){
+checkarg_add_cb(
+  CheckArg *ca, const char sopt, const char *lopt, CheckArgFP cb, const char *help) {
   return checkarg_add_cb_value(ca, sopt, lopt, cb, help, 0);
 }
 
 int
-checkarg_add_cb_value(CheckArg *ca, const char sopt, const char *lopt, CheckArgFP cb, const char *help, const uint8_t has_val){
+checkarg_add_cb_value(
+  CheckArg *ca, const char sopt, const char *lopt, CheckArgFP cb, const char *help,
+  const uint8_t has_val) {
   Opt *opt = opt_new(sopt, lopt, cb, help, has_val);
-  if(!opt) return CA_ALLOC_ERR;
+  if (!opt) return CA_ALLOC_ERR;
 
   return valid_args_insert(ca, opt);
 }
 
 int
-checkarg_add_long(CheckArg *ca, const char *lopt, const char *help){
+checkarg_add_long(CheckArg *ca, const char *lopt, const char *help) {
   return checkarg_add_long_value(ca, lopt, help, 0);
 }
 
 int
-checkarg_add_long_value(CheckArg *ca, const char *lopt, const char *help, const int8_t has_val){
+checkarg_add_long_value(
+  CheckArg *ca, const char *lopt, const char *help, const int8_t has_val) {
   Opt *opt = opt_new(0, lopt, NULL, help, has_val);
-  if(!opt) return CA_ALLOC_ERR;
+  if (!opt) return CA_ALLOC_ERR;
   return valid_args_insert(ca, opt);
 }
 
 int
-checkarg_add_long_cb(CheckArg *ca, const char *lopt, CheckArgFP cb, const char *help){
+checkarg_add_long_cb(CheckArg *ca, const char *lopt, CheckArgFP cb, const char *help) {
   return checkarg_add_long_cb_value(ca, lopt, cb, help, 0);
 }
 
 int
-checkarg_add_long_cb_value(CheckArg *ca, const char *lopt, CheckArgFP cb, const char *help, const uint8_t has_val) {
+checkarg_add_long_cb_value(
+  CheckArg *ca, const char *lopt, CheckArgFP cb, const char *help,
+  const uint8_t has_val) {
   Opt *opt = opt_new(0, lopt, cb, help, has_val);
-  if(!opt) return CA_ALLOC_ERR;
+  if (!opt) return CA_ALLOC_ERR;
   return valid_args_insert(ca, opt);
 }
 
 int
 checkarg_add_autohelp(CheckArg *ca) {
-  Opt *opt = opt_new('h', "help", checkarg_show_autohelp, "show this help message and exit", 0);
-  if(!opt) return CA_ALLOC_ERR;
+  Opt *opt =
+    opt_new('h', "help", checkarg_show_autohelp, "show this help message and exit", 0);
+  if (!opt) return CA_ALLOC_ERR;
   return valid_args_insert(ca, opt);
 }
 
@@ -177,13 +189,13 @@ checkarg_parse(CheckArg *ca) {
   int ret = CA_ALLOK;
   int i;
 
-  for(i=1; i<ca->p->argc; ++i){
+  for (i = 1; i < ca->p->argc; ++i) {
     ret = checkarg_arg(ca, ca->p->argv[i]);
-    if( ret != CA_ALLOK ) goto error;
+    if (ret != CA_ALLOK) goto error;
   }
 
-  if( ca->p->next_is_val_of ) {
-    return ca_error(CA_MISSVAL, ": %s!", ca->p->argv[ca->p->argc-1] );
+  if (ca->p->next_is_val_of) {
+    return ca_error(CA_MISSVAL, ": %s!", ca->p->argv[ca->p->argc - 1]);
   }
 
   /* TODO: resize pos_args */
@@ -200,22 +212,22 @@ error:
   free(ca->p->posarg_help_descr); ca->p->posarg_help_descr = NULL;
   free(ca->p->posarg_help_usage); ca->p->posarg_help_usage = NULL;
   free(ca->p->next_is_val_of);    ca->p->next_is_val_of    = NULL;
-	*/
+  */
 
 
   return ret;
 }
 
 int
-checkarg_set_posarg_help(CheckArg *ca, const char *usage, const char *descr){
+checkarg_set_posarg_help(CheckArg *ca, const char *usage, const char *descr) {
   /* free possible previous values */
   free(ca->p->posarg_help_descr);
   free(ca->p->posarg_help_usage);
 
   ca->p->posarg_help_usage = strdup(usage);
-  if(!ca->p->posarg_help_usage) return CA_ALLOC_ERR; /* malloc failed */
+  if (!ca->p->posarg_help_usage) return CA_ALLOC_ERR; /* malloc failed */
   ca->p->posarg_help_descr = strdup(descr);
-  if(!ca->p->posarg_help_descr){
+  if (!ca->p->posarg_help_descr) {
     free(ca->p->posarg_help_usage);
     ca->p->posarg_help_usage = NULL;
     return CA_ALLOC_ERR; /* malloc failed */
@@ -224,48 +236,49 @@ checkarg_set_posarg_help(CheckArg *ca, const char *usage, const char *descr){
 }
 
 int
-checkarg_set_usage_line(CheckArg *ca, const char *arg){
+checkarg_set_usage_line(CheckArg *ca, const char *arg) {
   free(ca->p->usage_line);
 
   ca->p->usage_line = strdup(arg);
-  if(!ca->p->usage_line)
-    return CA_ALLOC_ERR;
+  if (!ca->p->usage_line) return CA_ALLOC_ERR;
   return CA_ALLOK;
 }
 
-const char*
+const char *
 checkarg_argv0(CheckArg *ca) {
   return ca->p->argv[0];
 }
 
-const char**
-checkarg_pos_args(CheckArg *ca){
-  /* turn the cahr** into a const char** */
-  return (const char**)ca->p->pos_args;
+const char **
+checkarg_pos_args(CheckArg *ca) {
+  /* turn the cahr** into a const char**
+   * FIXME: maybe even a (const char *const *),
+   * making the pointers inside the "array" const ?
+   * users should have any reason to modify them */
+  return (const char **)ca->p->pos_args;
 }
 
 size_t
-checkarg_pos_args_count(CheckArg *ca){
+checkarg_pos_args_count(CheckArg *ca) {
   return ca->p->pos_args_count;
 }
 
-const char*
-checkarg_value(CheckArg* ca, const char *key){
+const char *
+checkarg_value(CheckArg *ca, const char *key) {
   Opt *opt = valid_args_find(ca, key);
-  if(opt) return opt->value;
+  if (opt) return opt->value;
   return NULL;
 }
 
 uint8_t
-checkarg_isset(CheckArg *ca, const char *key){
+checkarg_isset(CheckArg *ca, const char *key) {
   Opt *opt = valid_args_find(ca, key);
   /* find returns NULL if not found */
-  if(opt)
-    return opt->value == NULL ? 0 : 1;
+  if (opt) return opt->value == NULL ? 0 : 1;
   return 0;
 }
 
-const char*
+const char *
 checkarg_str_err(const int errno) {
   return errors[errno];
 }
@@ -273,19 +286,21 @@ checkarg_str_err(const int errno) {
 /**
  * returns a dynamically allocated pointer which must be freed by the user
  */
-char* checkarg_usage(CheckArg *ca) {
-  size_t len = 8; // "Usage: " + "\0"
+char *
+checkarg_usage(CheckArg *ca) {
+  size_t len = 8;  // "Usage: " + "\0"
   len += strlen(ca->p->usage_line);
   if (ca->p->posarg_help_usage) {
-    len += strlen(ca->p->posarg_help_usage) + 1; // +1 for the space
+    len += strlen(ca->p->posarg_help_usage) + 1;  // +1 for the space
   }
 
-  char* line = malloc(len);
+  char *line = malloc(len);
   if (!line) return NULL;
 
   if (ca->p->posarg_help_usage) {
     snprintf(line, len, "Usage: %s %s", ca->p->usage_line, ca->p->posarg_help_usage);
-  } else {
+  }
+  else {
     snprintf(line, len, "Usage: %s", ca->p->usage_line);
   }
 
@@ -293,8 +308,8 @@ char* checkarg_usage(CheckArg *ca) {
 }
 
 void
-checkarg_show_usage(CheckArg *ca){
-  char* line = checkarg_usage(ca);
+checkarg_show_usage(CheckArg *ca) {
+  char *line = checkarg_usage(ca);
   printf("%s\n", line);
   free(line);
 }
@@ -302,46 +317,53 @@ checkarg_show_usage(CheckArg *ca){
 /**
  * returns a dynamically allocated pointer which must be freed by the user
  */
-char*
-checkarg_autohelp(CheckArg *ca){
+char *
+checkarg_autohelp(CheckArg *ca) {
   size_t space = 0;
-  size_t tmp = 0;
-  Opt *it = ca->p->valid_args;
+  size_t tmp   = 0;
+  Opt *it      = ca->p->valid_args;
 
   do {
-    tmp = strlen(it->lopt);
+    tmp   = strlen(it->lopt);
     space = space > tmp ? space : tmp;
-  } while( (it=it->next) );
+  }
+  while ((it = it->next));
 
   /* two more than opt length, so theres some space between the columns */
   space += 2;
 
-	char *usage = checkarg_usage(ca);
-	size_t msglen =
-	  strlen(usage) +
-	  12 + // newline after usage + strlen("\nOptions\n") + final \0
-	  (ca->p->descr ? strlen(ca->p->descr) + 2 : 0) + // +2 -> 2*'\n'
-	  (ca->p->posarg_help_descr ? 24 + strlen(ca->p->posarg_help_descr) : 0) +
-	  (ca->p->appendix ? 2 + strlen(ca->p->appendix): 0);
+  char *usage = checkarg_usage(ca);
+  /*
+   * 12 == newline after usage + strlen("\nOptions\n") + final \0
+   * +2 == 2 * '\n' padding around description and appendix
+   * 24 == "Positional Arguments:" + newlines
+   */
+  size_t msglen = strlen(usage) + 12 + (ca->p->descr ? 2 + strlen(ca->p->descr) : 0)
+                +  // +2 -> 2*'\n'
+                  (ca->p->posarg_help_descr ? 24 + strlen(ca->p->posarg_help_descr) : 0)
+                + (ca->p->appendix ? 2 + strlen(ca->p->appendix) : 0);
 
   it = ca->p->valid_args;
   do {
-    // 10 == 6 char for short options + 3 chars for ' --' + a newline
-    // space is the width of the long options
+    /* 10 == 6 char for short options + 3 chars for ' --' + a newline
+     * space is the width of the long options */
     msglen += 10 + space + strlen(it->help);
-  } while( (it = it->next ) );
+  }
+  while ((it = it->next));
 
   size_t malloced_len = msglen;
-	char *msg = malloc(msglen);
-	if (!msg) {
-	  free(usage);
-	  return NULL;
+  char *msg           = malloc(msglen);
+  if (!msg) {
+    free(usage);
+    return NULL;
   }
   int pnum = snprintf(msg, msglen, "%s\n", usage);
-  msglen -= pnum; // next snprintf can write pnum less chars
-  char *cur = msg + pnum; // next snprintf shall start at the end of the already written stuff
+  /* next snprintf can write pnum less chars */
+  msglen -= pnum;
+  /* next snprintf shall start at the end of the already written stuff */
+  char *cur = msg + pnum;
 
-  if(ca->p->descr) {
+  if (ca->p->descr) {
     pnum = snprintf(cur, msglen, "\n%s\n", ca->p->descr);
     msglen -= pnum;
     cur += pnum;
@@ -353,31 +375,45 @@ checkarg_autohelp(CheckArg *ca){
 
   it = ca->p->valid_args;
   do {
-    if(it->sopt)
+    if (it->sopt)
       pnum = snprintf(cur, msglen, "   -%c,", it->sopt);
     else
       pnum = snprintf(cur, msglen, "      ");
     msglen -= pnum;
     cur += pnum;
 
-    pnum = snprintf(cur, msglen, " --%s%*s%s\n", it->lopt, (int)(space-strlen(it->lopt)), "", it->help);
+    pnum = snprintf(
+      cur, msglen, " --%s%*s%s\n", it->lopt, (int)(space - strlen(it->lopt)), "",
+      it->help);
     msglen -= pnum;
     cur += pnum;
-    assert( msglen > 0 && (cur - msg < malloced_len) );
-  } while( (it = it->next ) );
 
-  if(ca->p->posarg_help_descr){
-    pnum = snprintf(cur, msglen, "\nPositional Arguments:\n%s\n", ca->p->posarg_help_descr);
+    /* msglen must stay above zero,
+     * if it does not, malloced_len calculation must be buggy
+     * because it was smaller than the actual length of the help message
+     *
+     * same with the distance between cur and msg, (the current length of the message)
+     * it shall not exceed malloced_len */
+    assert(msglen > 0 && (cur - msg < malloced_len));
+  }
+  while ((it = it->next));
+
+  if (ca->p->posarg_help_descr) {
+    pnum =
+      snprintf(cur, msglen, "\nPositional Arguments:\n%s\n", ca->p->posarg_help_descr);
     msglen -= pnum;
     cur += pnum;
   }
 
-  if(ca->p->appendix){
+  if (ca->p->appendix) {
     pnum = snprintf(cur, msglen, "\n%s\n", ca->p->appendix);
     msglen -= pnum;
     cur += pnum;
   }
-  assert( msglen == 1 ); // 1 because snprintf does not count the trailing \0
+
+  /* msglen should have 1 remaining char
+   * because snprintf does not count the trailing \0 it writes into the buffer */
+  assert(msglen == 1);
 
   free(usage);
   return msg;
@@ -385,27 +421,29 @@ checkarg_autohelp(CheckArg *ca){
 
 void
 checkarg_show_help(CheckArg *ca) {
-  char* msg = checkarg_autohelp(ca);
+  char *msg = checkarg_autohelp(ca);
   printf("%s", msg);
   free(msg);
 }
 
 int
-checkarg_show_autohelp(CheckArg *ca, const char* larg, const char* val){
-	checkarg_show_help(ca);
+checkarg_show_autohelp(CheckArg *ca, const char *larg, const char *val) {
+  checkarg_show_help(ca);
   exit(0); /* always exit after showing help */
 }
 
-Opt*
-opt_new(const char sopt, const char *lopt, CheckArgFP cb, const char *help, const uint8_t has_val){
-  Opt *opt = (Opt*)malloc(sizeof(Opt));
-  if(!opt) return NULL;
+Opt *
+opt_new(
+  const char sopt, const char *lopt, CheckArgFP cb, const char *help,
+  const uint8_t has_val) {
+  Opt *opt = (Opt *)malloc(sizeof(Opt));
+  if (!opt) return NULL;
 
   opt->lopt = strdup(lopt);
-  if(!opt->lopt) goto clean;
+  if (!opt->lopt) goto clean;
 
   opt->help = strdup(help);
-  if(!opt->help) goto clean;
+  if (!opt->help) goto clean;
 
   opt->sopt    = sopt;
   opt->has_val = has_val;
@@ -415,26 +453,28 @@ opt_new(const char sopt, const char *lopt, CheckArgFP cb, const char *help, cons
   return opt;
 
 clean:
-	opt_free(opt);
-	return NULL;
+  opt_free(opt);
+  return NULL;
 }
 
 /* WARNING: you have to free 'next' yourself if used, like in valid_args_free */
-void opt_free(Opt *o){
-	if(o){
-	  if (o->has_val) {
-	    // value is either NULL if opt was not parsed or:
-	    // if has_val is true, value may have been strdup'ed and must be free'd
-	    // otherwise points to the literal "x", which is static
-		  free(o->value);
+void
+opt_free(Opt *o) {
+  if (o) {
+    if (o->has_val) {
+      // value is either NULL if opt was not parsed or:
+      // if has_val is true, value may have been strdup'ed and must be free'd
+      // otherwise points to the literal "x", which is static
+      free(o->value);
     }
-		free(o->help);
-		free(o->lopt);
-		free(o);
-	}
+    free(o->help);
+    free(o->lopt);
+    free(o);
+  }
 }
 
-int ca_error(int eno, const char *fmt, ...) {
+int
+ca_error(int eno, const char *fmt, ...) {
   va_list al;
   va_start(al, fmt);
 
@@ -442,25 +482,28 @@ int ca_error(int eno, const char *fmt, ...) {
   vfprintf(stderr, fmt, al);
   fprintf(stderr, "\n");
 
-	va_end(al);
+  va_end(al);
   return eno;
 }
 
-void pos_args_free(const char **posargs){
-	free(posargs);
+void
+pos_args_free(const char **posargs) {
+  free(posargs);
 }
 
-void valid_args_free(Opt* vaptr){
-  if(vaptr){
+void
+valid_args_free(Opt *vaptr) {
+  if (vaptr) {
     valid_args_free(vaptr->next);
     opt_free(vaptr);
   }
 }
 
-int  valid_args_insert(CheckArg *ca, Opt *opt){
-  if(ca->p->valid_args_last) {
+int
+valid_args_insert(CheckArg *ca, Opt *opt) {
+  if (ca->p->valid_args_last) {
     ca->p->valid_args_last->next = opt;
-    ca->p->valid_args_last = opt;
+    ca->p->valid_args_last       = opt;
     return CA_ALLOK;
   }
 
@@ -471,36 +514,39 @@ int  valid_args_insert(CheckArg *ca, Opt *opt){
 }
 
 /* sadly O(n), returns NULL if not found  */
-Opt* valid_args_find(CheckArg *ca, const char *lopt){
+Opt *
+valid_args_find(CheckArg *ca, const char *lopt) {
   Opt *it = ca->p->valid_args;
   do {
-    if( strcmp(it->lopt, lopt) == 0 )
-      return it;
-  } while( it && (it = it->next) );
+    if (strcmp(it->lopt, lopt) == 0) return it;
+  }
+  while (it && (it = it->next));
   return NULL;
 }
 
-Opt* valid_args_find_sopt(CheckArg *ca, char sopt){
+Opt *
+valid_args_find_sopt(CheckArg *ca, char sopt) {
   Opt *it = ca->p->valid_args;
   do
-    if( it->sopt == sopt )
-      return it;
-  while( it && (it = it->next) );
+    if (it->sopt == sopt) return it;
+  while (it && (it = it->next));
   return NULL;
 }
 
-int checkarg_arg(CheckArg *ca, const char *arg) {
-  if( ! ca->p->pos_arg_sep ){
+int
+checkarg_arg(CheckArg *ca, const char *arg) {
+  if (!ca->p->pos_arg_sep) {
     /* if the separator '--' was given, all following args are positional */
 
-    if( ca->p->next_is_val_of ){
+    if (ca->p->next_is_val_of) {
       /* _next_val_of should be an lopt with value */
       int ret = 0;
 
       Opt *opt = valid_args_find(ca, ca->p->next_is_val_of);
-      if(opt->value) free(opt->value); /* in case someone specifies an option with value twice */
+      if (opt->value)
+        free(opt->value); /* in case someone specifies an option with value twice */
       opt->value = strdup(arg);
-      if( ! opt->value ) /* malloc failed */
+      if (!opt->value) /* malloc failed */
         return ca_error(CA_ALLOC_ERR, "!");
 
       ret = call_cb(ca, opt);
@@ -509,15 +555,14 @@ int checkarg_arg(CheckArg *ca, const char *arg) {
       return ret;
     }
 
-    if( arg[0] == '-' ) { /* it's an option */
-      if( arg[1] == '-') { /* it's a long option */
-        return checkarg_arg_long(ca, (arg + 2) ); /* omit first two chars */
+    if (arg[0] == '-') {                         /* it's an option */
+      if (arg[1] == '-') {                       /* it's a long option */
+        return checkarg_arg_long(ca, (arg + 2)); /* omit first two chars */
       }
 
       /* it's a short or a group of short options */
-      return checkarg_arg_short(ca, (arg + 1) ); /* omit first char */
+      return checkarg_arg_short(ca, (arg + 1)); /* omit first char */
     }
-
   }
 
   /* it's a positional arg */
@@ -525,55 +570,54 @@ int checkarg_arg(CheckArg *ca, const char *arg) {
   return CA_ALLOK;
 }
 
-int checkarg_arg_long(CheckArg *ca, const char *lopt){
+int
+checkarg_arg_long(CheckArg *ca, const char *lopt) {
   char *real_opt, *value;
   char *it;
   Opt *opt;
   int ret = 0;
 
-  if( ! *lopt ) {
+  if (!*lopt) {
     /* if '--' was given, lopt is an empty string */
     ca->p->pos_arg_sep = 1;
     return CA_ALLOK;
   }
 
-  value = NULL;
+  value    = NULL;
   real_opt = strdup(lopt);
-  if( ! real_opt )
-    return ca_error(CA_ALLOC_ERR, "!");
+  if (!real_opt) return ca_error(CA_ALLOC_ERR, "!");
 
   it = real_opt;
-  while( *it && *it != '=' ) ++it;
+  while (*it && *it != '=') ++it;
   /* iterated to either the position of the first '=' or the end of the string */
 
-  if( *it == '=' ) { /* if we're at an '=', split the value off */
-    value = it +1; /* points to the part after the equal */
-    *it = 0;
-    /* mark the end of the option with '\0' instead of '=' so it'll become a separate c-str,
-     * real_opt should now contain the option only */
+  if (*it == '=') { /* if we're at an '=', split the value off */
+    value = it + 1; /* points to the part after the equal */
+    *it   = 0;
+    /* mark the end of the option with '\0' instead of '=' so it'll become a separate
+     * c-str, real_opt should now contain the option only */
   }
 
   opt = valid_args_find(ca, real_opt);
-  if(opt) {
-    if( opt->has_val && value ){
-      if(opt->value) free(opt->value); /* in case someone specifies an option with value twice */
+  if (opt) {
+    if (opt->has_val && value) {
+      if (opt->value)
+        free(opt->value); /* in case someone specifies an option with value twice */
       opt->value = strdup(value);
-      if( ! opt->value )
-        goto alloc_error;
+      if (!opt->value) goto alloc_error;
     }
-    else if( opt->has_val ){
+    else if (opt->has_val) {
       ca->p->next_is_val_of = strdup(real_opt);
-      if( ! ca->p->next_is_val_of )
-        goto alloc_error;
+      if (!ca->p->next_is_val_of) goto alloc_error;
     }
-    else if( value ) { /* unexpected value given */
+    else if (value) { /* unexpected value given */
       goto invval_error;
     }
     else {
       opt->value = "x"; /* mark option as seen, any value except NULL is ok here */
     }
 
-    if( !opt->has_val || value ){
+    if (!opt->has_val || value) {
       ret = call_cb(ca, opt);
       free(real_opt);
       return ret;
@@ -595,68 +639,65 @@ invval_error:
 alloc_error:
   free(real_opt);
   return ca_error(CA_ALLOC_ERR, "!");
-
 }
 
 
-int checkarg_arg_short(CheckArg *ca, const char *args){
+int
+checkarg_arg_short(CheckArg *ca, const char *args) {
   const char *it;
   Opt *opt;
   int ret = CA_ALLOK;
 
-  for(it=args; *it; ++it){
+  for (it = args; *it; ++it) {
     opt = valid_args_find_sopt(ca, *it);
-    if(opt) { /* short option found */
-      if( opt->has_val ){
-        if( *(++it) ) { /* there's a remainder, assign it as value */
-          if(opt->value) free(opt->value); /* in case someone specifies an option with value twice */
-          opt->value = strdup( it );
-          if( !opt->value )
-            goto alloc_error;
+    if (opt) { /* short option found */
+      if (opt->has_val) {
+        if (*(++it)) { /* there's a remainder, assign it as value */
+          if (opt->value)
+            free(opt->value); /* in case someone specifies an option with value twice */
+          opt->value = strdup(it);
+          if (!opt->value) goto alloc_error;
 
           ret = call_cb(ca, opt);
-	        if( ret != CA_ALLOK )
-		        return ret;
-
-        } else {
-          ca->p->next_is_val_of = strdup( opt->lopt );
-          if( ! ca->p->next_is_val_of )
-            goto alloc_error;
+          if (ret != CA_ALLOK) return ret;
+        }
+        else {
+          ca->p->next_is_val_of = strdup(opt->lopt);
+          if (!ca->p->next_is_val_of) goto alloc_error;
         }
         return CA_ALLOK; /* we're done here */
       }
       else {
         opt->value = "x"; /* any value except NULL is ok here */
-        ret = call_cb(ca, opt);
-        if( ret != CA_ALLOK )
-          return ret;
+        ret        = call_cb(ca, opt);
+        if (ret != CA_ALLOK) return ret;
       }
-    } else {
+    }
+    else {
       return ca_error(CA_INVOPT, ": -%c!", *it);
     }
   }
   return CA_ALLOK;
 
 alloc_error:
-  return ca_error(CA_ALLOC_ERR,"!");
-
+  return ca_error(CA_ALLOC_ERR, "!");
 }
 
-int call_cb(CheckArg *ca, Opt *opt){
+int
+call_cb(CheckArg *ca, Opt *opt) {
   int ret = CA_ALLOK;
 
-  if( opt->cb ) {
+  if (opt->cb) {
     ret = opt->cb(ca, opt->lopt, opt->value);
-    if( ret != CA_ALLOK ){
-      return ca_error(CA_CALLBACK, ": %d!", ret);
-    }
+    if (ret != CA_ALLOK) { return ca_error(CA_CALLBACK, ": %d!", ret); }
   }
   return CA_ALLOK;
 }
 
-void pos_args_append(CheckArg *ca, const char *arg){
-  const char** tmp = ca->p->pos_args + ca->p->pos_args_count;
-  *tmp = arg;
+void
+pos_args_append(CheckArg *ca, const char *arg) {
+  const char **tmp = ca->p->pos_args + ca->p->pos_args_count;
+  *tmp             = arg;
   ++(ca->p->pos_args_count);
 }
 
