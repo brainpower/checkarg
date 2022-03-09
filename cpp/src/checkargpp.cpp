@@ -5,7 +5,7 @@
 #include "checkargpp_private.hpp"
 
 #if CA_PRINTERR
-#  include <cstdarg>
+#include <cstdarg>
 #endif
 
 #include <iostream>
@@ -13,7 +13,7 @@
 // #include <format>
 
 #ifdef HAS_STD_FILESYSTEM
-#  include <filesystem>
+#include <filesystem>
 namespace fs = std::filesystem;
 #endif
 
@@ -97,11 +97,11 @@ using checkarg::str_to_upper;
  */
 
 map<int, string> CheckArgPrivate::errors = {
-  {CA_ALLOK, "Everything is fine"},
-  {CA_ERROR, "An Error occurred"},
-  {CA_INVOPT, "Unknown command line option"},
-  {CA_INVVAL, "Value given to non-value option"},
-  {CA_MISSVAL, "Missing value of option"},
+  {CA_ALLOK,    "Everything is fine"               },
+  {CA_ERROR,    "An Error occurred"                },
+  {CA_INVOPT,   "Unknown command line option"      },
+  {CA_INVVAL,   "Value given to non-value option"  },
+  {CA_MISSVAL,  "Missing value of option"          },
   {CA_CALLBACK, "Callback returned with error code"},
 };
 
@@ -186,36 +186,60 @@ CheckArg::~CheckArg() = default;
 // private c'tors
 CheckArgPrivate::CheckArgPrivate(
   CheckArg *const ca, const vector<string> &argv, const string &appname)
-    : argv(argv), parent(ca), appname(appname), pos_arg_sep(false),
-      usage_line(appname + " [options]") {}
+    : argv(argv)
+    , parent(ca)
+    , appname(appname)
+    , pos_arg_sep(false)
+    , usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(
   CheckArg *const ca, const vector<string> &argv, const string &appname,
   const string &desc)
-    : argv(argv), parent(ca), appname(appname), descr(desc), pos_arg_sep(false),
-      usage_line(appname + " [options]") {}
+    : argv(argv)
+    , parent(ca)
+    , appname(appname)
+    , descr(desc)
+    , pos_arg_sep(false)
+    , usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(
   CheckArg *const ca, const vector<string> &argv, const string &appname,
   const string &desc, const string &appendix)
-    : argv(argv), parent(ca), appname(appname), descr(desc), appendix(appendix),
-      pos_arg_sep(false), usage_line(appname + " [options]") {}
+    : argv(argv)
+    , parent(ca)
+    , appname(appname)
+    , descr(desc)
+    , appendix(appendix)
+    , pos_arg_sep(false)
+    , usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(
   CheckArg *const ca, vector<string> &&argv, const string &appname)
-    : argv(std::move(argv)), parent(ca), appname(appname), pos_arg_sep(false),
-      usage_line(appname + " [options]") {}
+    : argv(std::move(argv))
+    , parent(ca)
+    , appname(appname)
+    , pos_arg_sep(false)
+    , usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(
   CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc)
-    : argv(std::move(argv)), parent(ca), appname(appname), descr(desc),
-      pos_arg_sep(false), usage_line(appname + " [options]") {}
+    : argv(std::move(argv))
+    , parent(ca)
+    , appname(appname)
+    , descr(desc)
+    , pos_arg_sep(false)
+    , usage_line(appname + " [options]") {}
 
 CheckArgPrivate::CheckArgPrivate(
   CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc,
   const string &appendix)
-    : argv(std::move(argv)), parent(ca), appname(appname), descr(desc),
-      appendix(appendix), pos_arg_sep(false), usage_line(appname + " [options]") {}
+    : argv(std::move(argv))
+    , parent(ca)
+    , appname(appname)
+    , descr(desc)
+    , appendix(appendix)
+    , pos_arg_sep(false)
+    , usage_line(appname + " [options]") {}
 
 /**
  * \brief set help's text for positional arguments
@@ -817,9 +841,9 @@ checkarg::str_to_upper(const string &src) {
 
 
 #if CA_PRINTERR
-#  if not HAS_VASPRINTF
+#if not HAS_VASPRINTF
 
-#    include <cstring>
+#include <cstring>
 int
 vasprintf(char **strp, const char *format, va_list ap) {
   int count;
@@ -844,5 +868,5 @@ vasprintf(char **strp, const char *format, va_list ap) {
   return vsprintf(*strp, format, ap);
 }
 
-#  endif
+#endif
 #endif

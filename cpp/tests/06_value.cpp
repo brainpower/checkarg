@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2021-2022 brainpower <brainpower at mailbox dot org>
 #include "test.hpp"
 
 
@@ -23,7 +25,7 @@ TEST_CASE("options: short value", "[opt-val]") {
   string cb_value;
 
   CheckArg ca(argv, "test06");
-  ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
+  ca.add('a', "alpha", "value opt a", CA_VT_REQUIRED);
   ca.add(
     'b', "beta",
     [&](auto, auto &o, auto &v) -> int {
@@ -31,8 +33,8 @@ TEST_CASE("options: short value", "[opt-val]") {
       cb_value  = v;
       return 0;
     },
-    "non-value opt b", CA_VT_REQUIRED);
-  ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
+    "value opt b", CA_VT_REQUIRED);
+  ca.add("gamma", "value long opt gamma", CA_VT_REQUIRED);
   ca.add(
     "delta",
     [&](auto, auto &o, auto &v) -> int {
@@ -40,8 +42,8 @@ TEST_CASE("options: short value", "[opt-val]") {
       cb_value  = v;
       return 0;
     },
-    "non-value long opt delta", CA_VT_REQUIRED);
-  ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
+    "value long opt delta", CA_VT_REQUIRED);
+  ca.add('e', "epsilon", "value opt e", CA_VT_REQUIRED);
 
   int rc = ca.parse();
 

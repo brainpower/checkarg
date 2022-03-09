@@ -1,0 +1,91 @@
+---
+BasedOnStyle: WebKit
+AccessModifierOffset: -2
+AlignAfterOpenBracket: AlwaysBreak
+# use as soon as I have clang-format 14.x
+#AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Left
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignOperands:   AlignAfterOperator
+AlignTrailingComments: true
+
+AllowAllArgumentsOnNextLine: false
+AllowAllConstructorInitializersOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+
+AlwaysBreakAfterReturnType: TopLevelDefinitions
+
+AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakTemplateDeclarations: Yes
+
+BraceWrapping:
+  AfterCaseLabel:  false
+  AfterClass:      false
+  AfterControlStatement: Never
+  AfterEnum:       false
+  AfterFunction:   false
+  AfterNamespace:  false
+  AfterObjCDeclaration: false
+  AfterStruct:     false
+  AfterUnion:      false
+  AfterExternBlock: false
+  BeforeCatch:     true
+  BeforeElse:      true
+  BeforeLambdaBody: false
+  BeforeWhile:     true # maybe
+  IndentBraces:    false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Custom
+
+ColumnLimit:     88 # python's black uses this
+
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 2
+
+Cpp11BracedListStyle: true
+
+DeriveLineEnding: false
+
+FixNamespaceComments: true
+
+IncludeCategories:
+  - Regex:           '<[[:alnum:].]+>'
+    Priority:        2
+  - Regex:           '.*'
+    Priority:        1
+    SortPriority:    0
+IncludeIsMainRegex: '(_private|Private)?$'
+
+IndentWidth:     2
+
+JavaScriptQuotes: Single # ESLint usually wants Single ones
+
+MaxEmptyLinesToKeep: 2 # I like to have function definitions 2 lines apart like in python
+
+NamespaceIndentation: None
+
+PointerAlignment: Right
+
+SpaceAfterTemplateKeyword: false
+
+SpaceBeforeCpp11BracedList: false
+
+SpaceInEmptyBlock: false
+SpacesBeforeTrailingComments: 2 # like PEP8
+
+SpacesInContainerLiterals: false
+
+TabWidth:        2
+---
+Language: Cpp
+Standard: Latest
+...
