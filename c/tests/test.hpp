@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2021-2022 brainpower <brainpower at mailbox dot org>
+
 extern "C" {
 #include "checkarg.h"
 }
@@ -28,4 +31,3 @@ using std::unique_ptr;
 using std::vector;
 
 typedef std::unique_ptr<CheckArg, decltype(&checkarg_free)> CheckArgUPtr;
-

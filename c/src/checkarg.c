@@ -1,33 +1,14 @@
-/*
- * Copyright (c) 2013-2018 brainpower <brainpower at mailbox dot org>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2013-2022 brainpower <brainpower at mailbox dot org>
 
 #include "checkarg_private.h"
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 const char *errors[] = {
   /*CA_ALLOK    */ "Everything is fine",
@@ -372,7 +353,7 @@ checkarg_autohelp(CheckArg *ca) {
       /* -1 for the '=' */
       int tmp = space - strlen(it->lopt) - strlen(it->value_name) - 1;
       pnum    = snprintf(
-        cur, msglen, " --%s=%s%*s%s\n", it->lopt, it->value_name, tmp, "", it->help);
+           cur, msglen, " --%s=%s%*s%s\n", it->lopt, it->value_name, tmp, "", it->help);
     }
     else {
       pnum = snprintf(
@@ -453,7 +434,8 @@ opt_new(
     if (*value_name) {
       opt->value_name = strdup(value_name);
       if (!opt->value_name) goto clean;
-    } else {
+    }
+    else {
       opt->value_name = strdup(lopt);
       string_toupper(opt->value_name);
     }

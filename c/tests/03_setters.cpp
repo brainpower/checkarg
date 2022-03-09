@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2021-2022 brainpower <brainpower at mailbox dot org>
+
 #include "test.hpp"
 
 TEST_CASE("setters: positional argument help", "setters") {
