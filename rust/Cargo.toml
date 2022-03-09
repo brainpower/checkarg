@@ -1,0 +1,11 @@
+[package]
+name = "checkarg"
+version = "1.2.0"
+authors = ["brainpower <brainpower@mailbox.org>"]
+edition = "2021"
+
+[dependencies]
+
+[dev-dependencies]
+itertools = "^0.10"
+lazy_static = ">0"
