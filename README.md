@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/brainpower/checkarg.svg?branch=master)](https://travis-ci.org/brainpower/checkarg)
-
 CheckArg<br>
 is a lightweight and easy to use command line parser.
 

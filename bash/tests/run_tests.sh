@@ -1,20 +1,16 @@
 #!/bin/bash
-script_dir="$(dirname $(readlink -f "${0}"))"
+script_dir="$(dirname "$(readlink -f "${0}")")"
 
-compile_sources(){
-  compile_$type
+SHELL=${SHELL:-bash}
+printf "Running tests using: %s\n\n" "$SHELL"
+
+
+ok(){
+  printf "\033[39;1m[ \033[32;1m ok \033[39;1m ]\033[0m\n"
 }
 
-compile_cpp(){
-  g++ -std=gnu++11 "${sources[@]}" -o $name
-}
-compile_c(){
-  gcc -std=gnu11 "${sources[@]}" -o $name
-}
-
-clean(){
-  rm -f *.o
-  rm -f "$name"
+fail(){
+  printf "\033[39;1m[ \033[31;1mfail\033[39;1m ]\033[0m\n"
 }
 
 test_rc(){
@@ -22,14 +18,14 @@ test_rc(){
   local expect="$2"
   shift 2;
 
-  printf "   - Running test: ${tname}... "
-  ./$name "$@" >/dev/null ; ret=$?
+  printf "   - Running test: %s... " "${tname}"
+  $SHELL "$name" "$@" >/dev/null ; ret=$?
 
-  if [[ $expect == $ret ]]; then
-    printf "[ ok ]\n"
+  if [[ $expect == "$ret" ]]; then
+    ok
   else
-    printf "[ failed ]\n"
-    printf "Expected: $expect - Got: $ret\n"
+    fail
+    printf "Expected: %s - Got: %s\n" "$expect" "$ret"
   fi
 
 }
@@ -40,15 +36,15 @@ test_stdout(){
   shift 2
   local tmpout="${name}.${tname// /_}.out"
 
-  printf "   - Running test: ${tname}... "
-  ./$name "$@" > "$tmpout"
+  printf "   - Running test: %s... " "${tname}"
+  $SHELL "$name" "$@" > "$tmpout"
 
   # --strip-trailing-cr fixes test run on windows,
   # while only skipping \r not all whitespace like -w would
-  if diff -Nru --strip-trailing-cr $expect "$tmpout"; then
-    printf "[ ok ]\n"
+  if diff -Nru --strip-trailing-cr "$expect" "$tmpout"; then
+    ok
   else
-    printf "[ failed ]\n"
+    fail
   fi
   rm -f "$tmpout"
 }
@@ -59,23 +55,24 @@ test_stdout_str(){
   shift 2
   local tmpout="${name}.${tname// /_}.out"
 
-  printf "   - Running test: ${tname}... "
-	tmpout="$(./$name "$@")"
+  printf "   - Running test: %s... " "${tname}"
+	tmpout="$($SHELL "$name" "$@")"
 
   if [[ "$expect" == "$tmpout" ]]; then
-    printf "[ ok ]\n"
+    ok
   else
-    printf "[ failed ]\n"
+    fail
   	echo "Exp: '$expect'"
   	echo "Got: '$tmpout'"
   fi
 }
 
-cd "${script_dir}"
+cd "${script_dir}" || exit 1
 for test in *.bpt; do
     (
+    # shellcheck source=test01.bpt
     . ./"$test"
-    printf "\n * Running test set ${name}...\n"
+    printf "\n * Running test set %s...\n" "${name}"
     prepare || exit 1
     run
     clean

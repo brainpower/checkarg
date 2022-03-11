@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_dir="$(dirname $(readlink -f "${0}"))"
+script_dir="$(dirname "$(readlink -f "${0}")")"
 source "${script_dir}/../checkarg.sh"
 
 checkarg_init "test02"
@@ -17,7 +17,13 @@ ret="$?"
 
 if [[ $ret == 0 ]]; then
 	if checkarg_isset "test"; then
-		if [[ "${checkarg_pos_args[0]}" == "$(checkarg_value "test")" ]]; then
+		if [[ -v ZSH_VERSION ]]; then
+			first_pos_arg="${checkarg_pos_args[1]}"
+		else
+			first_pos_arg="${checkarg_pos_args[0]}"
+		fi
+
+		if [[ "${first_pos_arg}" == "$(checkarg_value "test")" ]]; then
 			exit 0
 		else
 			exit 99

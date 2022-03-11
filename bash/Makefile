@@ -19,5 +19,6 @@ install: all
 clean:
 	true
 
-check: tests/run_tests.sh
-	tests/run_tests.sh
+test: tests/run_tests.sh
+	bash tests/run_tests.sh
+	zsh tests/run_tests.sh
