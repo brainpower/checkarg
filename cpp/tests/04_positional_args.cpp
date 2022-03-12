@@ -7,10 +7,10 @@ TEST_CASE("positional args: general usage", "[positional]") {
     "/test04", "-i", "input.bin", "--", "file1", "file2",
   };
 
-  CheckArg ca(argv, "test04");
+  CheckArg ca("test04");
   ca.add('i', "input", "file to read from", CA_VT_REQUIRED);
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   CHECK(ret == CA_ALLOK);
 
@@ -29,10 +29,10 @@ TEST_CASE("positional args: args with dashes", "[positional]") {
 
   const vector<string> argv = {"/test04", "-i", "input.bin", "--", arg1, arg2, arg3};
 
-  CheckArg ca(argv, "test04");
+  CheckArg ca("test04");
   ca.add('i', "input", "file to read from", CA_VT_REQUIRED);
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   CHECK(ret == CA_ALLOK);
 
@@ -53,11 +53,11 @@ TEST_CASE("positional args: missing value before '--'", "[positional]") {
     "/test04", "-i", "--", "file1", "-j", "file2",
   };
 
-  CheckArg ca(argv, "test04");
+  CheckArg ca("test04");
   ca.add('i', "input", "file to read from", CA_VT_REQUIRED);
   ca.add('j', "jay", "just a jay", CA_VT_NONE);
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   // CHECK(ret == CA_MISSVAL); // should it be this?
   // REQUIRE(!ca.isset("jay"));

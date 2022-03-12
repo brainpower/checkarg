@@ -42,25 +42,14 @@ class CheckArg {
 
 public:
   // c'tors
-  CheckArg(const int argc, char **argv, const std::string &appname);
+  CheckArg(const std::string &appname);
+  CheckArg(const std::string &appname, const std::string &desc);
   CheckArg(
-    const int argc, char **argv, const std::string &appname, const std::string &desc);
-  CheckArg(
-    const int argc, char **argv, const std::string &appname, const std::string &desc,
-    const std::string &appendix);
-
-  CheckArg(const std::vector<std::string> &argv, const std::string &appname);
-  CheckArg(
-    const std::vector<std::string> &argv, const std::string &appname,
-    const std::string &desc);
-  CheckArg(
-    const std::vector<std::string> &argv, const std::string &appname,
-    const std::string &desc, const std::string &appendix);
+    const std::string &appname, const std::string &desc, const std::string &appendix);
 
 #ifdef HAS_STD_FILESYSTEM
   // these try to autodetect `appname` from basename(argv[0])
-  CheckArg(const int argc, char **argv);
-  explicit CheckArg(const std::vector<std::string> &argv);
+  CheckArg();
 #endif
 
   // default destructor needed for unique_ptr on incomplete CheckArgPrivate
@@ -74,14 +63,13 @@ public:
     const char sopt, const std::string &lopt, const std::string &help,
     const CAValueType value_type, const std::string &value_name);
   int add(
-    const char sopt, const std::string &lopt,
+    const char sopt, const std::string &lopt, const std::string &help,
     std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
-    const std::string &help, const CAValueType value_type = CA_VT_NONE);
+    const CAValueType value_type = CA_VT_NONE);
   int add(
-    const char sopt, const std::string &lopt,
+    const char sopt, const std::string &lopt, const std::string &help,
     std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
-    const std::string &help, const CAValueType value_type,
-    const std::string &value_name);
+    const CAValueType value_type, const std::string &value_name);
   int add(
     const std::string &lopt, const std::string &help,
     const CAValueType value_type = CA_VT_NONE);
@@ -89,19 +77,20 @@ public:
     const std::string &lopt, const std::string &help, const CAValueType value_type,
     const std::string &value_name);
   int add(
-    const std::string &lopt,
+    const std::string &lopt, const std::string &help,
     std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
-    const std::string &help, const CAValueType value_type = CA_VT_NONE);
+    const CAValueType value_type = CA_VT_NONE);
   int add(
-    const std::string &lopt,
+    const std::string &lopt, const std::string &help,
     std::function<int(CheckArg *const, const std::string &, const std::string &)> cb,
-    const std::string &help, const CAValueType value_type,
-    const std::string &value_name);
+    const CAValueType value_type, const std::string &value_name);
 
   int add_autohelp();
 
   // do parse!
-  int parse();
+  void reset();
+  int parse(const int argc, char **argv);
+  int parse(const std::vector<std::string> &argv);
 
   // set some autohelp strings
   void set_posarg_help(const std::string &usage, const std::string &descr);
@@ -109,6 +98,7 @@ public:
 
   // getters
   std::string argv0();
+  std::string callname();
   std::vector<std::string> pos_args() const;
   std::string value(const std::string &arg) const;
   std::string autohelp();

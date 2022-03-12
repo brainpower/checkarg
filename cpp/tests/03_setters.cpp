@@ -7,7 +7,7 @@ TEST_CASE("setters: positional argument help", "setters") {
     "/test02",
   };
 
-  CheckArg ca(argv, "test02");
+  CheckArg ca("test02");
 
   ca.add_autohelp();
   ca.add('i', "input", "file to read from", CA_VT_REQUIRED);
@@ -15,7 +15,7 @@ TEST_CASE("setters: positional argument help", "setters") {
 
   ca.set_posarg_help("[files...]", "one or more output files");
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   CHECK(ret == CA_ALLOK);
   REQUIRE(ca.usage() == "Usage: test02 [options] [files...]");
@@ -37,7 +37,7 @@ TEST_CASE("setters: override usage line", "setters") {
     "/test02",
   };
 
-  CheckArg ca(argv, "test02");
+  CheckArg ca("test02");
 
   ca.add_autohelp();
   ca.add('i', "input", "file to read from", CA_VT_REQUIRED);
@@ -45,7 +45,7 @@ TEST_CASE("setters: override usage line", "setters") {
 
   ca.set_usage_line("this is a really stupid usage line");
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   CHECK(ret == CA_ALLOK);
   REQUIRE(ca.usage() == "Usage: this is a really stupid usage line");

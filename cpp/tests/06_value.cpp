@@ -24,28 +24,28 @@ TEST_CASE("options: short value", "[opt-val]") {
   string cb_option;
   string cb_value;
 
-  CheckArg ca(argv, "test06");
+  CheckArg ca("test06");
   ca.add('a', "alpha", "value opt a", CA_VT_REQUIRED);
   ca.add(
-    'b', "beta",
+    'b', "beta", "value opt b",
     [&](auto, auto &o, auto &v) -> int {
       cb_option = o;
       cb_value  = v;
       return 0;
     },
-    "value opt b", CA_VT_REQUIRED);
+    CA_VT_REQUIRED);
   ca.add("gamma", "value long opt gamma", CA_VT_REQUIRED);
   ca.add(
-    "delta",
+    "delta", "value long opt delta",
     [&](auto, auto &o, auto &v) -> int {
       cb_option = o;
       cb_value  = v;
       return 0;
     },
-    "value long opt delta", CA_VT_REQUIRED);
+    CA_VT_REQUIRED);
   ca.add('e', "epsilon", "value opt e", CA_VT_REQUIRED);
 
-  int rc = ca.parse();
+  int rc = ca.parse(argv);
 
   CHECK(CA_ALLOK == rc);
 
@@ -83,28 +83,28 @@ TEST_CASE("options: long value", "[opt-val]") {
   string cb_option;
   string cb_value;
 
-  CheckArg ca(argv, "test06");
+  CheckArg ca("test06");
   ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
   ca.add(
-    'b', "beta",
+    'b', "beta", "non-value opt b",
     [&](auto, auto &o, auto &v) -> int {
       cb_option = o;
       cb_value  = v;
       return 0;
     },
-    "non-value opt b", CA_VT_REQUIRED);
+    CA_VT_REQUIRED);
   ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
   ca.add(
-    "delta",
+    "delta", "non-value long opt delta",
     [&](auto, auto &o, auto &v) -> int {
       cb_option = o;
       cb_value  = v;
       return 0;
     },
-    "non-value long opt delta", CA_VT_REQUIRED);
+    CA_VT_REQUIRED);
   ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
 
-  int rc = ca.parse();
+  int rc = ca.parse(argv);
 
   CHECK(CA_ALLOK == rc);
 
@@ -126,18 +126,18 @@ TEST_CASE("options: missing value", "[opt-val]") {
     option,
   };
 
-  CheckArg ca(argv, "test06");
+  CheckArg ca("test06");
   ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
   ca.add(
-    'b', "beta", [&](auto, auto &o, auto &v) -> int { return 0; }, "non-value opt b",
+    'b', "beta", "non-value opt b", [&](auto, auto &o, auto &v) -> int { return 0; },
     CA_VT_REQUIRED);
   ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
   ca.add(
-    "delta", [&](auto, auto &o, auto &v) -> int { return 0; },
-    "non-value long opt delta", CA_VT_REQUIRED);
+    "delta", "non-value long opt delta",
+    [&](auto, auto &o, auto &v) -> int { return 0; }, CA_VT_REQUIRED);
   ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
 
-  int rc = ca.parse();
+  int rc = ca.parse(argv);
 
   REQUIRE(CA_MISSVAL == rc);
 }
@@ -161,18 +161,18 @@ TEST_CASE("options: empty value", "[opt-val]") {
     };
   }
 
-  CheckArg ca(argv, "test06");
+  CheckArg ca("test06");
   ca.add('a', "alpha", "non-value opt a", CA_VT_REQUIRED);
   ca.add(
-    'b', "beta", [&](auto, auto &o, auto &v) -> int { return 0; }, "non-value opt b",
+    'b', "beta", "non-value opt b", [&](auto, auto &o, auto &v) -> int { return 0; },
     CA_VT_REQUIRED);
   ca.add("gamma", "non-value long opt gamma", CA_VT_REQUIRED);
   ca.add(
-    "delta", [&](auto, auto &o, auto &v) -> int { return 0; },
-    "non-value long opt delta", CA_VT_REQUIRED);
+    "delta", "non-value long opt delta",
+    [&](auto, auto &o, auto &v) -> int { return 0; }, CA_VT_REQUIRED);
   ca.add('e', "epsilon", "non-value opt e", CA_VT_REQUIRED);
 
-  int rc = ca.parse();
+  int rc = ca.parse(argv);
 
   INFO("option was:" << argv[1]);
   REQUIRE(CA_ALLOK == rc);  // an empty string as value should not trigger a CA_MISSVAL
@@ -209,10 +209,10 @@ TEST_CASE("options: special values", "[opt-val]") {
     };
   }
 
-  CheckArg ca(argv, "test06");
+  CheckArg ca("test06");
   ca.add('i', "input", "input file", CA_VT_REQUIRED);
 
-  int rc = ca.parse();
+  int rc = ca.parse(argv);
 
   CHECK(CA_ALLOK == rc);
 

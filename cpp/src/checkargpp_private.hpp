@@ -22,25 +22,12 @@ struct Opt {
 
 class CheckArgPrivate {
 private:
+  CheckArgPrivate(CheckArg *const ca, const std::string &appname);
   CheckArgPrivate(
-    CheckArg *const ca, const std::vector<std::string> &argv,
-    const std::string &appname);
+    CheckArg *const ca, const std::string &appname, const std::string &desc);
   CheckArgPrivate(
-    CheckArg *const ca, const std::vector<std::string> &argv,
-    const std::string &appname, const std::string &desc);
-  CheckArgPrivate(
-    CheckArg *const ca, const std::vector<std::string> &argv,
-    const std::string &appname, const std::string &desc, const std::string &appendix);
-
-  CheckArgPrivate(
-    CheckArg *const ca, std::vector<std::string> &&argv, const std::string &appname);
-  CheckArgPrivate(
-    CheckArg *const ca, std::vector<std::string> &&argv, const std::string &appname,
-    const std::string &desc);
-  CheckArgPrivate(
-    CheckArg *const ca, std::vector<std::string> &&argv, const std::string &appname,
-    const std::string &desc, const std::string &appendix);
-
+    CheckArg *const ca, const std::string &appname, const std::string &desc,
+    const std::string &appendix);
 
   int arg(const std::string &arg);
   int arg_long(const std::string &arg);
@@ -58,15 +45,16 @@ private:
 
   std::vector<std::string> pos_args;
 
-  const std::vector<std::string> argv;
   CheckArg *const parent;
 
   std::string appname;
   std::string descr;
   std::string appendix;
-  bool pos_arg_sep;
+  bool pos_arg_sep = false;
+  bool cleared     = true;
   std::string usage_line;
   std::string posarg_help_descr, posarg_help_usage;
+  std::string callname;
   // std::string _argv0;
 
   // state

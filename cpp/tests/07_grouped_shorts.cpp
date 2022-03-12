@@ -19,17 +19,17 @@ TEST_CASE("grouped short options", "[grouped]") {
       std::move_iterator(options.end()));
   }  // destroy options here, it's elements are "moved from"
 
-  CheckArg ca(argv, "test07");
+  CheckArg ca("test07");
   ca.add('a', "alpha", "opt a");
   ca.add(
-    'b', "beta", [](auto, const auto &, const auto &) -> int { return 0; }, "opt b");
+    'b', "beta", "opt b", [](auto, const auto &, const auto &) -> int { return 0; });
   ca.add('c', "gamma", "opt gamma");
-  ca.add(
-    'd', "delta", [](auto, const auto &, const auto &) -> int { return 0; },
-    "opt delta");
+  ca.add('d', "delta", "opt delta", [](auto, const auto &, const auto &) -> int {
+    return 0;
+  });
   ca.add('e', "epsy", "opt e");
 
-  int rc = ca.parse();
+  int rc = ca.parse(argv);
 
   INFO("argv:" << argv);
   CHECK(rc == CA_ALLOK);

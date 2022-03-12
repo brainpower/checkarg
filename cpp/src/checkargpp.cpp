@@ -109,74 +109,30 @@ map<int, string> CheckArgPrivate::errors = {
 
 /**
  * \brief constructs a CheckArg object
- * \param argc the number of arguments, you'll want to pass argc gotten from main()
- * \param argv the list of arguments, you'll want to pass argv from main()
  * \param appname the name of your application, will be used in the usage-line
  */
-CheckArg::CheckArg(const int argc, char **argv, const string &appname)
-    : p(new CheckArgPrivate(this, vector<string>(argv, argv + argc), appname)) {}
+CheckArg::CheckArg(const string &appname)
+    : p(new CheckArgPrivate(this, appname)) {}
 /**
  * \brief constructs a CheckArg object
- * \param argc the number of arguments, you'll want to pass argc gotten from main()
- * \param argv the list of arguments, you'll want to pass argv from main()
  * \param appname the name of your application, will be used in the usage-line
  * \param desc description of your programm, used in help
  */
-CheckArg::CheckArg(
-  const int argc, char **argv, const string &appname, const string &desc)
-    : p(new CheckArgPrivate(this, vector<string>(argv, argv + argc), appname, desc)) {}
+CheckArg::CheckArg(const string &appname, const string &desc)
+    : p(new CheckArgPrivate(this, appname, desc)) {}
 /**
  * \brief constructs a CheckArg object
- * \param argc the number of arguments, you'll want to pass argc gotten from main()
- * \param argv the list of arguments, you'll want to pass argv from main()
  * \param appname the name of your application, will be used in the usage-line
  * \param desc description of your programm, used in help
  * \param appendix text which will be added at the end of help
  */
-CheckArg::CheckArg(
-  const int argc, char **argv, const string &appname, const string &desc,
-  const string &appendix)
-    : p(new CheckArgPrivate(
-      this, vector<string>(argv, argv + argc), appname, desc, appendix)) {}
+CheckArg::CheckArg(const string &appname, const string &desc, const string &appendix)
+    : p(new CheckArgPrivate(this, appname, desc, appendix)) {}
 
-/**
- * \brief constructs a CheckArg object
- * \param argc the number of arguments, you'll want to pass argc gotten from main()
- * \param argv the list of arguments, you'll want to pass argv from main()
- * \param appname the name of your application, will be used in the usage-line
- */
-CheckArg::CheckArg(const vector<string> &argv, const string &appname)
-    : p(new CheckArgPrivate(this, argv, appname)) {}
-/**
- * \brief constructs a CheckArg object
- * \param argc the number of arguments, you'll want to pass argc gotten from main()
- * \param argv the list of arguments, you'll want to pass argv from main()
- * \param appname the name of your application, will be used in the usage-line
- * \param desc description of your programm, used in help
- */
-CheckArg::CheckArg(
-  const vector<string> &argv, const string &appname, const string &desc)
-    : p(new CheckArgPrivate(this, argv, appname, desc)) {}
-/**
- * \brief constructs a CheckArg object
- * \param argc the number of arguments, you'll want to pass argc gotten from main()
- * \param argv the list of arguments, you'll want to pass argv from main()
- * \param appname the name of your application, will be used in the usage-line
- * \param desc description of your programm, used in help
- * \param appendix text which will be added at the end of help
- */
-CheckArg::CheckArg(
-  const vector<string> &argv, const string &appname, const string &desc,
-  const string &appendix)
-    : p(new CheckArgPrivate(this, argv, appname, desc, appendix)) {}
 
 #ifdef HAS_STD_FILESYSTEM
-CheckArg::CheckArg(const vector<string> &argv)
-    : p(new CheckArgPrivate(this, argv, fs::path(argv[0]).filename())) {}
-
-CheckArg::CheckArg(const int argc, char **argv)
-    : p(new CheckArgPrivate(
-      this, vector<string>(argv, argv + argc), fs::path(argv[0]).filename())) {}
+CheckArg::CheckArg()
+    : p(new CheckArgPrivate(this, std::string{})) {}
 #endif
 
 
@@ -184,62 +140,31 @@ CheckArg::~CheckArg() = default;
 
 
 // private c'tors
-CheckArgPrivate::CheckArgPrivate(
-  CheckArg *const ca, const vector<string> &argv, const string &appname)
-    : argv(argv)
-    , parent(ca)
+CheckArgPrivate::CheckArgPrivate(CheckArg *const ca, const string &appname)
+    : parent(ca)
     , appname(appname)
-    , pos_arg_sep(false)
-    , usage_line(appname + " [options]") {}
+    , pos_arg_sep(false) {
+  if (!appname.empty()) usage_line = appname + " [options]";
+}
 
 CheckArgPrivate::CheckArgPrivate(
-  CheckArg *const ca, const vector<string> &argv, const string &appname,
-  const string &desc)
-    : argv(argv)
-    , parent(ca)
+  CheckArg *const ca, const string &appname, const string &desc)
+    : parent(ca)
     , appname(appname)
     , descr(desc)
-    , pos_arg_sep(false)
-    , usage_line(appname + " [options]") {}
+    , pos_arg_sep(false) {
+  if (!appname.empty()) usage_line = appname + " [options]";
+}
 
 CheckArgPrivate::CheckArgPrivate(
-  CheckArg *const ca, const vector<string> &argv, const string &appname,
-  const string &desc, const string &appendix)
-    : argv(argv)
-    , parent(ca)
+  CheckArg *const ca, const string &appname, const string &desc, const string &appendix)
+    : parent(ca)
     , appname(appname)
     , descr(desc)
     , appendix(appendix)
-    , pos_arg_sep(false)
-    , usage_line(appname + " [options]") {}
-
-CheckArgPrivate::CheckArgPrivate(
-  CheckArg *const ca, vector<string> &&argv, const string &appname)
-    : argv(std::move(argv))
-    , parent(ca)
-    , appname(appname)
-    , pos_arg_sep(false)
-    , usage_line(appname + " [options]") {}
-
-CheckArgPrivate::CheckArgPrivate(
-  CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc)
-    : argv(std::move(argv))
-    , parent(ca)
-    , appname(appname)
-    , descr(desc)
-    , pos_arg_sep(false)
-    , usage_line(appname + " [options]") {}
-
-CheckArgPrivate::CheckArgPrivate(
-  CheckArg *const ca, vector<string> &&argv, const string &appname, const string &desc,
-  const string &appendix)
-    : argv(std::move(argv))
-    , parent(ca)
-    , appname(appname)
-    , descr(desc)
-    , appendix(appendix)
-    , pos_arg_sep(false)
-    , usage_line(appname + " [options]") {}
+    , pos_arg_sep(false) {
+  if (!appname.empty()) usage_line = appname + " [options]";
+}
 
 /**
  * \brief set help's text for positional arguments
@@ -264,12 +189,23 @@ CheckArg::set_usage_line(const string &str) {
 
 
 /**
- * \brief get argv[0], the programms "name"
+ * \brief get argv[0], the programms "callname"
+ * \return argv[0]
+ * \deprecated use CheckArg::callname() instead
+ * \see CheckArg::callname
+ */
+[[deprecated("use CheckArg::callname() instead.")]] string
+CheckArg::argv0() {
+  return p->callname;
+}
+
+/**
+ * \brief get argv[0], the programms "callname"
  * \return argv[0]
  */
 string
-CheckArg::argv0() {
-  return p->argv[0];
+CheckArg::callname() {
+  return p->callname;
 }
 
 /**
@@ -380,9 +316,9 @@ CheckArg::add(
  */
 int
 CheckArg::add(
-  const char sopt, const string &lopt,
+  const char sopt, const string &lopt, const string &help,
   std::function<int(CheckArg *const, const string &, const string &)> cb,
-  const string &help, const CAValueType value_type) {
+  const CAValueType value_type) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
@@ -405,9 +341,9 @@ CheckArg::add(
  */
 int
 CheckArg::add(
-  const char sopt, const string &lopt,
+  const char sopt, const string &lopt, const string &help,
   std::function<int(CheckArg *const, const string &, const string &)> cb,
-  const string &help, const CAValueType value_type, const string &value_name) {
+  const CAValueType value_type, const string &value_name) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .sopt       = sopt,
@@ -475,9 +411,9 @@ CheckArg::add(
  */
 int
 CheckArg::add(
-  const string &lopt,
+  const string &lopt, const string &help,
   std::function<int(CheckArg *const, const string &, const string &)> cb,
-  const string &help, const CAValueType value_type) {
+  const CAValueType value_type) {
   p->valid_args[lopt] = {.value_type = value_type, .cb = cb, .help = help};
 
   return CA_ALLOK;
@@ -494,9 +430,9 @@ CheckArg::add(
  */
 int
 CheckArg::add(
-  const string &lopt,
+  const string &lopt, const string &help,
   std::function<int(CheckArg *const, const string &, const string &)> cb,
-  const string &help, const CAValueType value_type, const string &value_name) {
+  const CAValueType value_type, const string &value_name) {
   p->valid_args[lopt] = {
     .value_type = value_type,
     .cb         = cb,
@@ -528,40 +464,78 @@ CheckArg::add_autohelp() {
 }
 
 /**
+ * \brief reset internal state after a parse
+ * this is automatically called by Checkarg::parse() if you call it twice
+ */
+void
+CheckArg::reset() {
+  // clear and reset positional args in case of reuse / a second parse
+  p->pos_arg_sep = false;
+  p->pos_args.clear();
+  // clear this in case it was set last time
+  p->next_is_val_of.clear();
+
+  // clear values and isset-state
+  for (auto &opt : p->valid_args) { opt.second.value.clear(); }
+
+  p->cleared = true;
+}
+
+/**
  * \brief parse the commnd line
  * this should be called after all add()s and add_autohelp()
+ * \param argc the number of arguments, you'll want to pass argc gotten from main()
+ * \param argv the list of arguments, you'll want to pass argv from main()
  * \return CA_ALLOK on success, some other code from CAError otherwise
  * \see CAError
  */
 int
-CheckArg::parse() {
-  // FIXME: give args here? but then CA would have to return a ParsedArgs object or
-  // something?
+CheckArg::parse(int argc, char **argv) {
+  if (argv == nullptr) {
+    return p->ca_error(CA_ERROR, ": argv must have at least one element!");
+  }
+  return parse(vector<string>(argv, argv + argc));
+}
+
+/**
+ * \brief parse the commnd line
+ * this should be called after all add()s and add_autohelp()
+ * \param argv the vector of arguments, you'll want to pass argv from main()
+ * \return CA_ALLOK on success, some other code from CAError otherwise
+ * \see CAError
+ */
+int
+CheckArg::parse(const vector<string> &argv) {
+  // FIXME: return a ParsedArgs object or something?
   int ret = CA_ALLOK;
-  // for(auto &arg : p->argv | std::views::drop(1)) { // start with 1 here, because
-  // argv[0] is special
-  auto end = p->argv.cend();
-  for (auto arg = p->argv.cbegin() + 1; arg != end; ++arg) {
+
+  if (argv.size() == 0) {
+    return p->ca_error(CA_ERROR, ": argv must have at least one element!");
+  }
+
+  if (!p->cleared) reset();
+  p->cleared = false;  // we'll soon have state again
+
+  p->callname = argv[0];
+
+#ifdef HAS_STD_FILESYSTEM
+  if (p->appname.empty()) {
+    p->appname = fs::path(p->callname).filename();
+    if (p->usage_line.empty()) p->usage_line = p->appname + " [options]";
+  }
+#endif
+
+  // for(auto &arg : p->argv | std::views::drop(1)) {
+  // start with 1 here, because argv[0] is special
+  auto end = argv.cend();
+  for (auto arg = argv.cbegin() + 1; arg != end; ++arg) {
     ret = p->arg(*arg);
     if (ret != CA_ALLOK) goto error;
   }
   if (!p->next_is_val_of.empty()) {
-    return p->ca_error(CA_MISSVAL, ": %s! %s", p->argv.back().c_str());
+    return p->ca_error(CA_MISSVAL, ": %s!", argv.back().c_str());
   }
 
-  // free strings not necessary anymore, e.g. those for '--help'
-  /* // show_help() prevents that now, as it could be called any time
-   * // if you want to minimize memory, destroy the whole CheckArg object after use.
-  p->appname.clear();
-  p->appendix.clear();
-  p->usage_line.clear();
-  p->descr.clear();
-  p->posarg_help_descr.clear();
-  p->posarg_help_usage.clear();
-  p->next_is_val_of.clear();
-  for( auto arg : p->valid_args)
-    arg.second.help.clear();
-  */
 error:
   return ret;
 }
@@ -575,7 +549,6 @@ error:
  */
 string
 CheckArg::value(const string &arg) const {
-
   auto pos = p->valid_args.find(arg);
   if (pos != p->valid_args.end()) { return pos->second.value; }
   return "";
@@ -646,9 +619,7 @@ CheckArg::autohelp() {
 
   space += 2;  // add 2 more spaces
 
-  ss << "Usage: " << p->usage_line;
-  if (!p->posarg_help_usage.empty()) ss << " " << p->posarg_help_usage;
-  ss << endl;
+  ss << usage() << "\n";
 
   if (!p->descr.empty()) ss << endl << p->descr << endl;
 

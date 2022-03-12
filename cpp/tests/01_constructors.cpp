@@ -9,9 +9,9 @@ TEST_CASE("constructor: simple", "[constructor]") {
     NULL,
   };
 
-  CheckArg ca(argc, (char **)argv, "name");
+  CheckArg ca("name");
 
-  auto ret = ca.parse();
+  auto ret = ca.parse(argc, (char **)argv);
   REQUIRE(ret == CA_ALLOK);
 
 
@@ -33,9 +33,9 @@ TEST_CASE("constructor: simple (vector)", "[constructor]") {
     "/usr/bin/name",
   };
 
-  CheckArg ca(argv, "name");
+  CheckArg ca("name");
 
-  auto ret = ca.parse();
+  auto ret = ca.parse(argv);
   REQUIRE(ret == CA_ALLOK);
 
   SECTION("call name") {
@@ -57,9 +57,9 @@ TEST_CASE("constructor: app name autodetect", "[constructor]") {
     "/usr/bin/name",
   };
 
-  CheckArg ca(argv);
+  CheckArg ca;
 
-  auto ret = ca.parse();
+  auto ret = ca.parse(argv);
   REQUIRE(ret == CA_ALLOK);
 
   SECTION("call name") {

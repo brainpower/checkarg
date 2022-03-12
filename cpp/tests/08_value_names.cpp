@@ -9,7 +9,7 @@ TEST_CASE("variable names", "[val-names]") {
 
   };
 
-  CheckArg ca(argv, "test08");
+  CheckArg ca("test08");
 
   ca.add_autohelp();
   ca.add('z', "ag", "auto-generated name", CA_VT_REQUIRED, "");
@@ -19,13 +19,13 @@ TEST_CASE("variable names", "[val-names]") {
   ca.add("beta", "beta option", CA_VT_REQUIRED, "B");
 
   ca.add(
-    'c', "gamma", [](auto, const auto &, const auto &) -> int { return 0; },
-    "gamma option", CA_VT_REQUIRED, "C");
+    'c', "gamma", "gamma option",
+    [](auto, const auto &, const auto &) -> int { return 0; }, CA_VT_REQUIRED, "C");
   ca.add(
-    "delta", [](auto, const auto &, const auto &) -> int { return 0; }, "delta option",
+    "delta", "delta option", [](auto, const auto &, const auto &) -> int { return 0; },
     CA_VT_REQUIRED, "D");
 
-  int rc    = ca.parse();
+  int rc    = ca.parse(argv);
   auto help = ca.autohelp();
 
   CHECK(CA_ALLOK == rc);

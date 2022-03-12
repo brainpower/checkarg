@@ -25,14 +25,14 @@ TEST_CASE("options: long non-value options", "[non-val-opt]") {
     "--" + opt,
   };
 
-  CheckArg ca(argv, "test05");
+  CheckArg ca("test05");
   ca.add('a', "alpha", "non-value opt a");
-  ca.add('b', "beta", callback_b, "non-value opt b");
+  ca.add('b', "beta", "non-value opt b", callback_b);
   ca.add("gamma", "non-value long opt gamma");
-  ca.add("delta", callback_d, "non-value long opt delta");
+  ca.add("delta", "non-value long opt delta", callback_d);
   ca.add('e', "epsilon", "non-value long opt epsilon");
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   CHECK(ret == CA_ALLOK);
 
@@ -61,26 +61,21 @@ TEST_CASE("options: long non-value options (lambda callbacks)", "[non-val-opt]")
     "--" + opt,
   };
 
-  CheckArg ca(argv, "test05");
+  CheckArg ca("test05");
   ca.add('a', "alpha", "non-value opt a");
-  ca.add(
-    'b', "beta",
-    [&](auto, const auto &opt, auto &) -> int {
-      cb_opt2 = opt;
-      return cb_rc;
-    },
-    "non-value opt b");
+  ca.add('b', "beta", "non-value opt b", [&](auto, const auto &opt, auto &) -> int {
+    cb_opt2 = opt;
+    return cb_rc;
+  });
   ca.add("gamma", "non-value long opt gamma");
   ca.add(
-    "delta",
-    [&](auto, const auto &opt, auto &) -> int {
+    "delta", "non-value long opt delta", [&](auto, const auto &opt, auto &) -> int {
       cb_opt2 = opt;
       return cb_rc;
-    },
-    "non-value long opt delta");
+    });
   ca.add("epsilon", "non-value long opt");
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   if (opt == "beta" || opt == "delta") {
     // callback ran and if cb_rc == 0
@@ -113,13 +108,13 @@ TEST_CASE("options: short non-value options", "[non-val-opt]") {
     "-" + string(1, opt[0]),
   };
 
-  CheckArg ca(argv, "test05");
+  CheckArg ca("test05");
   ca.add('a', "alpha", "non-value opt a");
-  ca.add('b', "beta", callback_b, "non-value opt b");
+  ca.add('b', "beta", "non-value opt b", callback_b);
   ca.add("gamma", "non-value long opt gamma");
-  ca.add("delta", callback_d, "non-value long opt delta");
+  ca.add("delta", "non-value long opt delta", callback_d);
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   INFO("arg: -" << string(1, opt[0]));
   CHECK(ret == CA_ALLOK);
@@ -148,18 +143,18 @@ TEST_CASE("options: value given to long non-value options", "[non-val-opt]") {
     "--" + option + "=value",
   };
 
-  CheckArg ca(argv, "test05");
+  CheckArg ca("test05");
   ca.add('a', "alpha", "non-value opt a");
-  ca.add(
-    'b', "beta", [&](auto, const auto &opt, auto &) -> int { return 0; },
-    "non-value opt b");
+  ca.add('b', "beta", "non-value opt b", [&](auto, const auto &opt, auto &) -> int {
+    return 0;
+  });
   ca.add("gamma", "non-value long opt gamma");
   ca.add(
-    "delta", [&](auto, const auto &opt, auto &) -> int { return 0; },
-    "non-value long opt delta");
+    "delta", "non-value long opt delta",
+    [&](auto, const auto &opt, auto &) -> int { return 0; });
   ca.add("epsilon", "non-value long opt");
 
-  int ret = ca.parse();
+  int ret = ca.parse(argv);
 
   REQUIRE(CA_INVVAL == ret);
 };
