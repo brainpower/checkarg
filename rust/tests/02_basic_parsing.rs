@@ -106,4 +106,14 @@ Options:
 
     assert_matches!(rc, RC::MissVal, "parse should detect missing value");
   }
+
+  #[test]
+  #[should_panic(expected = "argv must have at least one element")]
+  fn empty_argv_vector() {
+    let mut ca = setup_simple_ca();
+
+    let argv = vec![];
+
+    ca.parse(&argv);
+  }
 }
