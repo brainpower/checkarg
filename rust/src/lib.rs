@@ -45,6 +45,7 @@ pub struct CheckArg<'a> {
   callname:   String,
   posargs:    Vec<String>,
   posarg_sep: bool,
+  cleared:    bool,
 
   next_is_val_of: Option<String>, // change to &str or &String of lopt, e.g. a key of valid_options
 }

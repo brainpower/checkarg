@@ -26,6 +26,7 @@ impl<'a> CheckArg<'a> {
       callname:   String::new(),
       posargs:    Vec::new(),
       posarg_sep: false,
+      cleared:    true,
     }
   }
 
@@ -300,17 +301,32 @@ impl<'a> CheckArg<'a> {
 
   fn produce_error(&self) -> RC { RC::Err }
 
+  pub fn reset(&mut self) {
+    // clear and reset positional args in case of reuse / a second parse
+    self.posarg_sep = false;
+    self.posargs.clear();
+    self.next_is_val_of = None;
+    for (_, opt) in &mut self.valid_options {
+      opt.value = None;
+    }
+    self.cleared = true;
+  }
+
   pub fn parse(&mut self, argv: &Vec<&str>) -> RC {
     let mut ret = RC::Ok;
-    assert!(argv.len() > 0); // args shall always have one element, the "callname"
+
+    assert!(argv.len() > 0, "argv must have at least one element"); // the "callname"
+
+    // clear and reset state in case of reuse / a second parse
+    if !self.cleared {
+      self.reset();
+    }
+    self.cleared = false;
+
     self.callname = argv
       .first()
       .expect("argv must have at least one element")
       .to_string();
-
-    // clear and reset positional args in case of reuse / a second parse
-    self.posarg_sep = false;
-    self.posargs.clear();
 
     for arg in &argv[1..] {
       //println!("Found: {:?}", arg);
