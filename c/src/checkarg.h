@@ -16,9 +16,7 @@ struct _CheckArg {
   CheckArgPrivate *p;
 };
 
-CheckArg *checkarg_new(
-  const int argc, char **argv, const char *appname, const char *desc,
-  const char *appendix);
+CheckArg *checkarg_new(const char *appname, const char *desc, const char *appendix);
 
 void checkarg_free(CheckArg *);
 
@@ -40,12 +38,14 @@ int checkarg_add_long_cb(
 
 int checkarg_add_autohelp(CheckArg *);
 
-int checkarg_parse(CheckArg *);
+void checkarg_reset(CheckArg *);
+int checkarg_parse(CheckArg *, const int argc, char **argv);
 
 int checkarg_set_posarg_help(CheckArg *, const char *usage, const char *descr);
 int checkarg_set_usage_line(CheckArg *, const char *arg);
 
 const char *checkarg_argv0(CheckArg *);
+const char *checkarg_callname(CheckArg *);
 const char **checkarg_pos_args(CheckArg *);
 size_t checkarg_pos_args_count(CheckArg *);
 

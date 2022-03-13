@@ -26,41 +26,42 @@ struct _CheckArgPrivate {
   const char **pos_args;
   size_t pos_args_count;
 
-  int argc;
-  char **argv;
-
   uint8_t pos_arg_sep;
+  uint8_t cleared;
 
   char *appname, *descr, *appendix, *usage_line, *posarg_help_usage, *posarg_help_descr,
     *next_is_val_of;
+  char *callname;
 };
 
 
-int checkarg_arg(CheckArg *, const char *arg);
-int checkarg_arg_short(CheckArg *, const char *arg);
-int checkarg_arg_long(CheckArg *, const char *arg);
-int checkarg_call_cb(CheckArg *, const char *arg);
+static int checkarg_arg(CheckArg *, const char *arg);
+static int checkarg_arg_short(CheckArg *, const char *arg);
+static int checkarg_arg_long(CheckArg *, const char *arg);
 
-Opt *opt_new(
+static Opt *opt_new(
   const char sopt, const char *lopt, CheckArgFP cb, const char *help,
   const uint8_t value_type, const char *value_name);
-void opt_free(Opt *o);
+static void opt_free(Opt *o);
 
-int ca_error(int eno, const char *fmt, ...);
+static int ca_error(int eno, const char *fmt, ...);
 
-int valid_args_insert(CheckArg *, Opt *opt);
-Opt *valid_args_find(CheckArg *, const char *lopt);
-Opt *valid_args_find_sopt(CheckArg *, char sopt);
-void valid_args_free(Opt *vaptr);
+static int valid_args_insert(CheckArg *, Opt *opt);
+#if 0
+static int valid_args_append(CheckArg *, Opt *opt);
+#endif
+static Opt *valid_args_find(CheckArg *, const char *lopt);
+static Opt *valid_args_find_sopt(CheckArg *, char sopt);
+static void valid_args_free(Opt *vaptr);
 
-void pos_args_append(CheckArg *, const char *);
-void pos_args_free(const char **);
+static void pos_args_append(CheckArg *, const char *);
+static void pos_args_free(const char **);
 
-int call_cb(CheckArg *, Opt *);
+static int call_cb(CheckArg *, Opt *);
 
 // fixme should return the number of converted chars,
 // and or error code
-void string_toupper(char *);
+static void string_toupper(char *);
 
 #endif /* CHECKARG_PRIVATE_H */
 

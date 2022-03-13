@@ -9,12 +9,10 @@ TEST_CASE("positional args: general usage", "[positional]") {
     "/test04", "-i", "input.bin", "--", "file1", "file2",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test04", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test04", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(ret == CA_ALLOK);
 
@@ -35,12 +33,10 @@ TEST_CASE("positional args: args with dashes", "[positional]") {
   const vector<const char *> argv = {"/test04", "-i", "input.bin", "--",
                                      arg1,      arg2, arg3};
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test04", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test04", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(ret == CA_ALLOK);
 
@@ -63,13 +59,11 @@ TEST_CASE("positional args: missing value before '--'", "[positional]") {
     "/test04", "-i", "--", "file1", "-j", "file2",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test04", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test04", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
   checkarg_add(ca.get(), 'j', "jay", "just a jay", 0, NULL);
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   // CHECK(ret == CA_MISSVAL); // should it be this?
   // REQUIRE(!checkarg_isset("jay"));

@@ -25,9 +25,7 @@ TEST_CASE("parsing: help using --help", "[parsing]") {
   cb_ran = false;
   out.clear();
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test01", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
 
   // the default callback calls exit(0), which is bad here
   // checkarg_add_autohelp();
@@ -46,7 +44,7 @@ TEST_CASE("parsing: help using --help", "[parsing]") {
   checkarg_add_cb(
     ca.get(), 'h', "help", &callback_help, "show this help message and exit", 0, NULL);
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
-  auto ret = checkarg_parse(ca.get());
+  auto ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(ret == CA_ALLOK);  // -h ran fine
   CHECK(cb_ran);           // callback actually ran
@@ -68,12 +66,10 @@ TEST_CASE("parsing: correct option and value", "[parsing]") {
     "input.in",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test01", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
-  auto ret = checkarg_parse(ca.get());
+  auto ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   // value ok
   REQUIRE(ret == CA_ALLOK);
@@ -90,12 +86,10 @@ TEST_CASE("parsing: invalid option", "[parsing]") {
     "-x",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test01", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
-  auto ret = checkarg_parse(ca.get());
+  auto ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   REQUIRE(ret == CA_INVOPT);  // invalid option
 }
@@ -106,12 +100,55 @@ TEST_CASE("parsing: missing value", "[parsing]") {
     "-i",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test01", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
 
-  auto ret = checkarg_parse(ca.get());
+  auto ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   REQUIRE(ret == CA_MISSVAL);  // missing value
+}
+
+
+TEST_CASE("parsing: empty argv (std::vector)", "[parsing]") {
+  const vector<const char *> argv{};
+
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
+
+  auto ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
+
+  REQUIRE(ret == CA_ERROR);  // empty argv
+}
+
+TEST_CASE("parsing: argv == NULL (argc=0, argv=NULL)", "[parsing]") {
+  const char **argv = NULL;
+
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
+
+  auto ret = checkarg_parse(ca.get(), 0, (char **)argv);
+
+  REQUIRE(ret == CA_ERROR);  // null argv
+}
+
+TEST_CASE("parsing: empty argv (argc=0, argv={NULL})", "[parsing]") {
+  const char **argv = {NULL};
+
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
+
+  auto ret = checkarg_parse(ca.get(), 0, (char **)argv);
+
+  REQUIRE(ret == CA_ERROR);  // empty argv
+}
+
+TEST_CASE("parsing: empty argv (argc=1, argv={NULL})", "[parsing]") {
+  const char **argv = {NULL};
+
+  CheckArgUPtr ca(checkarg_new("test01", NULL, NULL), &checkarg_free);
+  checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
+
+  auto ret = checkarg_parse(ca.get(), 1, (char **)argv);
+
+  REQUIRE(ret == CA_ERROR);  // empty argv
 }

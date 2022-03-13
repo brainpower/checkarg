@@ -8,9 +8,7 @@ TEST_CASE("setters: positional argument help", "setters") {
     "/test02",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test02", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test02", NULL, NULL), &checkarg_free);
 
   checkarg_add_autohelp(ca.get());
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
@@ -18,7 +16,7 @@ TEST_CASE("setters: positional argument help", "setters") {
 
   checkarg_set_posarg_help(ca.get(), "[files...]", "one or more output files");
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(ret == CA_ALLOK);
   string usage, help;
@@ -47,9 +45,7 @@ TEST_CASE("setters: override usage line", "setters") {
     "/test02",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test02", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test02", NULL, NULL), &checkarg_free);
 
   checkarg_add_autohelp(ca.get());
   checkarg_add(ca.get(), 'i', "input", "file to read from", CA_VT_REQUIRED, NULL);
@@ -57,7 +53,7 @@ TEST_CASE("setters: override usage line", "setters") {
 
   checkarg_set_usage_line(ca.get(), "this is a really stupid usage line");
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(ret == CA_ALLOK);
 

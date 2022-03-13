@@ -16,6 +16,7 @@ tests = {
   '06_value':           'options with values',
   '07_grouped_shorts':  'options grouped short',
   '08_value_names':     'value names',
+  '09_reuse':           'reuse',
 }
 
 foreach filename, name : tests

@@ -11,13 +11,11 @@ callback(CheckArg *, const char *, const char *) {
 
 
 TEST_CASE("variable names", "[val-names]") {
-  vector<string> argv = {
+  vector<const char *> argv = {
     "./test08",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test08", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test08", NULL, NULL), &checkarg_free);
 
 
   checkarg_add_autohelp(ca.get());
@@ -34,8 +32,8 @@ TEST_CASE("variable names", "[val-names]") {
   checkarg_add_long_cb(
     ca.get(), "delta", callback, "delta option", CA_VT_REQUIRED, "D");
 
-  int rc    = checkarg_parse(ca.get());
-  auto help = unique_ptr<char>(checkarg_autohelp(ca.get()));
+  int rc    = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
+  auto help = unique_ptr<char, decltype(&free)>(checkarg_autohelp(ca.get()), &free);
 
   CHECK(CA_ALLOK == rc);
 

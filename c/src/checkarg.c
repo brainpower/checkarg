@@ -25,9 +25,7 @@ const char *errors[] = {
 /* c'tors */
 
 CheckArg *
-checkarg_new(
-  const int argc, char **argv, const char *appname, const char *desc,
-  const char *appendix) {
+checkarg_new(const char *appname, const char *desc, const char *appendix) {
 
   CheckArg *ret         = NULL;
   CheckArgPrivate *priv = NULL;
@@ -43,9 +41,6 @@ checkarg_new(
 
   /* initialize struct with zeros #C99# */
   *priv = (CheckArgPrivate){0};
-
-  priv->argv = argv;
-  priv->argc = argc;
 
   priv->appname = strdup(appname);
   if (!priv->appname) goto clean;
@@ -68,9 +63,9 @@ checkarg_new(
     if (!priv->appendix) goto clean;
   }
 
-  /* alloc a bit too much and shrink it to real size in one go later */
-  priv->pos_args = (const char **)malloc(argc * sizeof(char *));
-  if (!priv->pos_args) goto clean;
+  /* just in case, zeroing the struct should have already done this */
+  priv->pos_args = NULL;
+  priv->callname = NULL;
 
   return ret;
 
@@ -90,6 +85,7 @@ checkarg_free(CheckArg *ca) {
     free(ca->p->next_is_val_of);
     free(ca->p->posarg_help_descr);
     free(ca->p->posarg_help_usage);
+    free(ca->p->callname);
 
     /* "arrays" and lists */
     pos_args_free(ca->p->pos_args);
@@ -150,37 +146,77 @@ checkarg_add_autohelp(CheckArg *ca) {
   return valid_args_insert(ca, opt);
 }
 
+void
+checkarg_reset(CheckArg *ca) {
+  free(ca->p->callname);
+  ca->p->callname = NULL;
+
+  ca->p->pos_arg_sep = 0;
+  free(ca->p->pos_args);
+  ca->p->pos_args = NULL;
+
+  free(ca->p->next_is_val_of);
+  ca->p->next_is_val_of = NULL;
+
+  Opt *it = ca->p->valid_args;
+  if (it) {
+    do {
+      free(it->value);
+      it->value = NULL;
+    }
+    while ((it = it->next));
+  }
+
+  ca->p->cleared = 1;
+}
+
 int
-checkarg_parse(CheckArg *ca) {
+checkarg_parse(CheckArg *ca, const int argc, char **argv) {
   int ret = CA_ALLOK;
   int i;
 
-  for (i = 1; i < ca->p->argc; ++i) {
-    ret = checkarg_arg(ca, ca->p->argv[i]);
+  if (argc < 1) {
+    fprintf(stderr, "argc must be at least 1");
+    ret = CA_ERROR;
+    goto error;
+  }
+  if (!argv) {
+    fprintf(stderr, "argv must not be NULL");
+    ret = CA_ERROR;
+    goto error;
+  }
+  if (!argv[0]) {
+    fprintf(stderr, "argv must have at least one element");
+    ret = CA_ERROR;
+    goto error;
+  }
+
+  if (!ca->p->cleared) { checkarg_reset(ca); }
+  ca->p->cleared = 0;
+
+  ca->p->callname = strdup(argv[0]);
+  if (!ca->p->callname) {
+    ret = CA_ALLOC_ERR;
+    goto error;
+  }
+
+  /* alloc a bit too much and shrink it to real size in one go later */
+  ca->p->pos_args = (const char **)malloc(argc * sizeof(char *));
+  if (!ca->p->pos_args) {
+    ret = CA_ALLOC_ERR;
+    goto error;
+  }
+
+  for (i = 1; i < argc; ++i) {
+    ret = checkarg_arg(ca, argv[i]);
     if (ret != CA_ALLOK) goto error;
   }
 
-  if (ca->p->next_is_val_of) {
-    return ca_error(CA_MISSVAL, ": %s!", ca->p->argv[ca->p->argc - 1]);
-  }
+  if (ca->p->next_is_val_of) { return ca_error(CA_MISSVAL, ": %s!", argv[argc - 1]); }
 
   /* TODO: resize pos_args */
 
 error:
-
-  /* free strings not neccessary anymore */
-  /* this is prevented by checkarg_show_help now.
-   * if you want to reduce memory, delete whole CheckArg after use
-  free(ca->p->appname);    ca->p->appname    = NULL;
-  free(ca->p->appendix);   ca->p->appendix   = NULL;
-  free(ca->p->usage_line); ca->p->usage_line = NULL;
-  free(ca->p->descr);      ca->p->descr      = NULL;
-  free(ca->p->posarg_help_descr); ca->p->posarg_help_descr = NULL;
-  free(ca->p->posarg_help_usage); ca->p->posarg_help_usage = NULL;
-  free(ca->p->next_is_val_of);    ca->p->next_is_val_of    = NULL;
-  */
-
-
   return ret;
 }
 
@@ -210,9 +246,14 @@ checkarg_set_usage_line(CheckArg *ca, const char *arg) {
   return CA_ALLOK;
 }
 
-const char *
+__attribute__((deprecated)) const char *
 checkarg_argv0(CheckArg *ca) {
-  return ca->p->argv[0];
+  return ca->p->callname;
+}
+
+const char *
+checkarg_callname(CheckArg *ca) {
+  return ca->p->callname;
 }
 
 const char **
@@ -407,7 +448,7 @@ checkarg_show_autohelp(CheckArg *ca, const char *larg, const char *val) {
   exit(0); /* always exit after showing help */
 }
 
-Opt *
+static Opt *
 opt_new(
   const char sopt, const char *lopt, CheckArgFP cb, const char *help,
   const uint8_t value_type, const char *value_name) {
@@ -449,7 +490,7 @@ clean:
 }
 
 /* WARNING: you have to free 'next' yourself if used, like in valid_args_free */
-void
+static void
 opt_free(Opt *o) {
   if (o) {
     if (o->value_type != CA_VT_NONE) {
@@ -458,13 +499,14 @@ opt_free(Opt *o) {
       // otherwise points to the literal "x", which is static
       free(o->value);
     }
+    free(o->value_name);
     free(o->help);
     free(o->lopt);
     free(o);
   }
 }
 
-int
+static int
 ca_error(int eno, const char *fmt, ...) {
   va_list al;
   va_start(al, fmt);
@@ -477,12 +519,12 @@ ca_error(int eno, const char *fmt, ...) {
   return eno;
 }
 
-void
+static void
 pos_args_free(const char **posargs) {
   free(posargs);
 }
 
-void
+static void
 valid_args_free(Opt *vaptr) {
   if (vaptr) {
     valid_args_free(vaptr->next);
@@ -490,7 +532,7 @@ valid_args_free(Opt *vaptr) {
   }
 }
 
-int
+static int
 valid_args_insert(CheckArg *ca, Opt *opt) {
   /* this inserts a new opt before the one that has a higher sort order
    * that way the list stays sorted, insertion is now O(n), though
@@ -541,7 +583,8 @@ valid_args_insert(CheckArg *ca, Opt *opt) {
   return CA_ALLOK;
 }
 
-int
+#if 0
+static int
 valid_args_append(CheckArg *ca, Opt *opt) {
   if (ca->p->valid_args_last) {
     ca->p->valid_args_last->next = opt;
@@ -554,9 +597,10 @@ valid_args_append(CheckArg *ca, Opt *opt) {
   ca->p->valid_args_last = opt;
   return CA_ALLOK;
 }
+#endif
 
 /* sadly O(n), returns NULL if not found  */
-Opt *
+static Opt *
 valid_args_find(CheckArg *ca, const char *lopt) {
   Opt *it = ca->p->valid_args;
   do {
@@ -566,7 +610,7 @@ valid_args_find(CheckArg *ca, const char *lopt) {
   return NULL;
 }
 
-Opt *
+static Opt *
 valid_args_find_sopt(CheckArg *ca, char sopt) {
   Opt *it = ca->p->valid_args;
   do
@@ -575,7 +619,7 @@ valid_args_find_sopt(CheckArg *ca, char sopt) {
   return NULL;
 }
 
-int
+static int
 checkarg_arg(CheckArg *ca, const char *arg) {
   if (!ca->p->pos_arg_sep) {
     /* if the separator '--' was given, all following args are positional */
@@ -612,7 +656,7 @@ checkarg_arg(CheckArg *ca, const char *arg) {
   return CA_ALLOK;
 }
 
-int
+static int
 checkarg_arg_long(CheckArg *ca, const char *lopt) {
   char *real_opt, *value;
   char *it;
@@ -684,7 +728,7 @@ alloc_error:
 }
 
 
-int
+static int
 checkarg_arg_short(CheckArg *ca, const char *args) {
   const char *it;
   Opt *opt;
@@ -725,7 +769,7 @@ alloc_error:
   return ca_error(CA_ALLOC_ERR, "!");
 }
 
-int
+static int
 call_cb(CheckArg *ca, Opt *opt) {
   if (opt->cb) {
     int ret = opt->cb(ca, opt->lopt, opt->value);
@@ -734,14 +778,14 @@ call_cb(CheckArg *ca, Opt *opt) {
   return CA_ALLOK;
 }
 
-void
+static void
 pos_args_append(CheckArg *ca, const char *arg) {
   const char **tmp = ca->p->pos_args + ca->p->pos_args_count;
   *tmp             = arg;
   ++(ca->p->pos_args_count);
 }
 
-void
+static void
 string_toupper(char *s) {
   while (*s) {
     *s = toupper(*s);

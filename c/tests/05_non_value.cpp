@@ -26,9 +26,7 @@ TEST_CASE("options: long non-value options", "[non-val-opt]") {
     optstr.c_str(),
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test05", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test05", NULL, NULL), &checkarg_free);
   // clang-format off
   checkarg_add        (ca.get(), 'a', "alpha",           "non-value opt a", 0, NULL);
   checkarg_add_cb     (ca.get(), 'b', "beta",  callback, "non-value opt b", 0, NULL);
@@ -37,7 +35,7 @@ TEST_CASE("options: long non-value options", "[non-val-opt]") {
   checkarg_add        (ca.get(), 'e', "epsilon",         "non-value long opt epsilon", 0, NULL);
   // clang-format on
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(ret == CA_ALLOK);
 
@@ -69,9 +67,7 @@ TEST_CASE("options: long non-value options (lambda callbacks)", "[non-val-opt]")
   };
 
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test05", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test05", NULL, NULL), &checkarg_free);
   // clang-format off
   checkarg_add        (ca.get(), 'a', "alpha",           "non-value opt a", 0, NULL);
   checkarg_add_cb     (ca.get(), 'b',  "beta", callback, "non-value opt b", 0, NULL);
@@ -80,7 +76,7 @@ TEST_CASE("options: long non-value options (lambda callbacks)", "[non-val-opt]")
   checkarg_add_long   (ca.get(),    "epsilon",           "non-value long opt", 0, NULL);
   // clang-format on
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   if (opt == "beta" || opt == "delta") {
     // callback ran and if cb_rc == 0
@@ -116,9 +112,7 @@ TEST_CASE("options: short non-value options", "[non-val-opt]") {
     optstr.c_str(),
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test05", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test05", NULL, NULL), &checkarg_free);
   // clang-format off
   checkarg_add        (ca.get(), 'a', "alpha",           "non-value opt a", 0, NULL);
   checkarg_add_cb     (ca.get(), 'b', "beta",  callback, "non-value opt b", 0, NULL);
@@ -126,7 +120,7 @@ TEST_CASE("options: short non-value options", "[non-val-opt]") {
   checkarg_add_long_cb(ca.get(),      "delta", callback, "non-value long opt delta", 0, NULL);
   // clang-format on
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   INFO("arg: " << optstr);
   CHECK(ret == CA_ALLOK);
@@ -158,9 +152,7 @@ TEST_CASE("options: value given to long non-value options", "[non-val-opt]") {
     optstr.c_str(),
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test05", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test05", NULL, NULL), &checkarg_free);
   // clang-format off
   checkarg_add        (ca.get(), 'a', "alpha",           "non-value opt a", 0, NULL  );
   checkarg_add_cb     (ca.get(), 'b',  "beta", callback, "non-value opt b", 0, NULL);
@@ -169,7 +161,7 @@ TEST_CASE("options: value given to long non-value options", "[non-val-opt]") {
   checkarg_add_long   (ca.get(),    "epsilon",           "non-value long opt", 0, NULL);
   // clang-format on
 
-  int ret = checkarg_parse(ca.get());
+  int ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   REQUIRE(CA_INVVAL == ret);
 };

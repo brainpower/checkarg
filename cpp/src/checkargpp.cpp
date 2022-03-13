@@ -469,6 +469,7 @@ CheckArg::add_autohelp() {
  */
 void
 CheckArg::reset() {
+  p->callname.clear();
   // clear and reset positional args in case of reuse / a second parse
   p->pos_arg_sep = false;
   p->pos_args.clear();

@@ -42,9 +42,7 @@ TEST_CASE("options: short value", "[opt-val]") {
     };
   }
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test06", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test06", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'a', "alpha", "value opt a", CA_VT_REQUIRED, NULL);
   checkarg_add_cb(ca.get(), 'b', "beta", callback, "value opt b", CA_VT_REQUIRED, NULL);
   checkarg_add_long(ca.get(), "gamma", "value long opt gamma", CA_VT_REQUIRED, NULL);
@@ -52,7 +50,7 @@ TEST_CASE("options: short value", "[opt-val]") {
     ca.get(), "delta", callback, "value long opt delta", CA_VT_REQUIRED, NULL);
   checkarg_add(ca.get(), 'e', "epsilon", "value opt e", CA_VT_REQUIRED, NULL);
 
-  int rc = checkarg_parse(ca.get());
+  int rc = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(CA_ALLOK == rc);
 
@@ -96,9 +94,7 @@ TEST_CASE("options: long value", "[opt-val]") {
     };
   }
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test06", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test06", NULL, NULL), &checkarg_free);
 
   checkarg_add(ca.get(), 'a', "alpha", "value opt a", CA_VT_REQUIRED, NULL);
   checkarg_add_cb(
@@ -109,7 +105,7 @@ TEST_CASE("options: long value", "[opt-val]") {
     ca.get(), "delta", callback, "non-value long opt delta", CA_VT_REQUIRED, NULL);
   checkarg_add(ca.get(), 'e', "epsilon", "non-value opt e", CA_VT_REQUIRED, NULL);
 
-  int rc = checkarg_parse(ca.get());
+  int rc = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(CA_ALLOK == rc);
 
@@ -132,9 +128,7 @@ TEST_CASE("options: missing value", "[opt-val]") {
     option,
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test06", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test06", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'a', "alpha", "non-value opt a", CA_VT_REQUIRED, NULL);
   checkarg_add_cb(
     ca.get(), 'b', "beta", callback, "non-value opt b", CA_VT_REQUIRED, NULL);
@@ -144,7 +138,7 @@ TEST_CASE("options: missing value", "[opt-val]") {
     ca.get(), "delta", callback, "non-value long opt delta", CA_VT_REQUIRED, NULL);
   checkarg_add(ca.get(), 'e', "epsilon", "non-value opt e", CA_VT_REQUIRED, NULL);
 
-  int rc = checkarg_parse(ca.get());
+  int rc = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   REQUIRE(CA_MISSVAL == rc);
 }
@@ -169,9 +163,7 @@ TEST_CASE("options: empty value", "[opt-val]") {
     };
   }
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test06", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test06", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'a', "alpha", "non-value opt a", CA_VT_REQUIRED, NULL);
   checkarg_add_cb(
     ca.get(), 'b', "beta", callback, "non-value opt b", CA_VT_REQUIRED, NULL);
@@ -181,7 +173,7 @@ TEST_CASE("options: empty value", "[opt-val]") {
     ca.get(), "delta", callback, "non-value long opt delta", CA_VT_REQUIRED, NULL);
   checkarg_add(ca.get(), 'e', "epsilon", "non-value opt e", CA_VT_REQUIRED, NULL);
 
-  int rc = checkarg_parse(ca.get());
+  int rc = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   INFO("option was:" << argv[1]);
   REQUIRE(CA_ALLOK == rc);  // an empty string as value should not trigger a CA_MISSVAL
@@ -223,12 +215,10 @@ TEST_CASE("options: special values", "[opt-val]") {
     };
   }
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test06", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test06", NULL, NULL), &checkarg_free);
   checkarg_add(ca.get(), 'i', "input", "input file", CA_VT_REQUIRED, NULL);
 
-  int rc = checkarg_parse(ca.get());
+  int rc = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   CHECK(CA_ALLOK == rc);
 

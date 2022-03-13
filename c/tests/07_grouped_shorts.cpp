@@ -24,9 +24,7 @@ TEST_CASE("grouped short options", "[grouped]") {
   }  // destroy options here, it's elements are literals that live in static memory, so
      // it should be fine
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "test05", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("test05", NULL, NULL), &checkarg_free);
 
   // clang-format off
 	checkarg_add   (ca.get(), 'a', "alpha",           "opt a", 0, NULL);
@@ -36,7 +34,7 @@ TEST_CASE("grouped short options", "[grouped]") {
 	checkarg_add   (ca.get(), 'e', "epsy",            "opt epsy", 0, NULL);
   // clang-format on
 
-  int rc = checkarg_parse(ca.get());
+  int rc = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
 
   INFO("argv:" << argv);
   CHECK(rc == CA_ALLOK);

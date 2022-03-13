@@ -13,10 +13,9 @@ TEST_CASE("constructor: simple", "[constructor]") {
   };
 
 
-  CheckArgUPtr ca(
-    checkarg_new(argc, (char **)argv, "name", NULL, NULL), &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("name", NULL, NULL), &checkarg_free);
 
-  auto ret = checkarg_parse(ca.get());
+  auto ret = checkarg_parse(ca.get(), argc, (char **)argv);
   REQUIRE(ret == CA_ALLOK);
 
 
@@ -27,22 +26,20 @@ TEST_CASE("constructor: simple", "[constructor]") {
   }
 
   SECTION("appname") {
-    auto usage = checkarg_usage(ca.get());
+    auto usage = unique_ptr<char, decltype(&free)>(checkarg_usage(ca.get()), &free);
 
-    REQUIRE(usage == string("Usage: name [options]"));
+    REQUIRE(usage.get() == string("Usage: name [options]"));
   }
 }
 
 TEST_CASE("constructor: simple (vector)", "[constructor]") {
-  const vector<string> argv = {
+  const vector<const char *> argv = {
     "/usr/bin/name",
   };
 
-  CheckArgUPtr ca(
-    checkarg_new(argv.size(), (char **)argv.data(), "name", NULL, NULL),
-    &checkarg_free);
+  CheckArgUPtr ca(checkarg_new("name", NULL, NULL), &checkarg_free);
 
-  auto ret = checkarg_parse(ca.get());
+  auto ret = checkarg_parse(ca.get(), argv.size(), (char **)argv.data());
   REQUIRE(ret == CA_ALLOK);
 
   SECTION("call name") {
@@ -51,7 +48,7 @@ TEST_CASE("constructor: simple (vector)", "[constructor]") {
   }
 
   SECTION("appname") {
-    auto usage = unique_ptr<char>(checkarg_usage(ca.get()));
+    auto usage = unique_ptr<char, decltype(&free)>(checkarg_usage(ca.get()), &free);
 
     REQUIRE(usage.get() == string("Usage: name [options]"));
   }
