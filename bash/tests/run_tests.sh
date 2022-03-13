@@ -1,8 +1,13 @@
 #!/bin/bash
 script_dir="$(dirname "$(readlink -f "${0}")")"
 
-SHELL=${SHELL:-bash}
-printf "Running tests using: %s\n\n" "$SHELL"
+SELF="$(readlink /proc/$$/exe)" || true
+if [[ -z "$SELF" ]]; then
+  SELF="$(ps -p $$ --no-headers -o cmd)" || true
+fi
+SELF="${SELF:-${SHELL:-bash}}"
+
+printf "Running tests using: %s\n\n" "$SELF"
 
 
 ok(){
@@ -19,7 +24,7 @@ test_rc(){
   shift 2;
 
   printf "   - Running test: %s... " "${tname}"
-  $SHELL "$name" "$@" >/dev/null ; ret=$?
+  $SELF "$name" "$@" >/dev/null ; ret=$?
 
   if [[ $expect == "$ret" ]]; then
     ok
@@ -37,7 +42,7 @@ test_stdout(){
   local tmpout="${name}.${tname// /_}.out"
 
   printf "   - Running test: %s... " "${tname}"
-  $SHELL "$name" "$@" > "$tmpout"
+  $SELF "$name" "$@" > "$tmpout"
 
   # --strip-trailing-cr fixes test run on windows,
   # while only skipping \r not all whitespace like -w would
@@ -56,7 +61,7 @@ test_stdout_str(){
   local tmpout="${name}.${tname// /_}.out"
 
   printf "   - Running test: %s... " "${tname}"
-	tmpout="$($SHELL "$name" "$@")"
+	tmpout="$($SELF "$name" "$@")"
 
   if [[ "$expect" == "$tmpout" ]]; then
     ok

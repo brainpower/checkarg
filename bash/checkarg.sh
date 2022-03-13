@@ -48,7 +48,7 @@ if [ -z "$CHECKARG_SH" ]; then # "include guard"
 # initialize public global vars used by checkarg
 ##
 # version string
-readonly CA_VER_STRING="1.2.0"
+readonly CA_VER_STRING="1.3.0"
 
 declare -a  checkarg_pos_args;
 

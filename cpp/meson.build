@@ -1,7 +1,7 @@
 
 project('checkarg++', 'cpp',
 	default_options: ['cpp_std=c++20', 'b_ndebug=if-release'],
-	version: '1.2.0'
+	version: '1.3.0'
 )
 
 # {{{ files

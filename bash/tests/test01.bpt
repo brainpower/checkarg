@@ -17,7 +17,6 @@ run(){
   test_rc "missing value" 4 -i
   test_rc "invalid option" 2 -x
   test_rc "correct value" 0 -i input.in
-
 }
 
 clean(){

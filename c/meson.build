@@ -1,7 +1,7 @@
 
 project('checkarg', 'c',
 	default_options: ['c_std=c11'],
-	version: '1.2.0'
+	version: '1.3.0'
 )
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
 

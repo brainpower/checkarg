@@ -1,6 +1,6 @@
 [package]
 name = "checkarg"
-version = "1.2.0"
+version = "1.3.0"
 authors = ["brainpower <brainpower@mailbox.org>"]
 edition = "2021"
 
