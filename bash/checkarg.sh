@@ -430,6 +430,19 @@ _checkarg_arg_long(){
   fi
 }
 
+checkarg_show_usage(){
+  if [[ -z "$_checkarg_usage_line" ]]; then
+    printf "Usage: %s [options]%s\n\n" "$_checkarg_appname" "$_checkarg_posarg_usage"
+  else
+    printf "%s\n\n" "$_checkarg_usage_line"
+  fi
+}
+
+# for backwards compatibility
+checkarg_show_help(){
+  _checkarg_show_help
+}
+
 _checkarg_show_help(){
   local space=0
   local keys
@@ -444,11 +457,7 @@ _checkarg_show_help(){
     space="$(( space > ${#key} ? space : ${#key} ))"
   done
 
-  if [[ -z "$_checkarg_usage_line" ]]; then
-    printf "Usage: %s [options]%s\n\n" "$_checkarg_appname" "$_checkarg_posarg_usage"
-  else
-    printf "%s\n\n" "$_checkarg_usage_line"
-  fi
+  checkarg_show_usage
 
   if [[ -n "$_checkarg_descr" ]]; then
     printf "%s\n\n" "$_checkarg_descr"
@@ -458,7 +467,7 @@ _checkarg_show_help(){
 
   for key in "${keys[@]}"; do
 
-    sopt="$(_checkarg_find_sopt "$key")"
+    sopt="$(_checkarg_find_sopt "$key")" || true # guard against pipefail
     if [[ -z "$sopt" ]]; then
       printf "       "
     else
@@ -493,7 +502,7 @@ _checkarg_find_sopt(){
   for key in "${keys[@]}"; do
     if [[ "${_checkarg_short_long[$key]}" == "$1" ]]; then
       printf "%s" "$key"
-      return
+      return 0
     fi
   done
   return 1
